@@ -1,8 +1,8 @@
 # Backlog
 
 ## In flight
-## Queued
 - [ ] ticket-4 - feat: authentication & two-tier role guards (Owner & Staff) blocked-by: ticket-1 (kind: task) (since 2026-10-20)
+## Queued
 - [ ] ticket-5 - feat: campaign management & creator invite link generation blocked-by: ticket-1 blocked-by: ticket-4 (kind: task) (since 2026-10-20)
 - [ ] ticket-6 - feat: in-store manual sales logging in ETB blocked-by: ticket-4 blocked-by: ticket-5 (kind: task) (since 2026-10-20)
 - [ ] ticket-7 - feat: brand performance funnel & analytics dashboard blocked-by: ticket-3 blocked-by: ticket-6 (kind: task) (since 2026-10-20)
