@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Language, translations } from "@/lib/translations";
 import {
@@ -40,13 +40,59 @@ export interface CampaignData {
   }>;
 }
 
+function getOrCreateVisitorId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let vid = localStorage.getItem("ethiolink_vid");
+    if (!vid) {
+      vid =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `vid_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem("ethiolink_vid", vid);
+      document.cookie = `ethiolink_vid=${vid}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+    return vid;
+  } catch {
+    return `vid_${Date.now()}`;
+  }
+}
+
+export function sendTelemetry(slug: string, eventType: string) {
+  const visitorId = getOrCreateVisitorId();
+  if (!visitorId) return;
+
+  const payload = JSON.stringify({
+    campaignSlug: slug,
+    eventType,
+    visitorId,
+  });
+
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const blob = new Blob([payload], { type: "application/json" });
+    navigator.sendBeacon("/api/events", blob);
+  } else if (typeof fetch !== "undefined") {
+    fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+  }
+}
+
 export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
   const [lang, setLang] = useState<Language>("am"); // Default to Amharic for Ethiopian market
   const [copied, setCopied] = useState(false);
 
   const t = translations[lang];
 
+  useEffect(() => {
+    sendTelemetry(campaign.slug, "PAGE_VIEW");
+  }, [campaign.slug]);
+
   const handleCopyCode = async () => {
+    sendTelemetry(campaign.slug, "COPY_CODE");
     try {
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(campaign.promoCode);
@@ -148,6 +194,7 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
               href={campaign.telegramUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sendTelemetry(campaign.slug, "TELEGRAM_CLICK")}
               className="w-full h-12 bg-[#229ED9] hover:bg-[#1e8cc0] text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2.5 shadow-md shadow-sky-500/15 transition-all active:scale-[0.98]"
             >
               <Send className="w-4 h-4" />
@@ -158,6 +205,7 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
           {campaign.phoneNumber && (
             <a
               href={`tel:${campaign.phoneNumber}`}
+              onClick={() => sendTelemetry(campaign.slug, "CALL_CLICK")}
               className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2.5 shadow-md shadow-slate-900/15 transition-all active:scale-[0.98]"
             >
               <Phone className="w-4 h-4" />
@@ -170,6 +218,7 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
               href={campaign.mapUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sendTelemetry(campaign.slug, "MAP_CLICK")}
               className="w-full h-12 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-semibold text-sm rounded-xl flex items-center justify-center gap-2.5 shadow-sm transition-all active:scale-[0.98]"
             >
               <MapPin className="w-4 h-4 text-emerald-600" />
