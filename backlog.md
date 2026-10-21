@@ -1,8 +1,8 @@
 # Backlog
 
 ## In flight
-## Queued
 - [ ] ticket-2 - feat: public campaign landing page with bilingual toggle blocked-by: ticket-1 (kind: task) (since 2026-10-20)
+## Queued
 - [ ] ticket-3 - feat: telemetry ingestion & deduplication pipeline blocked-by: ticket-2 (kind: task) (since 2026-10-20)
 - [ ] ticket-4 - feat: authentication & two-tier role guards (Owner & Staff) blocked-by: ticket-1 (kind: task) (since 2026-10-20)
 - [ ] ticket-5 - feat: campaign management & creator invite link generation blocked-by: ticket-1 blocked-by: ticket-4 (kind: task) (since 2026-10-20)

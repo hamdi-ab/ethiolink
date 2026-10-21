@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export async function GET() {
@@ -7,11 +6,11 @@ export async function GET() {
     // Attempt a light ping if database connection is available
     await db.$queryRaw`SELECT 1`;
     dbStatus = "connected";
-  } catch (error) {
+  } catch {
     dbStatus = "unreachable_or_uninitialized";
   }
 
-  return NextResponse.json({
+  return Response.json({
     status: "ok",
     service: "ethiolink",
     version: "0.1.0",
