@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  OWNER
+  STAFF
+  CREATOR
+  ADMIN
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum EventType {
+  PAGE_VIEW
+  TELEGRAM_CLICK
+  CALL_CLICK
+  MAP_CLICK
+  COPY_CODE
+}
+
+model Brand {
+  id           String     @id @default(cuid())
+  name         String
+  ownerName    String
+  phone        String     @unique
+  passwordHash String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  users        User[]
+  campaigns    Campaign[]
+}
+
+model User {
+  id           String      @id @default(cuid())
+  brandId      String?
+  brand        Brand?      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String      @unique
+  role         UserRole    @default(STAFF)
+  passwordHash String?
+  magicToken   String?     @unique
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  loggedSales  Sale[]
+  creator      Creator?
+}
+
+model Creator {
+  id               String               @id @default(cuid())
+  userId           String               @unique
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  telegramUsername String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  assignments      CampaignAssignment[]
+}
+
+model Campaign {
+  id          String               @id @default(cuid())
+  brandId     String
+  brand       Brand                @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  slug        String               @unique
+  name        String
+  promoCode   String
+  description String?
+  telegramUrl String?
+  phoneNumber String?
+  mapUrl      String?
+  status      CampaignStatus       @default(ACTIVE)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  creators    CampaignAssignment[]
+  events      Event[]
+  sales       Sale[]
+}
+
+model CampaignAssignment {
+  id         String   @id @default(cuid())
+  campaignId String
+  creatorId  String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creator    Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@unique([campaignId, creatorId])
+}
+
+model Event {
+  id         String    @id @default(cuid())
+  campaignId String
+  campaign   Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  eventType  EventType
+  visitorId  String
+  ipHash     String
+  createdAt  DateTime  @default(now())
+
+  @@index([campaignId, eventType, createdAt])
+}
+
+model Sale {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  loggedById String
+  loggedBy   User     @relation(fields: [loggedById], references: [id])
+  amountETB  Decimal  @db.Decimal(12, 2)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([campaignId, createdAt])
+}
