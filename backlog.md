@@ -1,8 +1,8 @@
 # Backlog
 
 ## In flight
-## Queued
 - [ ] ticket-1 - feat: project foundation, Next.js scaffold & Prisma schema (kind: task) (since 2026-10-20)
+## Queued
 - [ ] ticket-2 - feat: public campaign landing page with bilingual toggle blocked-by: ticket-1 (kind: task) (since 2026-10-20)
 - [ ] ticket-3 - feat: telemetry ingestion & deduplication pipeline blocked-by: ticket-2 (kind: task) (since 2026-10-20)
 - [ ] ticket-4 - feat: authentication & two-tier role guards (Owner & Staff) blocked-by: ticket-1 (kind: task) (since 2026-10-20)
