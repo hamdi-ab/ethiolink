@@ -48,12 +48,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Role verification (only OWNER and STAFF login through this portal)
-    if (user.role !== "OWNER" && user.role !== "STAFF" && user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "This portal is reserved for Brand Owners and Staff members" },
-        { status: 403 }
-      );
+    // Role-based redirect target
+    let redirectUrl = "/brand";
+    if (user.role === "STAFF") {
+      redirectUrl = "/brand/sales";
+    } else if (user.role === "CREATOR") {
+      redirectUrl = "/creator";
+    } else if (user.role === "ADMIN") {
+      redirectUrl = "/admin";
     }
 
     // Issue session token
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(
       {
         status: "ok",
+        redirectUrl,
         user: {
           id: user.id,
           name: user.name,
