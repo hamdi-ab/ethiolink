@@ -34,8 +34,12 @@ function parseSessionToken(token: string): SimpleSession | null {
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Protect brand and admin routes
-  if (pathname.startsWith("/brand") || pathname.startsWith("/admin")) {
+  // Protect brand, admin, and creator routes
+  if (
+    pathname.startsWith("/brand") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/creator")
+  ) {
     const token = req.cookies.get("ethiolink_session")?.value;
     const session = token ? parseSessionToken(token) : null;
 
@@ -53,6 +57,18 @@ export function middleware(req: NextRequest) {
       }
     }
 
+    // Role-based restrictions for Creators
+    if (session.role === "CREATOR") {
+      if (!pathname.startsWith("/creator")) {
+        return NextResponse.redirect(new URL("/creator", req.url));
+      }
+    }
+
+    // Role-based restrictions for Brand Owners visiting creator routes
+    if (session.role === "OWNER" && pathname.startsWith("/creator")) {
+      return NextResponse.redirect(new URL("/brand", req.url));
+    }
+
     // Admin-only route guard
     if (pathname.startsWith("/admin") && session.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/brand", req.url));
@@ -63,5 +79,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/brand/:path*", "/admin/:path*"],
+  matcher: ["/brand/:path*", "/admin/:path*", "/creator/:path*"],
 };
