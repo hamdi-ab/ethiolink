@@ -30,3 +30,9 @@ Thumbs.db
 
 # Stitch Canvas Artifacts
 .stitch_designs/
+
+# Playwright Test Artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

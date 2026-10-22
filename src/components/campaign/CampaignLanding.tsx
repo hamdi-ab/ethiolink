@@ -411,6 +411,8 @@ export function CampaignNotFound() {
     <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md flex justify-end mb-4">
         <button
+          type="button"
+          data-testid="lang-toggle"
           onClick={() => setLang(lang === "en" ? "am" : "en")}
           className="flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full px-3 py-1.5 shadow-xs transition-all cursor-pointer"
         >
