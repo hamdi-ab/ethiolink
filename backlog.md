@@ -1,9 +1,9 @@
 # Backlog
 
 ## In flight
-- [ ] ticket-9 - feat: admin audit & system health console blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (since 2026-10-20)
 ## Queued
 ## Done
+- [x] ticket-9 - feat: admin audit & system health console https://github.com/hamdi-ab/ethiolink/pull/18 blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (merged 2026-10-22)
 - [x] ticket-8 - feat: creator portal & magic-link onboarding https://github.com/hamdi-ab/ethiolink/pull/17 blocked-by: ticket-5 blocked-by: ticket-7 (kind: task) (merged 2026-10-22)
 - [x] ticket-7 - feat: brand performance funnel & analytics dashboard https://github.com/hamdi-ab/ethiolink/pull/16 blocked-by: ticket-3 blocked-by: ticket-6 (kind: task) (merged 2026-10-22)
 - [x] ticket-6 - feat: in-store manual sales logging in ETB https://github.com/hamdi-ab/ethiolink/pull/15 blocked-by: ticket-4 blocked-by: ticket-5 (kind: task) (merged 2026-10-22)
