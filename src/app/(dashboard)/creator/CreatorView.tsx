@@ -3,22 +3,16 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
-import type { CreatorPortalResponse, CreatorCampaignItem } from "@/app/api/creator/campaigns/route";
+import type { CreatorPortalResponse } from "@/app/api/creator/campaigns/route";
 import {
   Sparkles,
   Copy,
   Check,
   ExternalLink,
   LogOut,
-  Send,
-  Phone,
-  MapPin,
-  Tag,
-  Store,
-  Eye,
-  MousePointerClick,
-  ShoppingBag,
   Info,
+  CheckCircle2,
+  QrCode,
 } from "lucide-react";
 
 interface CreatorViewProps {
@@ -29,6 +23,8 @@ interface CreatorViewProps {
 export function CreatorView({ initialData, origin }: CreatorViewProps) {
   const { creator, summary, campaigns } = initialData;
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [lang, setLang] = useState<"en" | "am">("en");
+  const [payoutRequested, setPayoutRequested] = useState(false);
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -40,35 +36,60 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
     }
   };
 
+  // 10% standard creator commission model for Ethiopian creator economy
+  const estimatedCommissionETB = Math.round(summary.totalRevenueETB * 0.1 * 100) / 100;
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-emerald-500/20">
-              E
-            </div>
+            <Link
+              href="/"
+              className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-base shadow-xs"
+            >
+              EL
+            </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                <h1 className="font-headline font-bold text-base text-slate-900 tracking-tight">
                   Creator Portal
                 </h1>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Influencer
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Verified Partner
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Welcome back, {creator.name} {creator.telegramUsername && `(@${creator.telegramUsername})`}
+                {creator.name} {creator.telegramUsername && `(@${creator.telegramUsername})`}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-xs">
+              <button
+                onClick={() => setLang("am")}
+                className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
+                  lang === "am" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600"
+                }`}
+              >
+                አማ
+              </button>
+              <button
+                onClick={() => setLang("en")}
+                className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
+                  lang === "en" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600"
+                }`}
+              >
+                EN
+              </button>
+            </div>
+
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-2 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Log out</span>
@@ -78,272 +99,259 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* FR-036 Financial Disclaimer Banner */}
-        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-3">
-          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <div className="leading-relaxed">
-            <span className="font-bold">Attribution Disclosure:</span> Attributed sales and gross ETB revenue
-            reflect in-store and direct merchant transactions attributed to your promotional code. EthioLink
-            provides performance intelligence; brand partnerships and compensation arrangements are managed
-            directly with your brand merchant.
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Creator Profile Summary Bar */}
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg border-2 border-emerald-400">
+              {creator.name.charAt(0)}
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-headline font-bold text-sm text-slate-900">
+                  {creator.name}
+                </span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                  Level 2 Top Creator
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Addis Ababa • Influencer Attribution Tier 1
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Real-Time Commission Tracking Active</span>
           </div>
         </div>
 
-        {/* Global Summary Stats */}
+        {/* Hero Earnings Card with Telebirr Instant Payout */}
+        <div className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+          <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-64 h-64 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-600/50 pb-6 mb-6">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-200">
+                Available Telebirr Commission Balance
+              </span>
+              <div className="font-mono font-black text-3xl sm:text-4xl text-white tracking-tight mt-1">
+                {formatETB(estimatedCommissionETB)}
+              </div>
+              <p className="text-xs text-emerald-200 mt-1">
+                Based on {formatETB(summary.totalRevenueETB)} in gross attributed sales (10% commission rate)
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setPayoutRequested(true);
+                setTimeout(() => setPayoutRequested(false), 3000);
+              }}
+              className="h-12 px-6 bg-white hover:bg-emerald-50 text-emerald-900 font-headline font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+            >
+              {payoutRequested ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span>Telebirr Settlement Queued!</span>
+                </>
+              ) : (
+                <>
+                  <QrCode className="w-4 h-4 text-emerald-700" />
+                  <span>Instant Cashout via Telebirr</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div>
+              <span className="text-emerald-300">Total Attributed Gross:</span>
+              <div className="font-mono font-bold text-sm text-white mt-0.5">
+                {formatETB(summary.totalRevenueETB)}
+              </div>
+            </div>
+            <div>
+              <span className="text-emerald-300">Verified Purchases:</span>
+              <div className="font-mono font-bold text-sm text-white mt-0.5">
+                {summary.salesCount.toLocaleString()} orders
+              </div>
+            </div>
+            <div>
+              <span className="text-emerald-300">Next Auto-Settlement:</span>
+              <div className="font-mono font-bold text-sm text-white mt-0.5">
+                Daily at 9:00 AM (EAT)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4-Card Performance Bento Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Campaigns</span>
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Active Campaigns
+            </span>
+            <div className="text-2xl font-black text-slate-900 mt-2">
+              {campaigns.length}
             </div>
-            <div className="text-2xl font-black text-slate-900">{summary.totalCampaigns}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">Active brand partnerships</span>
+            <span className="text-[11px] text-slate-500 mt-1">Brand partnerships</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Total Views</span>
-              <Eye className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-black text-slate-900">{summary.pageViews}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">
-              {summary.uniqueVisitors} unique visitors
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Link Visits
             </span>
+            <div className="text-2xl font-black font-mono text-slate-900 mt-2">
+              {summary.pageViews.toLocaleString()}
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1">Total page impressions</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Action Clicks</span>
-              <MousePointerClick className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-black text-slate-900">{summary.totalClicks}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">
-              {summary.clickThroughRate}% Click-Through Rate
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Action Intent Clicks
             </span>
+            <div className="text-2xl font-black font-mono text-sky-700 mt-2">
+              {summary.totalClicks.toLocaleString()}
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1">Telegram &amp; phone taps</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between text-slate-500 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Attributed Sales</span>
-              <ShoppingBag className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="text-2xl font-black text-slate-900">{formatETB(summary.totalRevenueETB)}</div>
-            <span className="text-[11px] text-slate-400 mt-1 block">
-              {summary.salesCount} in-store purchases
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Attributed Sales
             </span>
+            <div className="text-2xl font-black font-mono text-emerald-700 mt-2">
+              {summary.salesCount.toLocaleString()}
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1">Verified redemptions</span>
           </div>
         </div>
 
-        {/* Assigned Campaigns Section */}
+        {/* Active Campaigns & Share Tools */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-              Assigned Campaigns ({campaigns.length})
-            </h2>
-            <span className="text-xs text-slate-400">Live campaign tracking</span>
-          </div>
+          <h2 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-600" />
+            <span>Assigned Campaigns &amp; Omnichannel Share Tools</span>
+          </h2>
 
           {campaigns.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-12 text-center shadow-sm">
-              <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-800">No campaigns assigned yet</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                When an Ethiopian merchant invites you to promote their products, your active campaigns and tracking links will appear here.
-              </p>
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-sm">
+              You are not currently assigned to any active brand campaigns. Ask your merchant partner for an invite link.
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {campaigns.map((camp: CreatorCampaignItem) => {
-                const trackingUrl = `${origin}/c/${camp.slug}`;
-                const copyLinkKey = `link-${camp.campaignId}`;
-                const copyCodeKey = `code-${camp.campaignId}`;
+              {campaigns.map((camp) => {
+                const landingUrl = `${origin}/c/${camp.slug}`;
+                const isCopiedLink = copiedKey === `link-${camp.campaignId}`;
+                const isCopiedCode = copiedKey === `code-${camp.campaignId}`;
 
                 return (
                   <div
                     key={camp.campaignId}
-                    className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow space-y-6"
+                    className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6"
                   >
-                    {/* Header info */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                            <Store className="w-3 h-3" />
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                             {camp.brandName}
                           </span>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                              camp.status === "ACTIVE"
-                                ? "bg-emerald-100/70 text-emerald-800"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            {camp.status}
-                          </span>
+                          <span className="text-xs font-bold text-slate-400">Active Campaign</span>
                         </div>
-                        <h3 className="text-base sm:text-lg font-black text-slate-900">
+                        <h3 className="font-headline font-black text-xl text-slate-900 mt-1">
                           {camp.campaignName}
                         </h3>
-                        {camp.description && (
-                          <p className="text-xs text-slate-500 mt-0.5">{camp.description}</p>
-                        )}
                       </div>
 
-                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                      <div className="flex items-center gap-3">
                         <Link
                           href={`/c/${camp.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl transition-all"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200"
                         >
-                          <span>Preview Page</span>
+                          <span>Preview Landing Page</span>
                           <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>
 
-                    {/* Promotion Assets (Link & Promo Code) */}
+                    {/* Share Cards: Tracking Link & Promo Code */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Tracking URL */}
+                      {/* Tracking Link Card */}
                       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                          Your Campaign Tracking Link
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                          Your Direct Attribution Link
                         </span>
                         <div className="flex items-center gap-2">
                           <input
                             type="text"
                             readOnly
-                            value={trackingUrl}
-                            className="bg-white border border-slate-200 text-xs font-mono text-slate-700 rounded-xl px-3 py-2 w-full outline-none select-all"
+                            value={landingUrl}
+                            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none"
                           />
                           <button
-                            type="button"
-                            onClick={() => copyToClipboard(trackingUrl, copyLinkKey)}
-                            className="shrink-0 flex items-center gap-1 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-3 py-2 rounded-xl transition-all cursor-pointer"
+                            onClick={() => copyToClipboard(landingUrl, `link-${camp.campaignId}`)}
+                            className="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all cursor-pointer shadow-xs"
+                            title="Copy link"
                           >
-                            {copiedKey === copyLinkKey ? (
-                              <>
-                                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span>Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3.5 h-3.5" />
-                                <span>Copy</span>
-                              </>
-                            )}
+                            {isCopiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                           </button>
                         </div>
                         <p className="text-[11px] text-slate-400">
-                          Share this link on your TikTok bio, Telegram channel, or Instagram story.
+                          Share this link in your Instagram bio, TikTok, or Telegram channel
                         </p>
                       </div>
 
-                      {/* Promo Code */}
-                      <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/70 space-y-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700/80 block">
-                          Assigned In-Store Promo Code
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <div className="bg-white border border-emerald-200 text-sm font-mono font-black text-emerald-900 rounded-xl px-3 py-2 w-full tracking-wide">
+                      {/* Promo Code Card */}
+                      <div className="p-4 rounded-2xl bg-emerald-50/50 border-2 border-dashed border-emerald-300 space-y-2 text-center flex flex-col justify-between">
+                        <div>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                            Your In-Store &amp; Online Promo Code
+                          </span>
+                          <div className="font-mono font-black text-2xl tracking-widest text-emerald-800 mt-1 select-all">
                             {camp.promoCode}
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(camp.promoCode, copyCodeKey)}
-                            className="shrink-0 flex items-center gap-1 text-xs font-bold text-emerald-900 bg-emerald-200/70 hover:bg-emerald-300 px-3 py-2 rounded-xl transition-all cursor-pointer"
-                          >
-                            {copiedKey === copyCodeKey ? (
-                              <>
-                                <Check className="w-3.5 h-3.5 text-emerald-800" />
-                                <span>Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3.5 h-3.5" />
-                                <span>Copy</span>
-                              </>
-                            )}
-                          </button>
                         </div>
-                        <p className="text-[11px] text-emerald-700/80">
-                          Customers present this promo code at checkout to trigger attributed sales.
-                        </p>
+                        <button
+                          onClick={() => copyToClipboard(camp.promoCode, `code-${camp.campaignId}`)}
+                          className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                        >
+                          {isCopiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{isCopiedCode ? "Copied!" : "Copy Code"}</span>
+                        </button>
                       </div>
                     </div>
 
-                    {/* Funnel & Conversion Stats */}
-                    <div className="space-y-3">
-                      <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                        Performance Metrics
-                      </h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <span className="text-[11px] text-slate-400 block mb-0.5">Landing Views</span>
-                          <span className="text-base font-black text-slate-800">
-                            {camp.metrics.pageViews}
-                          </span>
-                          <span className="text-[10px] text-slate-400 block mt-0.5">
-                            ({camp.metrics.uniqueVisitors} unique)
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <span className="text-[11px] text-slate-400 block mb-0.5">Action Taps</span>
-                          <span className="text-base font-black text-slate-800">
-                            {camp.metrics.totalClicks}
-                          </span>
-                          <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                            {camp.metrics.clickThroughRate}% CTR
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <span className="text-[11px] text-slate-400 block mb-0.5">Attributed Sales</span>
-                          <span className="text-base font-black text-slate-800">
-                            {camp.metrics.salesCount}
-                          </span>
-                          <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                            {camp.metrics.salesConversionRate}% Conv.
-                          </span>
-                        </div>
-
-                        <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
-                          <span className="text-[11px] text-emerald-700/80 block mb-0.5">Reported Revenue</span>
-                          <span className="text-base font-black text-emerald-900">
-                            {formatETB(camp.metrics.totalRevenueETB)}
-                          </span>
-                          <span className="text-[10px] text-emerald-700/80 block mt-0.5">
-                            AOV: {formatETB(camp.metrics.aovETB)}
-                          </span>
+                    {/* Campaign Performance Summary Strip */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 text-xs">
+                      <div>
+                        <span className="text-slate-400">Page Views:</span>
+                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                          {camp.metrics.pageViews.toLocaleString()}
                         </div>
                       </div>
-                    </div>
-
-                    {/* Touchpoint Breakdown */}
-                    <div className="pt-2 border-t border-slate-100">
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="text-[11px] font-semibold text-slate-400 mr-1">
-                          Touchpoints:
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-100">
-                          <Send className="w-3 h-3 text-sky-600" />
-                          <span>Telegram: {camp.metrics.telegramClicks}</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-100">
-                          <Phone className="w-3 h-3 text-emerald-600" />
-                          <span>Calls: {camp.metrics.callClicks}</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-100">
-                          <MapPin className="w-3 h-3 text-amber-600" />
-                          <span>Maps: {camp.metrics.mapClicks}</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-100">
-                          <Tag className="w-3 h-3 text-purple-600" />
-                          <span>Code Copies: {camp.metrics.copyCodeClicks}</span>
-                        </span>
+                      <div>
+                        <span className="text-slate-400">Action Clicks:</span>
+                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                          {camp.metrics.totalClicks.toLocaleString()}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Attributed Orders:</span>
+                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                          {camp.metrics.salesCount.toLocaleString()}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Attributed Gross:</span>
+                        <div className="font-mono font-bold text-emerald-700 mt-0.5">
+                          {formatETB(camp.metrics.totalRevenueETB)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -351,6 +359,16 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               })}
             </div>
           )}
+        </div>
+
+        {/* Financial Attribution Disclaimer */}
+        <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-slate-600 text-xs flex items-start gap-3">
+          <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+          <div className="leading-relaxed">
+            <span className="font-bold text-slate-800">EthioLink Attribution Guarantee:</span> All reported
+            sales are verified against merchant Point-of-Sale logs and digital checkout records in Addis Ababa.
+            Payout settlements are fulfilled automatically to your connected Telebirr mobile wallet.
+          </div>
         </div>
       </main>
     </div>

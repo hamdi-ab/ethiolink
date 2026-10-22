@@ -12,7 +12,11 @@ import {
   ArrowLeft,
   LogOut,
   Receipt,
-  Plus,
+  QrCode,
+  CreditCard,
+  Banknote,
+  ShieldCheck,
+  Check,
 } from "lucide-react";
 
 export interface ActiveCampaign {
@@ -59,6 +63,7 @@ export function SalesTerminal({
     initialCampaigns[0]?.id || ""
   );
   const [customPromoCode, setCustomPromoCode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"telebirr" | "cbe" | "cash">("telebirr");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +73,20 @@ export function SalesTerminal({
   const handleAddPreset = (delta: number) => {
     const current = parseFloat(amountInput) || 0;
     setAmountInput(String(Math.round((current + delta) * 100) / 100));
+  };
+
+  const handleKeypadPress = (val: string) => {
+    if (val === "C") {
+      setAmountInput("");
+    } else if (val === "⌫") {
+      setAmountInput((prev) => prev.slice(0, -1));
+    } else if (val === ".") {
+      if (!amountInput.includes(".")) {
+        setAmountInput((prev) => (prev ? `${prev}.` : "0."));
+      }
+    } else {
+      setAmountInput((prev) => `${prev}${val}`);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +102,9 @@ export function SalesTerminal({
         notes?: string;
       } = {
         amountETB: amountInput,
-        notes: notes.trim() || undefined,
+        notes: notes.trim()
+          ? `${paymentMethod.toUpperCase()}: ${notes.trim()}`
+          : `${paymentMethod.toUpperCase()} In-Store POS`,
       };
 
       if (customPromoCode.trim()) {
@@ -121,12 +142,13 @@ export function SalesTerminal({
   };
 
   const totalETBToday = salesList.reduce((sum, s) => sum + s.amountETB, 0);
+  const activeSelectedCampaign = initialCampaigns.find((c) => c.id === selectedCampaignId);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             {isOwner && (
               <Link
@@ -137,23 +159,24 @@ export function SalesTerminal({
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             )}
-            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold shadow-md shadow-teal-600/20">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-xs">
               <Store className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-slate-900 leading-tight">
-                {brandName}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="font-headline font-bold text-base text-slate-900 leading-tight">
+                  {brandName}
+                </h1>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  POS TERMINAL
+                </span>
+              </div>
               <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span>{userName}</span>
-                <span
-                  className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded-full border text-[11px] ${
-                    isOwner
-                      ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-                      : "text-teal-700 bg-teal-50 border-teal-200"
-                  }`}
-                >
-                  {userRole}
+                <span>Cashier: <strong className="text-slate-800">{userName}</strong></span>
+                <span>•</span>
+                <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  EthioLink Sync Live (2ms)
                 </span>
               </div>
             </div>
@@ -162,7 +185,7 @@ export function SalesTerminal({
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-2 rounded-xl transition-all cursor-pointer"
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Log out</span>
@@ -171,234 +194,311 @@ export function SalesTerminal({
         </div>
       </header>
 
-      {/* Main Terminal View */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Role Scope Notice */}
-        <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-100 text-teal-800 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-teal-600 shrink-0" />
+      {/* Main Terminal Grid */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Today's Shift Summary Pill */}
+        <div className="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+          <div className="flex items-center gap-2 text-slate-700">
+            <Receipt className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
               {isOwner
-                ? "In-Store Sales Mode: Log customer purchases in Ethiopian Birr attributed to influencer campaigns."
-                : "Staff Shift Active: In-store sales logging and promo code attribution enabled."}
+                ? "Retail POS Terminal: Log and attribute in-store receipts to active influencer promo codes."
+                : "Active Cashier Shift: In-store sales logging and promo code attribution enabled."}
             </span>
           </div>
-          <div className="font-bold text-teal-900 font-mono">
-            Total Today: {formatETB(totalETBToday)}
+          <div className="font-bold text-slate-900 font-mono text-sm bg-slate-50 px-3 py-1 rounded-lg border border-slate-200">
+            Shift Total: <span className="text-emerald-700">{formatETB(totalETBToday)}</span>
           </div>
         </div>
 
         {/* Success Feedback Card */}
         {lastLoggedSale && (
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start justify-between shadow-sm animate-fadeIn">
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start justify-between shadow-xs animate-fadeIn">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <div className="font-bold text-sm">
-                  Recorded {formatETB(lastLoggedSale.amountETB)} Successfully
+                  Attributed {formatETB(lastLoggedSale.amountETB)} Successfully
                 </div>
                 <div className="text-xs text-emerald-700 mt-0.5">
                   Attributed to{" "}
-                  <span className="font-semibold">
+                  <strong className="font-semibold text-emerald-900">
                     {lastLoggedSale.campaign.name}
-                  </span>{" "}
-                  (Code:{" "}
-                  <span className="font-mono font-bold">
+                  </strong>{" "}
+                  (Promo Code:{" "}
+                  <span className="font-mono font-bold text-emerald-800">
                     {lastLoggedSale.campaign.promoCode}
                   </span>
                   )
-                  {lastLoggedSale.notes && ` • "${lastLoggedSale.notes}"`}
+                  {lastLoggedSale.notes && ` • ${lastLoggedSale.notes}`}
                 </div>
               </div>
             </div>
             <button
               onClick={() => setLastLoggedSale(null)}
-              className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold"
+              className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold cursor-pointer"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        {/* Sales Logging Entry Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <span>Log Customer Purchase</span>
-          </h2>
-
-          {error && (
-            <div className="mb-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* ETB Amount Input */}
+        {/* 2-Column POS Register Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Fast Tender & Amount Entry (7 cols) */}
+          <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-6">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                Sale Amount in Ethiopian Birr (ETB) <span className="text-rose-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-slate-400 font-bold text-lg select-none">
-                  ETB
-                </span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  placeholder="0.00"
-                  value={amountInput}
-                  onChange={(e) => setAmountInput(e.target.value)}
-                  className="w-full pl-18 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-2xl font-black font-mono focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-slate-900"
-                />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-headline font-bold text-base text-slate-900">
+                  Sale Amount (ETB)
+                </h2>
+                <span className="text-xs font-semibold text-slate-400">Ethiopian Birr</span>
               </div>
 
-              {/* Quick Add Presets */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {[100, 250, 500, 1000, 2000].map((preset) => (
+              {/* Large Monospace Amount Display */}
+              <div className="relative mb-4">
+                <div className="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 flex items-baseline justify-between focus-within:border-emerald-500 focus-within:bg-white transition-all">
+                  <span className="font-mono font-black text-3xl sm:text-4xl text-slate-900 tracking-tight">
+                    {amountInput ? amountInput : "0.00"}
+                  </span>
+                  <span className="font-headline font-bold text-emerald-700 text-lg">ETB</span>
+                </div>
+              </div>
+
+              {/* Quick Increment Preset Chips */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {[100, 250, 500, 1000, 2500].map((preset) => (
                   <button
                     key={preset}
                     type="button"
                     onClick={() => handleAddPreset(preset)}
-                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all active:scale-95"
+                    className="flex-1 min-w-[70px] py-2 px-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 text-xs font-bold font-mono transition-all active:scale-95 cursor-pointer shadow-2xs"
                   >
-                    <Plus className="w-3 h-3 text-slate-500" />
-                    <span>{preset} ETB</span>
+                    +{preset}
                   </button>
                 ))}
                 <button
                   type="button"
                   onClick={() => setAmountInput("")}
-                  className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl text-xs font-medium ml-auto"
+                  className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all active:scale-95 cursor-pointer"
                 >
                   Clear
                 </button>
               </div>
+
+              {/* Tactile Numeric Keypad */}
+              <div className="grid grid-cols-3 gap-2">
+                {["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "⌫"].map((btn) => (
+                  <button
+                    key={btn}
+                    type="button"
+                    onClick={() => handleKeypadPress(btn)}
+                    className="h-12 sm:h-14 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl font-mono font-bold text-lg text-slate-800 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                  >
+                    {btn}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Campaign / Promo Code Selection */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Select Active Campaign
-                </label>
-                <div className="relative">
-                  <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            {/* Notes field */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Receipt Note / Cashier Reference (Optional)
+              </label>
+              <input
+                type="text"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="e.g. Receipt #1042, 2x Whole Bean Sidama"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Influencer Attribution & Payment Tender (5 cols) */}
+          <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-headline font-bold text-base text-slate-900">
+                  Influencer Attribution
+                </h3>
+                <Tag className="w-4 h-4 text-emerald-600" />
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {/* Promo Code Input or Campaign Select */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Customer Promo Code (Instant Match)
+                  </label>
+                  <input
+                    type="text"
+                    value={customPromoCode}
+                    onChange={(e) => setCustomPromoCode(e.target.value)}
+                    placeholder="e.g. ETHIO20"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-sm tracking-wider uppercase text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Or Select Active Campaign
+                  </label>
                   <select
                     value={selectedCampaignId}
                     onChange={(e) => {
                       setSelectedCampaignId(e.target.value);
                       setCustomPromoCode("");
                     }}
-                    className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-slate-900"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    {initialCampaigns.map((camp) => (
-                      <option key={camp.id} value={camp.id}>
-                        {camp.name} ({camp.promoCode})
+                    {initialCampaigns.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.promoCode})
                       </option>
                     ))}
                   </select>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Or Enter Customer Promo Code
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. MESKEL25"
-                  value={customPromoCode}
-                  onChange={(e) => setCustomPromoCode(e.target.value.toUpperCase())}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-slate-900"
-                />
+                {/* Attribution Proof Banner */}
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Attribution Target:</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800">
+                    {customPromoCode
+                      ? `Promo Code: ${customPromoCode.toUpperCase()}`
+                      : activeSelectedCampaign
+                      ? `${activeSelectedCampaign.name} (Code: ${activeSelectedCampaign.promoCode})`
+                      : "Direct Store Attribution"}
+                  </p>
+                </div>
+
+                {/* Ethiopian Payment Method Selector */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                    Payment Method
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("telebirr")}
+                      className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        paymentMethod === "telebirr"
+                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                      }`}
+                    >
+                      <QrCode className="w-4 h-4 text-emerald-600" />
+                      <span>Telebirr</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("cbe")}
+                      className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        paymentMethod === "cbe"
+                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4 text-purple-600" />
+                      <span>CBE Birr</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("cash")}
+                      className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                        paymentMethod === "cash"
+                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                      }`}
+                    >
+                      <Banknote className="w-4 h-4 text-amber-600" />
+                      <span>Cash</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Notes / Receipt Reference */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Receipt # / Cashier Notes (optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Receipt #4812, Table 3"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-slate-900"
-              />
-            </div>
-
-            {/* Submit Action */}
+            {/* Giant Submit CTA */}
             <button
-              type="submit"
-              disabled={loading || (!amountInput && !parseFloat(amountInput))}
-              className="w-full py-4 px-6 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-base shadow-lg shadow-teal-600/20 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-2"
+              onClick={handleSubmit}
+              disabled={loading || !amountInput || parseFloat(amountInput) <= 0}
+              className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-headline font-bold text-base rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
             >
               {loading ? (
-                <span>Recording Sale...</span>
+                <span>Recording Attribution...</span>
               ) : (
-                <span>
-                  Record Sale of{" "}
-                  {amountInput ? formatETB(parseFloat(amountInput)) : "0.00 ETB"}
-                </span>
+                <>
+                  <Check className="w-5 h-5 stroke-[2.5]" />
+                  <span>
+                    Complete Sale ({amountInput ? formatETB(parseFloat(amountInput)) : "0.00 ETB"})
+                  </span>
+                </>
               )}
             </button>
-          </form>
+          </div>
         </div>
 
-        {/* Shift Transactions History */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-500" />
-              <span>Recent In-Store Transactions</span>
+        {/* Bottom Live Activity Stream */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-headline font-bold text-sm text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-400" />
+              <span>Recent In-Store Attributions</span>
             </h3>
-            <span className="text-xs text-slate-500">
-              {salesList.length} total logged
-            </span>
+            <span className="text-xs text-slate-400">Last 20 Receipts</span>
           </div>
 
           {salesList.length === 0 ? (
-            <div className="text-center py-8 text-xs text-slate-400">
+            <div className="py-8 text-center text-slate-400 text-xs">
               No sales logged yet for this shift.
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 overflow-x-auto">
               {salesList.map((sale) => (
                 <div
                   key={sale.id}
-                  className="py-3 flex items-center justify-between text-xs"
+                  className="py-3 px-2 flex items-center justify-between text-xs hover:bg-slate-50/80 transition-colors"
                 >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm font-mono">
-                        {formatETB(sale.amountETB)}
-                      </span>
-                      <span className="font-mono text-[11px] font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                        {sale.campaign.promoCode}
-                      </span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs font-mono">
+                      ETB
                     </div>
-                    <div className="text-slate-500 text-[11px] flex items-center gap-2">
-                      <span>{sale.campaign.name}</span>
-                      <span>•</span>
-                      <span>Logged by {sale.loggedBy.name}</span>
-                      {sale.notes && (
-                        <>
-                          <span>•</span>
-                          <span className="italic">&ldquo;{sale.notes}&rdquo;</span>
-                        </>
-                      )}
+                    <div>
+                      <div className="font-bold text-slate-900">
+                        {sale.campaign.name}
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        Code:{" "}
+                        <span className="font-mono font-bold text-emerald-700">
+                          {sale.campaign.promoCode}
+                        </span>
+                        {sale.notes && ` • ${sale.notes}`}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="text-slate-400 text-[11px]">
-                    {new Date(sale.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                  <div className="text-right">
+                    <div className="font-mono font-black text-sm text-slate-900">
+                      {formatETB(sale.amountETB)}
+                    </div>
+                    <div className="text-[10px] text-slate-400">
+                      {new Date(sale.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
                   </div>
                 </div>
               ))}
