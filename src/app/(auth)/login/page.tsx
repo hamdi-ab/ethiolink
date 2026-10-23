@@ -9,7 +9,6 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/brand";
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
