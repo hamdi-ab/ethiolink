@@ -16,6 +16,7 @@ import {
   Clock,
   ShieldCheck,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export interface CampaignData {
   id: string;
@@ -109,9 +110,9 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
   const primaryCreator = campaign.creators?.[0]?.creator;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased flex flex-col selection:bg-emerald-100 dark:selection:bg-emerald-900/50 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200">
       {/* Top App Bar Header */}
-      <header className="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 shadow-xs">
+      <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800 shadow-xs transition-colors duration-200">
         <div className="w-full max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <Link
             href="/"
@@ -120,33 +121,36 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
             <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               EL
             </div>
-            <span className="text-slate-900">
-              Ethio<span className="text-emerald-600">Link</span>
+            <span className="text-slate-900 dark:text-white">
+              Ethio<span className="text-emerald-600 dark:text-emerald-400">Link</span>
             </span>
           </Link>
 
-          {/* Bilingual Language Switcher Pill */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200">
-            <button
-              onClick={() => setLang("am")}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
-                lang === "am"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              አማ
-            </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
-                lang === "en"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              EN
-            </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle size="sm" />
+            {/* Bilingual Language Switcher Pill */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-full border border-slate-200 dark:border-slate-700">
+              <button
+                onClick={() => setLang("am")}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                  lang === "am"
+                    ? "bg-emerald-600 text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                አማ
+              </button>
+              <button
+                onClick={() => setLang("en")}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition-all cursor-pointer ${
+                  lang === "en"
+                    ? "bg-emerald-600 text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                EN
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -155,36 +159,36 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
       <main className="w-full max-w-md mx-auto px-4 pt-4 pb-12 flex-1 flex flex-col gap-5">
         {/* Creator Attribution Badge */}
         {primaryCreator && (
-          <div className="flex items-center justify-between bg-emerald-50/80 border border-emerald-200 rounded-xl px-3.5 py-2.5 shadow-xs">
+          <div className="flex items-center justify-between bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl px-3.5 py-2.5 shadow-xs">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm border-2 border-emerald-400">
                 {primaryCreator.user.name.charAt(0)}
               </div>
               <div>
                 <div className="flex items-center gap-1">
-                  <span className="font-headline font-bold text-xs text-slate-900">
+                  <span className="font-headline font-bold text-xs text-slate-900 dark:text-white">
                     {primaryCreator.user.name}
                   </span>
                   {primaryCreator.telegramUsername && (
-                    <span className="text-[11px] text-slate-500 font-medium">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                       (@{primaryCreator.telegramUsername})
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>{t.creatorTag}</span>
                 </div>
               </div>
             </div>
-            <div className="bg-white/90 border border-emerald-200 px-2 py-0.5 rounded-md text-[10px] font-bold text-emerald-800 tracking-wider">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md text-[10px] font-bold text-emerald-800 dark:text-emerald-300 tracking-wider">
               VERIFIED
             </div>
           </div>
         )}
 
         {/* Featured Campaign Hero Card */}
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+        <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
           {/* Urgency Partner Banner */}
           <div className="bg-amber-500 px-4 py-2 flex items-center justify-between text-slate-950 font-bold text-xs">
             <span className="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
@@ -199,25 +203,25 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
 
           <div className="p-5 flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                 {campaign.brand.name}
               </span>
-              <span className="text-xs font-medium text-slate-500">Official Merchant</span>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Official Merchant</span>
             </div>
 
-            <h1 className="font-headline font-black text-2xl text-slate-900 tracking-tight leading-tight">
+            <h1 className="font-headline font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">
               {campaign.name}
             </h1>
 
             {campaign.description && (
-              <p className="font-body text-sm text-slate-600 leading-relaxed">
+              <p className="font-body text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {campaign.description}
               </p>
             )}
 
             {/* Campaign Validity if provided */}
             {campaign.endDate && (
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 pt-1">
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 pt-1">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>
                   {t.validUntil} {new Date(campaign.endDate).toLocaleDateString()}
@@ -228,19 +232,19 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
         </section>
 
         {/* Promo Code Voucher Card */}
-        <section className="border-2 border-dashed border-emerald-400 bg-emerald-50/50 rounded-2xl p-5 text-center flex flex-col items-center gap-3 relative shadow-xs">
+        <section className="border-2 border-dashed border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl p-5 text-center flex flex-col items-center gap-3 relative shadow-xs">
           <div className="space-y-0.5">
-            <span className="font-headline text-xs font-bold uppercase tracking-widest text-emerald-800">
+            <span className="font-headline text-xs font-bold uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
               {t.promoCodeLabel}
             </span>
-            <h2 className="font-headline font-extrabold text-lg text-slate-900">
+            <h2 className="font-headline font-extrabold text-lg text-slate-900 dark:text-white">
               {campaign.brand.name} Special Promotion
             </h2>
           </div>
 
           {/* High-Impact Code Display */}
-          <div className="w-full bg-white border border-emerald-300 rounded-xl py-3 px-4 shadow-inner flex items-center justify-center">
-            <span className="font-mono font-black text-2xl sm:text-3xl tracking-widest text-emerald-700 select-all">
+          <div className="w-full bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 rounded-xl py-3 px-4 shadow-inner flex items-center justify-center">
+            <span className="font-mono font-black text-2xl sm:text-3xl tracking-widest text-emerald-700 dark:text-emerald-400 select-all">
               {campaign.promoCode}
             </span>
           </div>
@@ -262,114 +266,62 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
               </>
             )}
           </button>
-
-          <p className="text-[12px] font-medium text-emerald-800 flex items-center justify-center gap-1">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Use online or present this code at in-store checkout</span>
-          </p>
         </section>
 
-        {/* Omnichannel Conversion Channels */}
-        <div className="flex items-center justify-between px-1 pt-1">
-          <h3 className="font-headline font-bold text-sm text-slate-800 uppercase tracking-wider">
-            Redeem &amp; Order Options
-          </h3>
-          <span className="text-xs text-slate-500 font-medium">3 Direct Paths</span>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          {/* 1. Telegram Deep Link Channel */}
+        {/* Action Callout Channels (Omnichannel) */}
+        <div className="flex flex-col gap-3 pt-1">
+          {/* Channel 1: Telegram Order Funnel */}
           {campaign.telegramUrl ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-blue-400 transition-colors flex flex-col gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center flex-shrink-0">
-                  <Send className="w-5 h-5" />
+            <a
+              href={campaign.telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => sendTelemetry(campaign.slug, "TELEGRAM_CLICK")}
+              className="w-full h-14 bg-[#229ED9] hover:bg-[#1E8EC4] text-white active:scale-[0.98] transition-all rounded-xl font-headline font-bold text-sm flex items-center justify-between px-5 shadow-xs cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                  <Send className="w-4 h-4 text-white" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="font-headline font-bold text-slate-900 text-sm">
-                      Telegram Channel &amp; Bot
-                    </h4>
-                    <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-200">
-                      Instant
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Direct chat ordering with Telebirr / CBE Birr support
-                  </p>
-                </div>
-              </div>
-              <a
-                href={campaign.telegramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => sendTelemetry(campaign.slug, "TELEGRAM_CLICK")}
-                className="w-full h-12 bg-[#229ED9] hover:bg-[#1d8bc0] active:scale-[0.98] transition-all rounded-xl text-white font-headline font-bold text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
                 <span>{t.telegramBtn}</span>
-              </a>
-              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium">
-                <span>Telebirr</span>
-                <span>•</span>
-                <span>CBE Birr</span>
-                <span>•</span>
-                <span>Cash on Delivery</span>
               </div>
-            </div>
+              <span className="text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full">
+                Chat &amp; Order
+              </span>
+            </a>
           ) : null}
 
-          {/* 2. Direct Phone Call */}
+          {/* Channel 2: Direct Phone Line */}
           {campaign.phoneNumber ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-emerald-300 transition-colors flex flex-col gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="font-headline font-bold text-slate-900 text-sm">
-                      Call Store Direct
-                    </h4>
-                    <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-200">
-                      Voice Order
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Speak directly with store staff and reserve items
-                  </p>
-                </div>
-              </div>
-              <a
-                href={`tel:${campaign.phoneNumber}`}
-                onClick={() => sendTelemetry(campaign.slug, "CALL_CLICK")}
-                className="w-full h-12 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] transition-all rounded-xl text-white font-headline font-bold text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-              >
-                <Phone className="w-4 h-4" />
-                <span>
-                  {t.callBtn} ({campaign.phoneNumber})
-                </span>
-              </a>
-            </div>
+            <a
+              href={`tel:${campaign.phoneNumber}`}
+              onClick={() => sendTelemetry(campaign.slug, "CALL_CLICK")}
+              className="w-full h-12 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 active:scale-[0.98] transition-all rounded-xl font-headline font-bold text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+            >
+              <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>
+                {t.callBtn} ({campaign.phoneNumber})
+              </span>
+            </a>
           ) : null}
 
-          {/* 3. Physical Store Location */}
+          {/* Channel 3: Map Store Location (POS Walk-in) */}
           {campaign.mapUrl ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs hover:border-slate-300 transition-colors flex flex-col gap-3">
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col gap-3">
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
-                    <h4 className="font-headline font-bold text-slate-900 text-sm">
+                    <h4 className="font-headline font-bold text-slate-900 dark:text-white text-sm">
                       Visit Retail Store
                     </h4>
-                    <span className="bg-amber-50 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">
+                    <span className="bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800">
                       In-Person
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                     Redeem promo code at physical checkout register
                   </p>
                 </div>
@@ -379,9 +331,9 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => sendTelemetry(campaign.slug, "MAP_CLICK")}
-                className="w-full h-12 bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 active:scale-[0.98] transition-all rounded-xl font-headline font-bold text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full h-12 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 active:scale-[0.98] transition-all rounded-xl font-headline font-bold text-sm flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
-                <MapPin className="w-4 h-4 text-emerald-600" />
+                <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{t.mapBtn}</span>
               </a>
             </div>
@@ -389,12 +341,12 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
         </div>
 
         {/* Security & Provenance Footer */}
-        <footer className="mt-6 pt-6 border-t border-slate-200/80 text-center flex flex-col items-center gap-2 text-xs text-slate-500">
-          <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+        <footer className="mt-6 pt-6 border-t border-slate-200/80 dark:border-slate-800 text-center flex flex-col items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold">
             <ShieldCheck className="w-4 h-4" />
             <span>Verified by EthioLink Attribution Engine</span>
           </div>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">
             {t.poweredBy} • Addis Ababa, Ethiopia
           </p>
         </footer>
@@ -408,26 +360,27 @@ export function CampaignNotFound() {
   const t = translations[lang];
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md flex justify-end mb-4">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col items-center justify-center px-4 py-12 transition-colors duration-200">
+      <div className="w-full max-w-md flex justify-end items-center gap-2 mb-4">
+        <ThemeToggle size="sm" />
         <button
           type="button"
           data-testid="lang-toggle"
           onClick={() => setLang(lang === "en" ? "am" : "en")}
-          className="flex items-center gap-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full px-3 py-1.5 shadow-xs transition-all cursor-pointer"
+          className="flex items-center gap-1.5 text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-full px-3 py-1.5 shadow-xs transition-all cursor-pointer"
         >
           <span>{lang === "en" ? "አማርኛ" : "English"}</span>
         </button>
       </div>
 
-      <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xs p-8 flex flex-col items-center text-center">
-        <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs p-8 flex flex-col items-center text-center">
+        <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4">
           <AlertCircle className="w-8 h-8 text-amber-500" />
         </div>
-        <h1 className="font-headline text-2xl font-black text-slate-900 mb-2">
+        <h1 className="font-headline text-2xl font-black text-slate-900 dark:text-white mb-2">
           {t.notFoundTitle}
         </h1>
-        <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
           {t.notFoundDesc}
         </p>
         <Link
@@ -438,7 +391,7 @@ export function CampaignNotFound() {
         </Link>
       </div>
 
-      <footer className="mt-8 text-xs text-slate-400">
+      <footer className="mt-8 text-xs text-slate-400 dark:text-slate-500">
         <span>{t.poweredBy}</span>
       </footer>
     </main>

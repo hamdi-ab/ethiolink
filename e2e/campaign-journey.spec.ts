@@ -1,6 +1,61 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("EthioLink Platform E2E Suite", () => {
+  test("Homepage renders EthioLink value proposition, navigation, and role CTA routes", async ({ page }) => {
+    await page.goto("/");
+
+    // Verify Brand title and Ge'ez subtitle
+    await expect(page.locator("header")).toContainText("EthioLink");
+    await expect(page.locator("header")).toContainText("የኢትዮጵያ የግብይት መድረክ");
+
+    // Verify Hero headline
+    const heroHeading = page.locator("h1");
+    await expect(heroHeading).toBeVisible();
+    await expect(heroHeading).toContainText("Measure Real Sales From Influencer Campaigns");
+
+    // Verify Primary CTAs
+    const registerCta = page.getByRole("link", { name: /Register Your Brand/i });
+    const portalCta = page.getByRole("link", { name: /Merchant & Staff Portal/i });
+    await expect(registerCta).toBeVisible();
+    await expect(portalCta).toBeVisible();
+
+    // Verify navigation to Merchant portal
+    await portalCta.click();
+    await expect(page).toHaveURL(/.*login/);
+    await expect(page.getByRole("heading", { name: /Merchant & Staff Portal/i })).toBeVisible();
+  });
+
+  test("Theme toggle switches between light and dark modes and persists to storage", async ({ page }) => {
+    await page.goto("/");
+
+    const themeToggle = page.getByTestId("theme-toggle");
+    await expect(themeToggle).toBeVisible();
+
+    const html = page.locator("html");
+
+    // Click to toggle theme to dark with retry assertion to accommodate client hydration
+    await expect(async () => {
+      await themeToggle.click();
+      await expect(html).toHaveClass(/dark/);
+    }).toPass({ timeout: 10000 });
+
+    await expect(html).toHaveAttribute("data-theme", "dark");
+
+    // Verify localStorage has saved 'dark'
+    const storedDark = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
+    expect(storedDark).toBe("dark");
+
+    // Click to toggle back to light
+    await expect(async () => {
+      await themeToggle.click();
+      await expect(html).not.toHaveClass(/dark/);
+    }).toPass({ timeout: 10000 });
+
+    await expect(html).toHaveAttribute("data-theme", "light");
+    const storedLight = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
+    expect(storedLight).toBe("light");
+  });
+
   test("Health check endpoint returns status 200 with runtime diagnostics", async ({ request }) => {
     const response = await request.get("/api/health");
     expect(response.status()).toBe(200);
@@ -57,7 +112,7 @@ test.describe("EthioLink Platform E2E Suite", () => {
   test("Authentication views render expected input fields and action buttons", async ({ page }) => {
     // Navigate to Login page
     await page.goto("/login");
-    await expect(page.locator("h2")).toContainText("Merchant & Staff Portal");
+    await expect(page.getByRole("heading", { name: /Merchant & Staff Portal/i })).toBeVisible();
 
     // Verify phone input and password input
     const phoneInput = page.locator('input#phone[type="tel"]');
