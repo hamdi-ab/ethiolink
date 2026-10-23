@@ -34,12 +34,9 @@ function LoginForm() {
         throw new Error(data.error || "Failed to log in");
       }
 
-      // Route based on role
-      if (data.user.role === "STAFF") {
-        router.push("/brand/sales");
-      } else {
-        router.push(from.startsWith("/brand") ? from : "/brand");
-      }
+      // Route based on role or explicit from param
+      const targetUrl = searchParams.get("from") || data.redirectUrl || "/brand";
+      router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
