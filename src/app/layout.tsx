@@ -23,9 +23,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body bg-slate-50 text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col font-body bg-slate-50 text-slate-900 selection:bg-emerald-100 selection:text-emerald-900"
+      >
         {children}
       </body>
     </html>

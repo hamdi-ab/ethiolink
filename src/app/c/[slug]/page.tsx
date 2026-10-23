@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
+import { connection } from "next/server";
 import { db } from "@/lib/db";
 import {
   CampaignLanding,
@@ -12,6 +13,7 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  await connection();
   const { slug } = await params;
   try {
     const campaign = await db.campaign.findUnique({
@@ -64,6 +66,7 @@ function CampaignLoadingSkeleton() {
 }
 
 async function CampaignView({ params }: PageProps) {
+  await connection();
   const { slug } = await params;
 
   let campaign = null;
