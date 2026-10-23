@@ -19,7 +19,7 @@ export function ThemeToggle({ className = "", size = "md" }: ThemeToggleProps) {
     () => false
   );
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
 
   const sizeClasses =
     size === "sm"
@@ -30,11 +30,12 @@ export function ThemeToggle({ className = "", size = "md" }: ThemeToggleProps) {
     <button
       type="button"
       data-testid="theme-toggle"
+      suppressHydrationWarning
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={isDark ? "Switch to light theme" : "Switch to dark theme"}
       className={`inline-flex items-center justify-center border transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
-        mounted && isDark
+        isDark
           ? "bg-slate-800/80 hover:bg-slate-700/80 text-amber-400 border-slate-700 shadow-2xs"
           : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-2xs"
       } ${sizeClasses} ${className}`}
