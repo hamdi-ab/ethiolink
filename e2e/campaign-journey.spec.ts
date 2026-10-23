@@ -25,6 +25,37 @@ test.describe("EthioLink Platform E2E Suite", () => {
     await expect(page.getByRole("heading", { name: /Merchant & Staff Portal/i })).toBeVisible();
   });
 
+  test("Theme toggle switches between light and dark modes and persists to storage", async ({ page }) => {
+    await page.goto("/");
+
+    const themeToggle = page.getByTestId("theme-toggle");
+    await expect(themeToggle).toBeVisible();
+
+    const html = page.locator("html");
+
+    // Click to toggle theme to dark with retry assertion to accommodate client hydration
+    await expect(async () => {
+      await themeToggle.click();
+      await expect(html).toHaveClass(/dark/);
+    }).toPass({ timeout: 10000 });
+
+    await expect(html).toHaveAttribute("data-theme", "dark");
+
+    // Verify localStorage has saved 'dark'
+    const storedDark = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
+    expect(storedDark).toBe("dark");
+
+    // Click to toggle back to light
+    await expect(async () => {
+      await themeToggle.click();
+      await expect(html).not.toHaveClass(/dark/);
+    }).toPass({ timeout: 10000 });
+
+    await expect(html).toHaveAttribute("data-theme", "light");
+    const storedLight = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
+    expect(storedLight).toBe("light");
+  });
+
   test("Health check endpoint returns status 200 with runtime diagnostics", async ({ request }) => {
     const response = await request.get("/api/health");
     expect(response.status()).toBe(200);

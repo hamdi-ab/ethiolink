@@ -13,7 +13,12 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  await connection();
+  try {
+    await connection();
+  } catch {
+    // Ignore outside request scope (e.g. unit test runner)
+  }
+
   const { slug } = await params;
   try {
     const campaign = await db.campaign.findUnique({
@@ -66,7 +71,12 @@ function CampaignLoadingSkeleton() {
 }
 
 async function CampaignView({ params }: PageProps) {
-  await connection();
+  try {
+    await connection();
+  } catch {
+    // Ignore outside request scope (e.g. unit test runner)
+  }
+
   const { slug } = await params;
 
   let campaign = null;
