@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import type { CreatorPortalResponse } from "@/app/api/creator/campaigns/route";
 import {
   Sparkles,
@@ -40,9 +41,9 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
   const estimatedCommissionETB = Math.round(summary.totalRevenueETB * 0.1 * 100) / 100;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
@@ -53,25 +54,27 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-headline font-bold text-base text-slate-900 tracking-tight">
+                <h1 className="font-headline font-bold text-base text-slate-900 dark:text-white tracking-tight">
                   Creator Portal
                 </h1>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Verified Partner
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {creator.name} {creator.telegramUsername && `(@${creator.telegramUsername})`}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-xs">
+            <ThemeToggle />
+
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs">
               <button
                 onClick={() => setLang("am")}
                 className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
-                  lang === "am" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600"
+                  lang === "am" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600 dark:text-slate-300"
                 }`}
               >
                 አማ
@@ -79,7 +82,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               <button
                 onClick={() => setLang("en")}
                 className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
-                  lang === "en" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600"
+                  lang === "en" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600 dark:text-slate-300"
                 }`}
               >
                 EN
@@ -89,7 +92,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Log out</span>

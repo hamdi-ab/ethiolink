@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { formatETB } from "@/lib/sales";
 import type { PlatformOverviewStats, SystemHealthMetrics } from "@/lib/admin";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   Activity,
   Store,
@@ -210,10 +211,12 @@ export function AdminDashboardView({
               </div>
             </div>
 
+            <ThemeToggle />
+
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer ml-1"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer ml-1"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Log out</span>
