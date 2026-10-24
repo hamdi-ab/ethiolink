@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import {
   BarChart3,
@@ -81,14 +82,14 @@ export function AnalyticsView({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link
               href="/brand"
-              className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
               title="Back to Dashboard"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -98,14 +99,14 @@ export function AnalyticsView({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-headline font-bold text-lg text-slate-900 leading-tight">
+                <h1 className="font-headline font-bold text-lg text-slate-900 dark:text-white leading-tight">
                   {brandName}
                 </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                   BRAND CONSOLE
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Omnichannel performance attribution, conversion funnel &amp; ETB metrics
               </p>
             </div>
@@ -113,7 +114,7 @@ export function AnalyticsView({
 
           <div className="flex items-center gap-3">
             {/* Live Telemetry Status */}
-            <div className="hidden lg:flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-lg">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Attribution Engine Live (2ms)</span>
             </div>
@@ -121,11 +122,13 @@ export function AnalyticsView({
             {/* Export Action */}
             <button
               onClick={exportCSV}
-              className="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 cursor-pointer"
+              className="flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 dark:hover:text-white cursor-pointer"
             >
-              <Download className="w-4 h-4 text-slate-500" />
+              <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
               <span>Export CSV</span>
             </button>
+
+            <ThemeToggle />
           </div>
         </div>
       </header>

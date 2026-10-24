@@ -4,6 +4,7 @@ import React, { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formatClientError } from "@/lib/client-errors";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   Sparkles,
   ArrowRight,
@@ -164,7 +165,7 @@ function JoinContent() {
   }
 
   return (
-    <div className="bg-white py-8 px-6 shadow-xl rounded-3xl border border-slate-100 max-w-md w-full text-left">
+    <div className="bg-white dark:bg-slate-900 py-8 px-6 shadow-xl shadow-slate-200/50 dark:shadow-none rounded-3xl border border-slate-100 dark:border-slate-800 max-w-md w-full text-left transition-colors duration-200">
       {/* Brand & Campaign Header Preview */}
       <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100/80 mb-6">
         <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -286,13 +287,16 @@ function JoinContent() {
 
 export default function JoinPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center px-4 py-12 relative transition-colors duration-200">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
       <div className="text-center mb-6">
         <Link href="/" className="inline-flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-500/20">
             E
           </div>
-          <span className="text-xl font-black text-slate-900 tracking-tight">EthioLink</span>
+          <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">EthioLink</span>
         </Link>
       </div>
 
