@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword, createSessionToken, setSessionCookie } from "@/lib/auth";
+import { handleApiError } from "@/lib/api-errors";
 
 export async function POST(req: NextRequest) {
   try {
@@ -111,10 +112,6 @@ export async function POST(req: NextRequest) {
     setSessionCookie(response, token);
     return response;
   } catch (error) {
-    console.error("Brand registration failed:", error);
-    return NextResponse.json(
-      { error: "Failed to register brand" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Failed to register brand");
   }
 }

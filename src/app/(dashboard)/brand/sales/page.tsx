@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { SalesTerminal, ActiveCampaign, RecentSale } from "./SalesTerminal";
 
 async function SalesView() {
+  try { await connection(); } catch {}
   const session = await getSession();
 
   if (!session || !session.brandId) {

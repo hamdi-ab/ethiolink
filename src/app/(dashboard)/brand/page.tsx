@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 async function BrandView() {
+  try { await connection(); } catch {}
   const session = await getSession();
 
   if (!session) {

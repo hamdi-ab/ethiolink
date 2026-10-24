@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lock, Phone, User, Building, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { formatClientError } from "@/lib/client-errors";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,43 +29,52 @@ export default function RegisterPage() {
         body: JSON.stringify({ brandName, ownerName, phone, password }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to register brand");
+        if (res.status === 503 || data?.code === "DATABASE_UNREACHABLE") {
+          throw new Error(
+            data?.error ||
+              "Unable to reach the database server. Please check your internet or network connection."
+          );
+        }
+        throw new Error(data?.error || "Failed to register brand");
       }
 
       router.push("/brand");
       router.refresh();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred";
-      setError(message);
+      setError(formatClientError(err, "Failed to register brand. Please check your network."));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative transition-colors duration-200">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link href="/" className="inline-flex items-center gap-2 mb-4">
           <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-500/20">
             E
           </div>
-          <span className="text-2xl font-black text-slate-900 tracking-tight">EthioLink</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">EthioLink</span>
         </Link>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
           Register Your Brand
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Track Ethiopian influencer campaigns, sales attribution, and ROI
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 sm:rounded-2xl sm:px-10 border border-slate-100">
+        <div className="bg-white dark:bg-slate-900 py-8 px-4 shadow-xl shadow-slate-200/50 dark:shadow-none sm:rounded-2xl sm:px-10 border border-slate-100 dark:border-slate-800 transition-colors duration-200">
           {error && (
-            <div className="mb-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-center gap-2">
+            <div className="mb-6 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -71,11 +82,11 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="brandName" className="block text-xs font-semibold uppercase text-slate-700">
+              <label htmlFor="brandName" className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
                 Business / Brand Name
               </label>
               <div className="mt-1 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Building className="w-4 h-4" />
                 </div>
                 <input
@@ -86,17 +97,17 @@ export default function RegisterPage() {
                   placeholder="e.g. Habesha Coffee Roasters"
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-900 transition-all"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="ownerName" className="block text-xs font-semibold uppercase text-slate-700">
+              <label htmlFor="ownerName" className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
                 Owner Full Name
               </label>
               <div className="mt-1 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -107,17 +118,17 @@ export default function RegisterPage() {
                   placeholder="e.g. Abebe Kebede"
                   value={ownerName}
                   onChange={(e) => setOwnerName(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-900 transition-all"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-xs font-semibold uppercase text-slate-700">
+              <label htmlFor="phone" className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
                 Owner Phone Number
               </label>
               <div className="mt-1 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Phone className="w-4 h-4" />
                 </div>
                 <input
@@ -128,17 +139,17 @@ export default function RegisterPage() {
                   placeholder="0911223344"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-900 transition-all"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-semibold uppercase text-slate-700">
+              <label htmlFor="password" className="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <div className="mt-1 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -149,7 +160,7 @@ export default function RegisterPage() {
                   placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-900 transition-all"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 text-slate-900 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
@@ -172,15 +183,15 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Includes 2-tier access: Brand Owner & Staff sales logging.</span>
+          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>Includes 2-tier access: Brand Owner &amp; Staff sales logging.</span>
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-slate-500">
+        <p className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
           Already registered?{" "}
-          <Link href="/login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+          <Link href="/login" className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700">
             Sign In to your account
           </Link>
         </p>

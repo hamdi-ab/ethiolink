@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { headers } from "next/headers";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -8,6 +9,7 @@ import { CreatorView } from "./CreatorView";
 import type { CreatorPortalResponse, CreatorCampaignItem } from "@/app/api/creator/campaigns/route";
 
 async function CreatorServerContent() {
+  try { await connection(); } catch {}
   const session = await getSession();
 
   if (!session) {

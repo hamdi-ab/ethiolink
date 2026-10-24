@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getSystemHealthDiagnostics, calculatePlatformTotals } from "@/lib/admin";
 import { AdminDashboardView } from "./AdminDashboardView";
 
 async function AdminServerContent() {
+  try { await connection(); } catch {}
   const session = await getSession();
 
   if (!session) {

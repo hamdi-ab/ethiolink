@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, connection } from "next/server";
 
 export type UserRole = "OWNER" | "STAFF" | "CREATOR" | "ADMIN";
 
@@ -97,6 +97,7 @@ export async function getSession(req?: NextRequest): Promise<SessionPayload | nu
     return getSessionFromRequest(req);
   }
   try {
+    try { await connection(); } catch {}
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
     if (!token) return null;

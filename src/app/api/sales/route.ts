@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { parseAmountETB } from "@/lib/sales";
+import { handleApiError } from "@/lib/api-errors";
 import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
@@ -49,8 +50,7 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Failed to query sales:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return handleApiError(error, "Failed to query sales");
   }
 }
 
@@ -178,7 +178,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Sales logging error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return handleApiError(error, "Failed to record sale");
   }
 }

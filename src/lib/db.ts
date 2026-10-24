@@ -15,7 +15,7 @@ const pool =
   globalForPrisma.pgPool ??
   new Pool({
     connectionString,
-    connectionTimeoutMillis: 3000,
+    connectionTimeoutMillis: 10000,
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.pgPool = pool;

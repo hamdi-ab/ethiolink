@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyPassword, createSessionToken, setSessionCookie } from "@/lib/auth";
+import { handleApiError } from "@/lib/api-errors";
 
 export async function POST(req: NextRequest) {
   try {
@@ -86,10 +87,6 @@ export async function POST(req: NextRequest) {
     setSessionCookie(response, token);
     return response;
   } catch (error) {
-    console.error("Login authentication error:", error);
-    return NextResponse.json(
-      { error: "Internal server error during authentication" },
-      { status: 500 }
-    );
+    return handleApiError(error, "Internal server error during authentication");
   }
 }
