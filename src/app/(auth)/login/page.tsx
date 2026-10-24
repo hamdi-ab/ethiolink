@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Phone, ArrowRight, ShieldCheck, Store, AlertCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { formatClientError } from "@/lib/client-errors";
 
 function LoginForm() {
   const router = useRouter();
@@ -27,10 +28,16 @@ function LoginForm() {
         body: JSON.stringify({ phone, password }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to log in");
+        if (res.status === 503 || data?.code === "DATABASE_UNREACHABLE") {
+          throw new Error(
+            data?.error ||
+              "Unable to reach the database server. Please check your internet or network connection."
+          );
+        }
+        throw new Error(data?.error || "Failed to log in");
       }
 
       // Route based on role or explicit from param
@@ -38,8 +45,7 @@ function LoginForm() {
       router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred";
-      setError(message);
+      setError(formatClientError(err, "Failed to sign in. Please verify your connection."));
     } finally {
       setLoading(false);
     }

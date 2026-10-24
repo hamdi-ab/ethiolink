@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
+import { formatClientError } from "@/lib/client-errors";
 import {
   Store,
   Tag,
@@ -119,10 +120,15 @@ export function SalesTerminal({
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to record sale");
+        if (res.status === 503 || data?.code === "DATABASE_UNREACHABLE") {
+          throw new Error(
+            data?.error || "Unable to reach database. Please check your internet connection."
+          );
+        }
+        throw new Error(data?.error || "Failed to record sale");
       }
 
       const recorded: RecentSale = data.sale;
@@ -134,8 +140,7 @@ export function SalesTerminal({
       setNotes("");
       setCustomPromoCode("");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to record sale";
-      setError(message);
+      setError(formatClientError(err, "Failed to record sale. Please check your network."));
     } finally {
       setLoading(false);
     }

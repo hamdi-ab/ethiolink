@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { formatClientError } from "@/lib/client-errors";
 import {
   ArrowLeft,
   Tag,
@@ -62,18 +63,23 @@ export default function NewCampaignPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create campaign");
+        if (res.status === 503 || data?.code === "DATABASE_UNREACHABLE") {
+          throw new Error(
+            data?.error || "Unable to reach database. Please check your internet connection."
+          );
+        }
+        throw new Error(data?.error || "Failed to create campaign");
       }
 
       const origin = typeof window !== "undefined" ? window.location.origin : "";
       setCreatedPublicUrl(`${origin}/c/${data.campaign.slug}`);
       setCreatedInviteUrl(`${origin}${data.creatorInvite.url}`);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred";
-      setError(message);
+
+      setError(formatClientError(err, "Failed to create campaign. Please check your network."));
     } finally {
       setLoading(false);
     }

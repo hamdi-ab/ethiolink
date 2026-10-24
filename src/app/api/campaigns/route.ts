@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { slugify, createCreatorInviteToken } from "@/lib/invites";
+import { handleApiError } from "@/lib/api-errors";
 
 export async function GET(req: NextRequest) {
   const session = await getSession(req);
@@ -39,8 +40,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status: "ok", campaigns });
   } catch (error) {
-    console.error("Failed to list campaigns:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return handleApiError(error, "Failed to list campaigns");
   }
 }
 
@@ -136,7 +136,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to create campaign:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return handleApiError(error, "Failed to create campaign");
   }
 }

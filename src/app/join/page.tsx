@@ -3,6 +3,7 @@
 import React, { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { formatClientError } from "@/lib/client-errors";
 import {
   Sparkles,
   ArrowRight,
@@ -51,7 +52,7 @@ function JoinContent() {
     async function fetchInvite() {
       try {
         const res = await fetch(`/api/auth/invite?token=${encodeURIComponent(token!)}`);
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
 
         if (!isMounted) return;
 
@@ -110,16 +111,21 @@ function JoinContent() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to complete onboarding.");
+        if (res.status === 503 || data?.code === "DATABASE_UNREACHABLE") {
+          throw new Error(
+            data?.error || "Unable to reach database. Please check your internet connection."
+          );
+        }
+        throw new Error(data?.error || "Failed to complete onboarding.");
       }
 
       router.push(data.redirectUrl || "/creator");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
-      setSubmitError(msg);
+
+      setSubmitError(formatClientError(err, "Something went wrong. Please check your network."));
       setIsSubmitting(false);
     }
   };

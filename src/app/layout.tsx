@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { NetworkStatus } from "@/components/common/NetworkStatus";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-headline",
@@ -42,7 +43,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var s=localStorage.getItem('ethiolink_theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s==='dark'||(!s&&d)){document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark')}else{document.documentElement.classList.remove('dark');document.documentElement.setAttribute('data-theme','light')}}catch(e){}})()`,
           }}
         />
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <NetworkStatus />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
