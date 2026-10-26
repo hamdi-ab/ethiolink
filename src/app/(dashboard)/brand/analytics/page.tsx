@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { calculateFunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
+import { AuditLogEntry } from "@/lib/reports";
 import { AnalyticsView } from "./AnalyticsView";
 
 async function AnalyticsServerContent() {
@@ -22,6 +23,7 @@ async function AnalyticsServerContent() {
   let brandName = "Brand Console";
   let campaigns: CampaignAnalyticsResponse[] = [];
   let summary = calculateFunnelMetrics([], []);
+  let auditEntries: AuditLogEntry[] = [];
 
   try {
     const brand = await db.brand.findUnique({
@@ -37,12 +39,23 @@ async function AnalyticsServerContent() {
           select: {
             eventType: true,
             visitorId: true,
+            createdAt: true,
           },
+          orderBy: { createdAt: "desc" },
         },
         sales: {
           select: {
+            id: true,
             amountETB: true,
+            notes: true,
+            createdAt: true,
+            loggedBy: {
+              select: {
+                name: true,
+              },
+            },
           },
+          orderBy: { createdAt: "desc" },
         },
         creators: {
           include: {
@@ -83,6 +96,38 @@ async function AnalyticsServerContent() {
         })),
       };
     });
+
+    auditEntries = [
+      ...dbCampaigns.flatMap((camp) =>
+        camp.events.map((e) => ({
+          timestamp: e.createdAt.toISOString(),
+          recordType: "EVENT" as const,
+          campaignName: camp.name,
+          promoCode: camp.promoCode,
+          channelOrAction: e.eventType,
+          visitorOrReceiptId: e.visitorId,
+          amountETB: null,
+          staffName: null,
+          notes: null,
+        }))
+      ),
+      ...dbCampaigns.flatMap((camp) =>
+        camp.sales.map((s) => ({
+          timestamp: s.createdAt.toISOString(),
+          recordType: "SALE" as const,
+          campaignName: camp.name,
+          promoCode: camp.promoCode,
+          channelOrAction: "IN_STORE_REDEMPTION",
+          visitorOrReceiptId: s.id,
+          amountETB:
+            typeof s.amountETB === "object" && s.amountETB !== null && "toNumber" in s.amountETB
+              ? s.amountETB.toNumber()
+              : Number(s.amountETB),
+          staffName: s.loggedBy?.name || "Cashier",
+          notes: s.notes || null,
+        }))
+      ),
+    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   } catch (error) {
     console.error("Failed to load analytics page data:", error);
   }
@@ -92,6 +137,7 @@ async function AnalyticsServerContent() {
       brandName={brandName}
       summary={summary}
       campaigns={campaigns}
+      auditEntries={auditEntries}
     />
   );
 }
@@ -100,7 +146,7 @@ export default function AnalyticsPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
         </div>
       }
