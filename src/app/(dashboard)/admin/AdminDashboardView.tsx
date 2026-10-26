@@ -311,7 +311,7 @@ export function AdminDashboardView({
               {/* Quick CSV Export */}
               <button
                 onClick={exportAuditCSV}
-                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition-all shadow-xs cursor-pointer"
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition-all shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               >
                 <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>Export CSV</span>
@@ -323,7 +323,7 @@ export function AdminDashboardView({
                   setSynced(true);
                   setTimeout(() => setSynced(false), 2000);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition-all shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95 transition-all shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               >
                 <RefreshCw
                   className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 ${
@@ -375,10 +375,10 @@ export function AdminDashboardView({
               </div>
 
               {/* Core Platform KPIs Bento Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
                 {/* KPI 1: Gross Sales */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Platform Revenue
                   </span>
                   <div className="text-lg font-black font-mono text-emerald-700 dark:text-emerald-400 mt-1">
@@ -392,7 +392,7 @@ export function AdminDashboardView({
 
                 {/* KPI 2: Total Recorded Sales */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Verified Orders
                   </span>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
@@ -405,7 +405,7 @@ export function AdminDashboardView({
 
                 {/* KPI 3: Registered Brands */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Brand Merchants
                   </span>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
@@ -418,7 +418,7 @@ export function AdminDashboardView({
 
                 {/* KPI 4: Creators */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Influencer Roster
                   </span>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
@@ -431,7 +431,7 @@ export function AdminDashboardView({
 
                 {/* KPI 5: Active Campaigns */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Active Campaigns
                   </span>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
@@ -445,7 +445,7 @@ export function AdminDashboardView({
 
                 {/* KPI 6: Ingested Events */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Ingested Telemetry
                   </span>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
@@ -671,12 +671,12 @@ export function AdminDashboardView({
                 {/* Funnel Stage Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Stage 1: Page Views */}
-                  <div className="relative p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="relative p-4.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300">
                         STAGE 1
                       </span>
-                      <span className="text-xs font-mono text-slate-400">100% Baseline</span>
+                      <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">100% Baseline</span>
                     </div>
                     <div>
                       <div className="text-2xl font-black font-mono text-slate-900 dark:text-slate-100">
@@ -695,9 +695,9 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Stage 2: Unique Visitors */}
-                  <div className="relative p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="relative p-4.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300">
                         STAGE 2
                       </span>
                       <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400 font-bold">
@@ -736,9 +736,9 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Stage 3: Intent Action Taps */}
-                  <div className="relative p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="relative p-4.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">
                         STAGE 3
                       </span>
                       <span className="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold">
@@ -767,9 +767,9 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Stage 4: Attributed POS Sales */}
-                  <div className="relative p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="relative p-4.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
                         STAGE 4
                       </span>
                       <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">
@@ -832,14 +832,51 @@ export function AdminDashboardView({
                       Which conversion channels Ethiopian customers prefer when taking action
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-slate-400">
+                  <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                     {channelTotals.total} total intent actions
                   </span>
                 </div>
 
+                {/* Proportional Segmented Share Bar */}
+                <div className="space-y-2">
+                  <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex shadow-2xs">
+                    {channelTotals.telegram > 0 && (
+                      <div
+                        style={{ width: `${telegramPct}%` }}
+                        className="bg-[#229ED9] h-full transition-all duration-500"
+                        title={`Telegram: ${channelTotals.telegram} (${telegramPct}%)`}
+                      />
+                    )}
+                    {channelTotals.phone > 0 && (
+                      <div
+                        style={{ width: `${phonePct}%` }}
+                        className="bg-emerald-500 h-full transition-all duration-500"
+                        title={`Phone Calls: ${channelTotals.phone} (${phonePct}%)`}
+                      />
+                    )}
+                    {channelTotals.map > 0 && (
+                      <div
+                        style={{ width: `${mapPct}%` }}
+                        className="bg-indigo-500 h-full transition-all duration-500"
+                        title={`Map Directions: ${channelTotals.map} (${mapPct}%)`}
+                      />
+                    )}
+                    {channelTotals.promo > 0 && (
+                      <div
+                        style={{ width: `${promoPct}%` }}
+                        className="bg-amber-500 h-full transition-all duration-500"
+                        title={`Promo Code Copies: ${channelTotals.promo} (${promoPct}%)`}
+                      />
+                    )}
+                    {channelTotals.total === 0 && (
+                      <div className="w-full h-full bg-slate-200 dark:bg-slate-700/60" />
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Channel 1: Telegram */}
-                  <div className="p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-800/50 space-y-2">
+                  <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Send className="w-4 h-4 text-sky-600 dark:text-sky-400" />
@@ -863,7 +900,7 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Channel 2: Phone Direct Calls */}
-                  <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/50 space-y-2">
+                  <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <PhoneCall className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -887,7 +924,7 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Channel 3: Google Maps */}
-                  <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 space-y-2">
+                  <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
@@ -911,24 +948,24 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Channel 4: Promo Code Copies */}
-                  <div className="p-4 rounded-xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-800/50 space-y-2">
+                  <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition-all space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Copy className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <Copy className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                         <span className="font-bold text-xs text-slate-900 dark:text-slate-100">
                           Promo Copies
                         </span>
                       </div>
-                      <span className="font-mono font-bold text-xs text-purple-700 dark:text-purple-400">
+                      <span className="font-mono font-bold text-xs text-amber-700 dark:text-amber-400">
                         {promoPct}%
                       </span>
                     </div>
                     <div className="text-xl font-black font-mono text-slate-900 dark:text-slate-100">
                       {channelTotals.promo}
                     </div>
-                    <div className="w-full bg-purple-200/60 dark:bg-purple-900/60 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-amber-200/60 dark:bg-amber-900/60 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="bg-purple-600 dark:bg-purple-400 h-1.5 rounded-full"
+                        className="bg-amber-600 dark:bg-amber-400 h-1.5 rounded-full"
                         style={{ width: `${promoPct}%` }}
                       ></div>
                     </div>

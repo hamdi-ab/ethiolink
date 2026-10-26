@@ -82,7 +82,7 @@ export function ExecutiveReportModal({
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadSummaryCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               title="Download Executive Summary as CSV"
             >
               <Download className="w-3.5 h-3.5" />
@@ -91,7 +91,7 @@ export function ExecutiveReportModal({
 
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               title="Print or Save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -207,36 +207,36 @@ export function ExecutiveReportModal({
             </div>
 
             <div className="grid grid-cols-5 gap-2 text-center text-xs">
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 print:bg-slate-100 print:border-slate-300">
-                <div className="text-[10px] text-slate-500 print:text-slate-600 font-bold uppercase">1. Views</div>
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent print:border-slate-300">
+                <div className="text-[11px] text-slate-600 dark:text-slate-400 print:text-slate-600 font-bold uppercase">1. Views</div>
                 <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
                   {metrics.pageViews.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 print:bg-slate-100 print:border-slate-300">
-                <div className="text-[10px] text-indigo-700 dark:text-indigo-400 print:text-slate-600 font-bold uppercase">2. Visitors</div>
+              <div className="p-3 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-transparent print:border-slate-300">
+                <div className="text-[11px] text-indigo-700 dark:text-indigo-400 print:text-slate-600 font-bold uppercase">2. Visitors</div>
                 <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
                   {metrics.uniqueVisitors.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-sky-50/50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 print:bg-slate-100 print:border-slate-300">
-                <div className="text-[10px] text-sky-700 dark:text-sky-400 print:text-slate-600 font-bold uppercase">3. Action Taps</div>
+              <div className="p-3 rounded-xl bg-sky-50/40 dark:bg-sky-950/20 border border-transparent print:border-slate-300">
+                <div className="text-[11px] text-sky-700 dark:text-sky-400 print:text-slate-600 font-bold uppercase">3. Action Taps</div>
                 <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
                   {metrics.totalClicks.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-amber-50/50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 print:bg-slate-100 print:border-slate-300">
-                <div className="text-[10px] text-amber-700 dark:text-amber-400 print:text-slate-600 font-bold uppercase">4. Orders</div>
+              <div className="p-3 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-transparent print:border-slate-300">
+                <div className="text-[11px] text-amber-700 dark:text-amber-400 print:text-slate-600 font-bold uppercase">4. Orders</div>
                 <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
                   {metrics.salesCount.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 print:bg-slate-100 print:border-slate-300">
-                <div className="text-[10px] text-emerald-800 dark:text-emerald-400 print:text-slate-600 font-bold uppercase">5. Gross ETB</div>
+              <div className="p-3 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-transparent print:border-slate-300">
+                <div className="text-[11px] text-emerald-800 dark:text-emerald-400 print:text-slate-600 font-bold uppercase">5. Gross ETB</div>
                 <div className="text-sm sm:text-base font-black font-mono mt-1 text-emerald-700 dark:text-emerald-400 print:text-emerald-900">
                   {formatETB(metrics.totalRevenueETB)}
                 </div>
@@ -250,7 +250,7 @@ export function ExecutiveReportModal({
               Omnichannel Touchpoint Breakdown
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
                   <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Telegram Clicks</div>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
@@ -260,7 +260,7 @@ export function ExecutiveReportModal({
                 <Send className="w-4 h-4 text-[#229ED9]" />
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
                   <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Direct Calls</div>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
@@ -270,7 +270,7 @@ export function ExecutiveReportModal({
                 <Phone className="w-4 h-4 text-emerald-600" />
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
                   <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Map Directions</div>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
@@ -280,7 +280,7 @@ export function ExecutiveReportModal({
                 <MapPin className="w-4 h-4 text-indigo-600" />
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
                   <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Promo Code Copies</div>
                   <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">

@@ -154,7 +154,7 @@ export function AdminSidebar({
                 <span className="font-headline font-black text-base text-slate-900 dark:text-slate-100 tracking-tight">
                   Ethio<span className="text-emerald-600 dark:text-emerald-400">Link</span>
                 </span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                   OPS
                 </span>
               </div>
@@ -180,7 +180,7 @@ export function AdminSidebar({
         {navSections.map((section, idx) => (
           <div key={idx} className="space-y-1">
             {!isCollapsed && (
-              <h3 className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 font-headline">
+              <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-headline">
                 {section.title}
               </h3>
             )}
@@ -193,7 +193,7 @@ export function AdminSidebar({
                     key={item.id}
                     onClick={() => handleItemClick(item.id)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group relative cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900 ${
                       isActive
                         ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 border border-transparent"
@@ -211,7 +211,7 @@ export function AdminSidebar({
                         <span className="truncate flex-1 text-left">{item.label}</span>
                         {item.badge !== undefined && (
                           <span
-                            className={`px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-md ${
+                            className={`px-1.5 py-0.5 text-[11px] font-mono font-bold rounded-md ${
                               item.badgeColor ||
                               (isActive
                                 ? "bg-emerald-200/60 dark:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200"
@@ -267,7 +267,7 @@ export function AdminSidebar({
                   type="submit"
                   title="Sign out"
                   aria-label="Sign out"
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -285,7 +285,7 @@ export function AdminSidebar({
                 onClick={onToggleCollapse}
                 title="Collapse sidebar"
                 aria-label="Collapse sidebar"
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               >
                 <PanelLeftClose className="w-3.5 h-3.5" />
                 <span className="text-[11px]">Collapse</span>

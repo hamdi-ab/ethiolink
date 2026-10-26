@@ -25,6 +25,7 @@ import {
   ChevronDown,
   Printer,
   Table,
+  Sparkles,
 } from "lucide-react";
 
 interface AnalyticsViewProps {
@@ -78,6 +79,13 @@ export function AnalyticsView({
 
   const sanitizedBrandName = brandName.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
+  // Omnichannel Channel Share calculations
+  const totalTouchpoints = activeMetrics.totalClicks || 1;
+  const telegramPct = Math.round((activeMetrics.telegramClicks / totalTouchpoints) * 100);
+  const callPct = Math.round((activeMetrics.callClicks / totalTouchpoints) * 100);
+  const mapPct = Math.round((activeMetrics.mapClicks / totalTouchpoints) * 100);
+  const copyPct = Math.max(0, 100 - telegramPct - callPct - mapPct);
+
   // Export 1: High-Level Executive Summary CSV
   const handleExportSummaryCSV = () => {
     const csv = generateSummaryCSV(brandName, targetCampaigns, activeMetrics);
@@ -109,7 +117,7 @@ export function AnalyticsView({
           <div className="flex items-center gap-4">
             <Link
               href="/brand"
-              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               title="Back to Dashboard"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -142,7 +150,7 @@ export function AnalyticsView({
             {/* Executive Report Modal Trigger */}
             <button
               onClick={() => setIsReportModalOpen(true)}
-              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg shadow-xs text-xs font-semibold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg shadow-xs text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
               title="Open Executive Report Preview"
             >
               <FileText className="w-4 h-4" />
@@ -153,7 +161,7 @@ export function AnalyticsView({
             <div className="relative" ref={exportDropdownRef}>
               <button
                 onClick={() => setIsExportDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 dark:hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
                 aria-expanded={isExportDropdownOpen}
                 aria-haspopup="true"
               >
@@ -169,7 +177,7 @@ export function AnalyticsView({
                   </div>
                   <button
                     onClick={handleExportSummaryCSV}
-                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-700"
                   >
                     <Table className="w-4 h-4 text-slate-400" />
                     <div>
@@ -182,7 +190,7 @@ export function AnalyticsView({
 
                   <button
                     onClick={handleExportAuditCSV}
-                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-700"
                   >
                     <Layers className="w-4 h-4 text-slate-400" />
                     <div>
@@ -200,7 +208,7 @@ export function AnalyticsView({
                       setIsExportDropdownOpen(false);
                       setIsReportModalOpen(true);
                     }}
-                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-700"
                   >
                     <Printer className="w-4 h-4 text-slate-400" />
                     <div>
@@ -230,7 +238,7 @@ export function AnalyticsView({
             <select
               value={selectedCampaignId}
               onChange={(e) => setSelectedCampaignId(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer transition-colors"
+              className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               <option value="all">All Campaigns Combined ({campaigns.length})</option>
               {campaigns.map((c) => (
@@ -256,7 +264,7 @@ export function AnalyticsView({
           {/* Card 1: Attributed Gross Sales */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Attributed Gross Sales
               </span>
               <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
@@ -277,7 +285,7 @@ export function AnalyticsView({
           {/* Card 2: Verified Conversions */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Verified Conversions
               </span>
               <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
@@ -300,7 +308,7 @@ export function AnalyticsView({
           {/* Card 3: Active Influencers */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Creators &amp; Partners
               </span>
               <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
@@ -320,7 +328,7 @@ export function AnalyticsView({
           {/* Card 4: Sales Conversion Rate */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Blended Conversion Rate
               </span>
               <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
@@ -341,12 +349,12 @@ export function AnalyticsView({
           </div>
         </div>
 
-        {/* 5-Stage Conversion Funnel Visualization */}
+        {/* 5-Stage Conversion Funnel Visualization - Flattened anti-slop tiles */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-                <Layers className="w-4 h-4 text-emerald-600" />
+                <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>5-Stage Attribution &amp; Conversion Pipeline</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -361,12 +369,12 @@ export function AnalyticsView({
             </div>
           </div>
 
-          {/* Step Progression Grid */}
+          {/* Step Progression Grid - Flattened Borderless Tint Tiles */}
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
             {/* Step 1: Impressions / Page Views */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex flex-col justify-between transition-all">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Stage 1 • Views
                 </span>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
@@ -377,9 +385,9 @@ export function AnalyticsView({
             </div>
 
             {/* Step 2: Unique Visitors */}
-            <div className="p-4 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-transparent hover:border-indigo-200/60 dark:hover:border-indigo-800/40 flex flex-col justify-between transition-all">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                   Stage 2 • Visitors
                 </span>
                 <div className="text-2xl font-black text-indigo-950 dark:text-indigo-200 mt-1 font-mono">
@@ -390,9 +398,9 @@ export function AnalyticsView({
             </div>
 
             {/* Step 3: Touchpoint Intent */}
-            <div className="p-4 rounded-xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-sky-50/40 dark:bg-sky-950/20 border border-transparent hover:border-sky-200/60 dark:hover:border-sky-800/40 flex flex-col justify-between transition-all">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                   Stage 3 • Action Intent
                 </span>
                 <div className="text-2xl font-black text-sky-950 dark:text-sky-200 mt-1 font-mono">
@@ -403,9 +411,9 @@ export function AnalyticsView({
             </div>
 
             {/* Step 4: In-Store POS Scans & Sales */}
-            <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-transparent hover:border-amber-200/60 dark:hover:border-amber-800/40 flex flex-col justify-between transition-all">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                   Stage 4 • Redemptions
                 </span>
                 <div className="text-2xl font-black text-amber-950 dark:text-amber-200 mt-1 font-mono">
@@ -416,9 +424,9 @@ export function AnalyticsView({
             </div>
 
             {/* Step 5: Gross Revenue */}
-            <div className="p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-transparent hover:border-emerald-200/60 dark:hover:border-emerald-800/40 flex flex-col justify-between transition-all">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
                   Stage 5 • Net Sales
                 </span>
                 <div className="text-xl sm:text-2xl font-black text-emerald-950 dark:text-emerald-200 mt-1 font-mono">
@@ -432,57 +440,127 @@ export function AnalyticsView({
           </div>
         </div>
 
-        {/* Omnichannel Channel Share */}
-        <div>
-          <h3 className="font-headline font-bold text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3 px-1">
-            Omnichannel Touchpoint Breakdown
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
+        {/* Omnichannel Channel Share & Horizontal Segmented Share Bar */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h3 className="font-headline font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Omnichannel Touchpoint Mix</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Channel distribution and conversion preference across {activeMetrics.totalClicks.toLocaleString()} verified customer interactions
+              </p>
+            </div>
+            <div className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              {activeMetrics.totalClicks.toLocaleString()} Total Actions
+            </div>
+          </div>
+
+          {/* Proportional Segmented Share Bar */}
+          <div className="space-y-2">
+            <div className="h-3.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex shadow-2xs">
+              {activeMetrics.telegramClicks > 0 && (
+                <div
+                  style={{ width: `${telegramPct}%` }}
+                  className="bg-[#229ED9] h-full transition-all duration-500"
+                  title={`Telegram: ${activeMetrics.telegramClicks} (${telegramPct}%)`}
+                />
+              )}
+              {activeMetrics.callClicks > 0 && (
+                <div
+                  style={{ width: `${callPct}%` }}
+                  className="bg-emerald-500 h-full transition-all duration-500"
+                  title={`Direct Calls: ${activeMetrics.callClicks} (${callPct}%)`}
+                />
+              )}
+              {activeMetrics.mapClicks > 0 && (
+                <div
+                  style={{ width: `${mapPct}%` }}
+                  className="bg-indigo-500 h-full transition-all duration-500"
+                  title={`Map Views: ${activeMetrics.mapClicks} (${mapPct}%)`}
+                />
+              )}
+              {activeMetrics.copyCodeClicks > 0 && (
+                <div
+                  style={{ width: `${copyPct}%` }}
+                  className="bg-amber-500 h-full transition-all duration-500"
+                  title={`Code Copies: ${activeMetrics.copyCodeClicks} (${copyPct}%)`}
+                />
+              )}
+              {activeMetrics.totalClicks === 0 && (
+                <div className="w-full h-full bg-slate-200 dark:bg-slate-700/60" />
+              )}
+            </div>
+
+            {/* Micro Legend */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 pt-1">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#229ED9]" />
+                <span>Telegram: <strong className="text-slate-800 dark:text-slate-200 font-mono">{telegramPct}%</strong></span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Calls: <strong className="text-slate-800 dark:text-slate-200 font-mono">{callPct}%</strong></span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                <span>Maps: <strong className="text-slate-800 dark:text-slate-200 font-mono">{mapPct}%</strong></span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>Promo Codes: <strong className="text-slate-800 dark:text-slate-200 font-mono">{copyPct}%</strong></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Flattened Channel Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex items-center justify-between transition-all">
               <div>
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Telegram Clicks</div>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.telegramClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center">
-                <Send className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center">
+                <Send className="w-4.5 h-4.5" />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex items-center justify-between transition-all">
               <div>
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Phone Calls</div>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.callClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center">
-                <Phone className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <Phone className="w-4.5 h-4.5" />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex items-center justify-between transition-all">
               <div>
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Map Views</div>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.mapClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                <MapPin className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <MapPin className="w-4.5 h-4.5" />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex items-center justify-between transition-all">
               <div>
                 <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Code Copies</div>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.copyCodeClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Copy className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <Copy className="w-4.5 h-4.5" />
               </div>
             </div>
           </div>
@@ -501,7 +579,7 @@ export function AnalyticsView({
             </div>
             <Link
               href="/brand/campaigns/new"
-              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all shadow-xs"
+              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
             >
               <span>+ New Campaign</span>
             </Link>
@@ -515,7 +593,7 @@ export function AnalyticsView({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <th className="py-3 px-3">Campaign</th>
                     <th className="py-3 px-3">Promo Code</th>
                     <th className="py-3 px-3">Assigned Creators</th>
@@ -532,7 +610,7 @@ export function AnalyticsView({
                     <tr key={camp.campaignId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-3.5 px-3">
                         <div className="font-bold text-slate-900 dark:text-white">{camp.campaignName}</div>
-                        <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">/c/{camp.slug}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">/c/{camp.slug}</div>
                       </td>
                       <td className="py-3.5 px-3">
                         <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
@@ -548,7 +626,7 @@ export function AnalyticsView({
                               <div key={idx} className="font-medium text-slate-700 dark:text-slate-300">
                                 {cr.name}
                                 {cr.telegramUsername && (
-                                  <span className="text-[11px] text-slate-400 dark:text-slate-500 ml-1">
+                                  <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1">
                                     (@{cr.telegramUsername})
                                   </span>
                                 )}
