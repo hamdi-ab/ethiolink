@@ -35,12 +35,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       };
     }
 
+    const promoDesc =
+      campaign.description ||
+      `Special promotion from ${campaign.brand.name}. Claim discount with promo code: ${campaign.promoCode}`;
+
     return {
       title: `${campaign.name} | ${campaign.brand.name} - EthioLink`,
-      description: campaign.description || `Special promotion from ${campaign.brand.name}`,
+      description: promoDesc,
       openGraph: {
         title: `${campaign.name} - ${campaign.brand.name}`,
-        description: campaign.description || `Exclusive offer via EthioLink`,
+        description: promoDesc,
+        siteName: "EthioLink",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${campaign.name} - ${campaign.brand.name}`,
+        description: promoDesc,
       },
     };
   } catch {

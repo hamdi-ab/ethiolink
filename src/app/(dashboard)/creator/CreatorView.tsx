@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
+import { generateTelegramShareUrl, formatCampaignShareText } from "@/lib/qr";
 import type { CreatorPortalResponse } from "@/app/api/creator/campaigns/route";
 import {
   Sparkles,
@@ -14,6 +16,7 @@ import {
   Info,
   CheckCircle2,
   QrCode,
+  Send,
 } from "lucide-react";
 
 interface CreatorViewProps {
@@ -26,6 +29,13 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [lang, setLang] = useState<"en" | "am">("en");
   const [payoutRequested, setPayoutRequested] = useState(false);
+  const [selectedShareCampaign, setSelectedShareCampaign] = useState<{
+    id: string;
+    name: string;
+    slug: string;
+    promoCode: string;
+    brandName: string;
+  } | null>(null);
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -270,14 +280,29 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                         </h3>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() =>
+                            setSelectedShareCampaign({
+                              id: camp.campaignId,
+                              name: camp.campaignName,
+                              slug: camp.slug,
+                              promoCode: camp.promoCode,
+                              brandName: camp.brandName,
+                            })
+                          }
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+                        >
+                          <QrCode className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span>POS QR &amp; Share</span>
+                        </button>
                         <Link
                           href={`/c/${camp.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800"
                         >
-                          <span>Preview Landing Page</span>
+                          <span>Preview</span>
                           <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       </div>
@@ -295,7 +320,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                             type="text"
                             readOnly
                             value={landingUrl}
-                            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 focus:outline-none"
+                            className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none"
                           />
                           <button
                             onClick={() => copyToClipboard(landingUrl, `link-${camp.campaignId}`)}
@@ -304,6 +329,18 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                           >
                             {isCopiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                           </button>
+                          <a
+                            href={generateTelegramShareUrl(
+                              landingUrl,
+                              formatCampaignShareText(camp.campaignName, camp.brandName, camp.promoCode, lang)
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center"
+                            title="Share to Telegram channel"
+                          >
+                            <Send className="w-4 h-4" />
+                          </a>
                         </div>
                         <p className="text-[11px] text-slate-400">
                           Share this link in your Instagram bio, TikTok, or Telegram channel
@@ -374,6 +411,14 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
           </div>
         </div>
       </main>
+
+      {/* POS QR Code & Telegram Sharing Suite Modal */}
+      <CampaignShareModal
+        isOpen={!!selectedShareCampaign}
+        onClose={() => setSelectedShareCampaign(null)}
+        campaign={selectedShareCampaign}
+        origin={origin}
+      />
     </div>
   );
 }
