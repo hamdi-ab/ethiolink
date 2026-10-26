@@ -9,6 +9,7 @@ import type {
 } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminSidebar, type AdminTab } from "./AdminSidebar";
+import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import {
   Search,
   CheckCircle2,
@@ -31,6 +32,7 @@ import {
   ChevronRight,
   Activity,
   Award,
+  QrCode,
 } from "lucide-react";
 
 export interface SaleAuditItem {
@@ -114,6 +116,13 @@ export function AdminDashboardView({
   const [synced, setSynced] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [selectedShareCampaign, setSelectedShareCampaign] = useState<{
+    id: string;
+    name: string;
+    slug: string;
+    promoCode: string;
+    brandName: string;
+  } | null>(null);
 
   // Search filters
   const filteredSales = useMemo(() => {
@@ -1159,6 +1168,7 @@ export function AdminDashboardView({
                       <th className="py-3 px-4 text-right">Events</th>
                       <th className="py-3 px-4 text-right">Orders</th>
                       <th className="py-3 px-4 text-center">Status</th>
+                      <th className="py-3 px-4 text-center">Distribution</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-body">
@@ -1194,6 +1204,24 @@ export function AdminDashboardView({
                           >
                             {camp.status}
                           </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-center">
+                          <button
+                            onClick={() =>
+                              setSelectedShareCampaign({
+                                id: camp.id,
+                                name: camp.name,
+                                slug: camp.slug,
+                                promoCode: camp.promoCode,
+                                brandName: camp.brandName,
+                              })
+                            }
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-300 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shadow-2xs"
+                            title="Generate POS QR Code & Telegram deep link"
+                          >
+                            <QrCode className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <span>QR &amp; Share</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1536,6 +1564,13 @@ export function AdminDashboardView({
           )}
         </main>
       </div>
+
+      {/* Campaign POS QR & Distribution Suite Modal */}
+      <CampaignShareModal
+        isOpen={!!selectedShareCampaign}
+        onClose={() => setSelectedShareCampaign(null)}
+        campaign={selectedShareCampaign}
+      />
     </div>
   );
 }

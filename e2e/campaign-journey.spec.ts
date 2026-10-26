@@ -33,12 +33,12 @@ test.describe("EthioLink Platform E2E Suite", () => {
 
     const html = page.locator("html");
 
-    // Click to toggle theme to dark with retry assertion to accommodate client hydration
-    await expect(async () => {
-      await themeToggle.click();
-      await expect(html).toHaveClass(/dark/);
-    }).toPass({ timeout: 10000 });
+    // Wait until ThemeToggle has mounted and hydrated in the browser
+    await expect(themeToggle.locator("svg")).toBeVisible({ timeout: 15000 });
 
+    // Click to toggle theme to dark
+    await themeToggle.click();
+    await expect(html).toHaveClass(/dark/);
     await expect(html).toHaveAttribute("data-theme", "dark");
     const colorSchemeDark = await page.evaluate(() => document.documentElement.style.colorScheme);
     expect(colorSchemeDark).toBe("dark");
@@ -48,11 +48,8 @@ test.describe("EthioLink Platform E2E Suite", () => {
     expect(storedDark).toBe("dark");
 
     // Click to toggle back to light
-    await expect(async () => {
-      await themeToggle.click();
-      await expect(html).not.toHaveClass(/dark/);
-    }).toPass({ timeout: 10000 });
-
+    await themeToggle.click();
+    await expect(html).not.toHaveClass(/dark/);
     await expect(html).toHaveAttribute("data-theme", "light");
     const colorSchemeLight = await page.evaluate(() => document.documentElement.style.colorScheme);
     expect(colorSchemeLight).toBe("light");
