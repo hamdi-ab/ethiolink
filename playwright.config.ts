@@ -31,7 +31,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm.cmd run dev -- -p 3000",
+    command: process.platform === "win32" ? "npm.cmd run dev -- -p 3000" : "npm run dev -- -p 3000",
     url: "http://127.0.0.1:3000/api/health",
     reuseExistingServer: !process.env.CI,
     timeout: 60 * 1000,

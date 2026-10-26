@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards (kind: chore) (since 2026-10-26)
 ## Queued
 ## Done
 - [x] ETL-019 - Impeccable UI Polish: Flatten Funnel Steps, Channel Share Bar, and Contrast Tune https://github.com/hamdi-ab/ethiolink/pull/27 (kind: polish) (merged 2026-10-26)
