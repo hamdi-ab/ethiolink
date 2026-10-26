@@ -40,6 +40,8 @@ test.describe("EthioLink Platform E2E Suite", () => {
     }).toPass({ timeout: 10000 });
 
     await expect(html).toHaveAttribute("data-theme", "dark");
+    const colorSchemeDark = await page.evaluate(() => document.documentElement.style.colorScheme);
+    expect(colorSchemeDark).toBe("dark");
 
     // Verify localStorage has saved 'dark'
     const storedDark = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
@@ -52,6 +54,8 @@ test.describe("EthioLink Platform E2E Suite", () => {
     }).toPass({ timeout: 10000 });
 
     await expect(html).toHaveAttribute("data-theme", "light");
+    const colorSchemeLight = await page.evaluate(() => document.documentElement.style.colorScheme);
+    expect(colorSchemeLight).toBe("light");
     const storedLight = await page.evaluate(() => localStorage.getItem("ethiolink_theme"));
     expect(storedLight).toBe("light");
   });
