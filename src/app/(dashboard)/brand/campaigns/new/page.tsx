@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatClientError } from "@/lib/client-errors";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   ArrowLeft,
   Tag,
@@ -101,19 +102,22 @@ export default function NewCampaignPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-          <Link
-            href="/brand"
-            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-lg font-bold text-slate-900">Create Influencer Campaign</h1>
-            <p className="text-xs text-slate-500">Configure promo code, customer touchpoints, and creator invite</p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 transition-colors duration-200">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/brand"
+              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900 dark:text-white">Create Influencer Campaign</h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Configure promo code, customer touchpoints, and creator invite</p>
+            </div>
           </div>
+          <ThemeToggle />
         </div>
       </header>
 

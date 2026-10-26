@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
 import { formatClientError } from "@/lib/client-errors";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   Store,
   Tag,
@@ -150,15 +151,15 @@ export function SalesTerminal({
   const activeSelectedCampaign = initialCampaigns.find((c) => c.id === selectedCampaignId);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             {isOwner && (
               <Link
                 href="/brand"
-                className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
                 title="Back to Brand Overview"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -169,17 +170,17 @@ export function SalesTerminal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-headline font-bold text-base text-slate-900 leading-tight">
+                <h1 className="font-headline font-bold text-base text-slate-900 dark:text-white leading-tight">
                   {brandName}
                 </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                   POS TERMINAL
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span>Cashier: <strong className="text-slate-800">{userName}</strong></span>
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span>Cashier: <strong className="text-slate-800 dark:text-slate-200">{userName}</strong></span>
                 <span>•</span>
-                <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   EthioLink Sync Live (2ms)
                 </span>
@@ -187,15 +188,18 @@ export function SalesTerminal({
             </div>
           </div>
 
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Log out</span>
-            </button>
-          </form>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log out</span>
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
