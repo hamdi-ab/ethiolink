@@ -11,11 +11,11 @@ import {
   Users,
   Radio,
   Server,
-  ChevronLeft,
-  ChevronRight,
   LogOut,
   X,
   ShieldCheck,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 export type AdminTab =
@@ -237,63 +237,102 @@ export function AdminSidebar({
       </div>
 
       {/* Admin Profile & Footer Actions */}
-      <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
-        {/* User Card */}
-        <div
-          className={`flex items-center gap-2.5 p-2 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 shadow-xs ${
-            isCollapsed ? "justify-center" : ""
-          }`}
-        >
-          <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-500/20">
-            {adminName.charAt(0).toUpperCase()}
-          </div>
-          {!isCollapsed && (
-            <div className="truncate flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                  {adminName}
-                </span>
-                <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        {!isCollapsed ? (
+          /* Expanded Mode: Integrated Profile Card & Aligned Toolbar */
+          <div className="space-y-2.5">
+            {/* User Profile Card with Embedded Sign Out */}
+            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-500/20 shadow-2xs">
+                  {adminName.charAt(0).toUpperCase()}
+                </div>
+                <div className="truncate min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {adminName}
+                    </span>
+                    <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  </div>
+                  <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    <span>Superadmin</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                <span>Superadmin</span>
-              </div>
+
+              {/* Integrated Sign Out Button */}
+              <form action="/api/auth/logout" method="POST" className="shrink-0">
+                <button
+                  type="submit"
+                  title="Sign out"
+                  aria-label="Sign out"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </form>
             </div>
-          )}
-        </div>
 
-        {/* Action Buttons: Theme Toggle & Logout & Collapse */}
-        <div
-          className={`flex items-center gap-1.5 ${
-            isCollapsed ? "flex-col justify-center" : "justify-between"
-          }`}
-        >
-          <ThemeToggle />
+            {/* Bottom Utilities Row: Theme Toggle + Sidebar Collapse */}
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <ThemeToggle size="sm" />
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Theme</span>
+              </div>
 
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              title="Log out"
-              className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all cursor-pointer"
+              <button
+                onClick={onToggleCollapse}
+                title="Collapse sidebar"
+                aria-label="Collapse sidebar"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <PanelLeftClose className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Collapse</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Collapsed Mode: Uniform 36x36px Centered Action Stack */
+          <div className="flex flex-col items-center gap-2 py-1">
+            {/* User Avatar */}
+            <div
+              title={`${adminName} (Superadmin)`}
+              className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-500/20 shadow-2xs cursor-default"
             >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </form>
+              {adminName.charAt(0).toUpperCase()}
+            </div>
 
-          {/* Desktop collapse toggle */}
-          <button
-            onClick={onToggleCollapse}
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="hidden lg:flex p-2 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <ChevronLeft className="w-4 h-4" />
-            )}
-          </button>
-        </div>
+            <div className="w-6 h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
+
+            {/* Theme Toggle (36x36px) */}
+            <div className="flex items-center justify-center" title="Toggle theme">
+              <ThemeToggle size="md" />
+            </div>
+
+            {/* Sign Out (36x36px) */}
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                title="Sign out"
+                aria-label="Sign out"
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/50 transition-all cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Expand Sidebar (36x36px) */}
+            <button
+              onClick={onToggleCollapse}
+              title="Expand sidebar"
+              aria-label="Expand sidebar"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
+            >
+              <PanelLeftOpen className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
