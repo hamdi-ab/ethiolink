@@ -1,9 +1,9 @@
 # Backlog
 
 ## In flight
-- [ ] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards (kind: chore) (since 2026-10-26)
 ## Queued
 ## Done
+- [x] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards https://github.com/hamdi-ab/ethiolink/pull/28 (kind: chore) (merged 2026-10-26)
 - [x] ETL-019 - Impeccable UI Polish: Flatten Funnel Steps, Channel Share Bar, and Contrast Tune https://github.com/hamdi-ab/ethiolink/pull/27 (kind: polish) (merged 2026-10-26)
 - [x] ETL-018 - Brand Executive PDF/CSV Campaign Performance Report Generator https://github.com/hamdi-ab/ethiolink/pull/26 (kind: feature) (merged 2026-10-26)
 - [x] ticket-9 - feat: admin audit & system health console https://github.com/hamdi-ab/ethiolink/pull/18 blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (merged 2026-10-22)
@@ -13,4 +13,3 @@
 - [x] ticket-5 - feat: campaign management & creator invite link generation https://github.com/hamdi-ab/ethiolink/pull/14 blocked-by: ticket-1 blocked-by: ticket-4 (kind: task) (merged 2026-10-22)
 - [x] ticket-4 - feat: authentication & two-tier role guards (Owner & Staff) https://github.com/hamdi-ab/ethiolink/pull/13 blocked-by: ticket-1 (kind: task) (merged 2026-10-21)
 - [x] ticket-3 - feat: telemetry ingestion & deduplication pipeline https://github.com/hamdi-ab/ethiolink/pull/12 blocked-by: ticket-2 (kind: task) (merged 2026-10-21)
-- [x] ticket-2 - feat: public campaign landing page with bilingual toggle https://github.com/hamdi-ab/ethiolink/pull/11 blocked-by: ticket-1 (kind: task) (merged 2026-10-21)
