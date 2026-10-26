@@ -1,0 +1,7 @@
+if [ -n "$COMSPEC" ]; then
+  cmd.exe /c "npx.cmd lint-staged && npm.cmd run typecheck && npm.cmd test"
+else
+  npx lint-staged
+  npm run typecheck
+  npm test
+fi

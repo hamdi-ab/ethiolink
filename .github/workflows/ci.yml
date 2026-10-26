@@ -55,6 +55,9 @@ jobs:
       - name: Push database schema
         run: npm run prisma:push -- --accept-data-loss
 
+      - name: Run typecheck
+        run: npm run typecheck
+
       - name: Run linter
         run: npm run lint
 
@@ -63,3 +66,11 @@ jobs:
 
       - name: Build Next.js application
         run: npm run build
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
