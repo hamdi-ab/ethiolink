@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
+import { AuditLogEntry, generateSummaryCSV, generateAuditCSV, downloadCSV } from "@/lib/reports";
+import { ExecutiveReportModal } from "@/components/brand/ExecutiveReportModal";
 import {
   BarChart3,
   Send,
@@ -19,66 +21,84 @@ import {
   CheckCircle2,
   Layers,
   Users,
+  FileText,
+  ChevronDown,
+  Printer,
+  Table,
 } from "lucide-react";
 
 interface AnalyticsViewProps {
   brandName: string;
   summary: FunnelMetrics;
   campaigns: CampaignAnalyticsResponse[];
+  auditEntries?: AuditLogEntry[];
 }
 
 export function AnalyticsView({
   brandName,
   summary,
   campaigns,
+  auditEntries = [],
 }: AnalyticsViewProps) {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>("all");
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [isExportDropdownOpen, setIsExportDropdownOpen] = useState<boolean>(false);
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close export dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        exportDropdownRef.current &&
+        !exportDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsExportDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const activeMetrics =
     selectedCampaignId === "all"
       ? summary
       : campaigns.find((c) => c.campaignId === selectedCampaignId) || summary;
 
+  const activeCampaign =
+    selectedCampaignId === "all"
+      ? null
+      : campaigns.find((c) => c.campaignId === selectedCampaignId);
+
+  const targetCampaigns = activeCampaign ? [activeCampaign] : campaigns;
+
   const totalCreators = campaigns.reduce(
     (acc, c) => acc + (c.creators?.length || 0),
     0
   );
 
-  const exportCSV = () => {
-    const headers = [
-      "Campaign Name",
-      "Slug",
-      "Promo Code",
-      "Status",
-      "Page Views",
-      "Unique Visitors",
-      "Total Clicks",
-      "Sales Count",
-      "Total Revenue (ETB)",
-      "Conversion Rate (%)",
-    ];
-    const rows = campaigns.map((c) => [
-      `"${c.campaignName.replace(/"/g, '""')}"`,
-      c.slug,
-      c.promoCode,
-      c.status,
-      c.pageViews,
-      c.uniqueVisitors,
-      c.totalClicks,
-      c.salesCount,
-      c.totalRevenueETB,
-      c.salesConversionRate,
-    ]);
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${brandName.toLowerCase().replace(/\s+/g, "_")}_analytics.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const sanitizedBrandName = brandName.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+  // Export 1: High-Level Executive Summary CSV
+  const handleExportSummaryCSV = () => {
+    const csv = generateSummaryCSV(brandName, targetCampaigns, activeMetrics);
+    const suffix = activeCampaign ? `_${activeCampaign.slug}` : "";
+    downloadCSV(`${sanitizedBrandName}_summary${suffix}.csv`, csv);
+    setIsExportDropdownOpen(false);
+  };
+
+  // Export 2: Granular Audit & Redemption Ledger CSV
+  const handleExportAuditCSV = () => {
+    const filteredEntries =
+      selectedCampaignId === "all"
+        ? auditEntries
+        : auditEntries.filter(
+            (entry) => entry.campaignName === activeCampaign?.campaignName
+          );
+
+    const csv = generateAuditCSV(brandName, filteredEntries);
+    const suffix = activeCampaign ? `_${activeCampaign.slug}` : "";
+    downloadCSV(`${sanitizedBrandName}_audit_ledger${suffix}.csv`, csv);
+    setIsExportDropdownOpen(false);
   };
 
   return (
@@ -119,14 +139,80 @@ export function AnalyticsView({
               <span>Attribution Engine Live (2ms)</span>
             </div>
 
-            {/* Export Action */}
+            {/* Executive Report Modal Trigger */}
             <button
-              onClick={exportCSV}
-              className="flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 dark:hover:text-white cursor-pointer"
+              onClick={() => setIsReportModalOpen(true)}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg shadow-xs text-xs font-semibold transition-all cursor-pointer"
+              title="Open Executive Report Preview"
             >
-              <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-              <span>Export CSV</span>
+              <FileText className="w-4 h-4" />
+              <span>Executive Report</span>
             </button>
+
+            {/* Export Dropdown */}
+            <div className="relative" ref={exportDropdownRef}>
+              <button
+                onClick={() => setIsExportDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs text-xs font-semibold transition-all hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                aria-expanded={isExportDropdownOpen}
+                aria-haspopup="true"
+              >
+                <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <span>Export Data</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+
+              {isExportDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-2 z-40 text-xs">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    CSV Downloads
+                  </div>
+                  <button
+                    onClick={handleExportSummaryCSV}
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <Table className="w-4 h-4 text-slate-400" />
+                    <div>
+                      <div className="font-semibold">Executive Summary (.csv)</div>
+                      <div className="text-[10px] text-slate-400">
+                        Aggregated campaign KPIs &amp; ROI
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={handleExportAuditCSV}
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <Layers className="w-4 h-4 text-slate-400" />
+                    <div>
+                      <div className="font-semibold">Attribution &amp; Sales Audit (.csv)</div>
+                      <div className="text-[10px] text-slate-400">
+                        Granular touchpoints &amp; POS redemptions
+                      </div>
+                    </div>
+                  </button>
+
+                  <div className="my-1.5 border-t border-slate-100 dark:border-slate-700" />
+
+                  <button
+                    onClick={() => {
+                      setIsExportDropdownOpen(false);
+                      setIsReportModalOpen(true);
+                    }}
+                    className="w-full text-left px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700/60 hover:text-emerald-700 dark:hover:text-emerald-400 flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <Printer className="w-4 h-4 text-slate-400" />
+                    <div>
+                      <div className="font-semibold">Print / Save PDF</div>
+                      <div className="text-[10px] text-slate-400">
+                        Formatted board-ready executive report
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
 
             <ThemeToggle />
           </div>
@@ -134,17 +220,17 @@ export function AnalyticsView({
       </header>
 
       {/* Filter Toolbar */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-200/90 py-2.5">
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 py-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-4">
-            <span className="text-slate-500 font-medium flex items-center gap-1.5">
+            <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5 text-slate-400" />
               Filter by Campaign:
             </span>
             <select
               value={selectedCampaignId}
               onChange={(e) => setSelectedCampaignId(e.target.value)}
-              className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+              className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer transition-colors"
             >
               <option value="all">All Campaigns Combined ({campaigns.length})</option>
               {campaigns.map((c) => (
@@ -155,10 +241,10 @@ export function AnalyticsView({
             </select>
           </div>
 
-          <div className="flex items-center gap-3 text-slate-500 font-medium">
+          <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 font-medium">
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              Reporting Period: <strong className="text-slate-800">Real-Time Cumulative</strong>
+              Reporting Period: <strong className="text-slate-800 dark:text-slate-200">Real-Time Cumulative</strong>
             </span>
           </div>
         </div>
@@ -168,20 +254,20 @@ export function AnalyticsView({
         {/* Top Bento KPI Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Attributed Gross Sales */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Attributed Gross Sales
               </span>
-              <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                 ETB
               </span>
             </div>
             <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black font-mono text-slate-900 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-white tracking-tight">
                 {formatETB(activeMetrics.totalRevenueETB)}
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 mt-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1.5">
                 <TrendingUp className="w-3.5 h-3.5" />
                 <span>Verified in-store &amp; digital orders</span>
               </div>
@@ -189,22 +275,22 @@ export function AnalyticsView({
           </div>
 
           {/* Card 2: Verified Conversions */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Verified Conversions
               </span>
-              <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                 {activeMetrics.salesCount.toLocaleString()}
               </div>
-              <div className="text-xs font-medium text-slate-500 mt-1.5">
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5">
                 Average Order Value:{" "}
-                <strong className="text-slate-800 font-mono">
+                <strong className="text-slate-800 dark:text-slate-200 font-mono">
                   {formatETB(activeMetrics.aovETB)}
                 </strong>
               </div>
@@ -212,62 +298,64 @@ export function AnalyticsView({
           </div>
 
           {/* Card 3: Active Influencers */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Creators &amp; Partners
               </span>
-              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
                 <Users className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                 {totalCreators}
               </div>
-              <div className="text-xs font-medium text-slate-500 mt-1.5">
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5">
                 Across {campaigns.length} active campaigns
               </div>
             </div>
           </div>
 
           {/* Card 4: Sales Conversion Rate */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Blended Conversion Rate
               </span>
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
                 %
               </div>
             </div>
             <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                 {activeMetrics.salesConversionRate}%
               </div>
-              <div className="text-xs font-medium text-slate-500 mt-1.5">
+              <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1.5">
                 Visitor CTR:{" "}
-                <strong className="text-slate-800">{activeMetrics.clickThroughRate}%</strong>
+                <strong className="text-slate-800 dark:text-slate-200">
+                  {activeMetrics.clickThroughRate}%
+                </strong>
               </div>
             </div>
           </div>
         </div>
 
         {/* 5-Stage Conversion Funnel Visualization */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
-              <h2 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
+              <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                 <Layers className="w-4 h-4 text-emerald-600" />
                 <span>5-Stage Attribution &amp; Conversion Pipeline</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 End-to-end journey from link impression to verified purchase redemption
               </p>
             </div>
 
             <div className="flex items-center gap-3 text-xs font-semibold">
-              <span className="text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <span className="text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
                 Funnel Efficiency: {activeMetrics.salesConversionRate}%
               </span>
             </div>
@@ -276,68 +364,68 @@ export function AnalyticsView({
           {/* Step Progression Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
             {/* Step 1: Impressions / Page Views */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                   Stage 1 • Views
                 </span>
-                <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.pageViews.toLocaleString()}
                 </div>
               </div>
-              <span className="text-[11px] text-slate-500 mt-3">Link Impressions</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-3">Link Impressions</span>
             </div>
 
             {/* Step 2: Unique Visitors */}
-            <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                   Stage 2 • Visitors
                 </span>
-                <div className="text-2xl font-black text-indigo-950 mt-1 font-mono">
+                <div className="text-2xl font-black text-indigo-950 dark:text-indigo-200 mt-1 font-mono">
                   {activeMetrics.uniqueVisitors.toLocaleString()}
                 </div>
               </div>
-              <span className="text-[11px] text-indigo-700/80 mt-3">Distinct Client UUIDs</span>
+              <span className="text-[11px] text-indigo-700/80 dark:text-indigo-400/80 mt-3">Distinct Client UUIDs</span>
             </div>
 
             {/* Step 3: Touchpoint Intent */}
-            <div className="p-4 rounded-xl bg-sky-50/60 border border-sky-100 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                   Stage 3 • Action Intent
                 </span>
-                <div className="text-2xl font-black text-sky-950 mt-1 font-mono">
+                <div className="text-2xl font-black text-sky-950 dark:text-sky-200 mt-1 font-mono">
                   {activeMetrics.totalClicks.toLocaleString()}
                 </div>
               </div>
-              <span className="text-[11px] text-sky-700/80 mt-3">Telegram / Calls / Maps</span>
+              <span className="text-[11px] text-sky-700/80 dark:text-sky-400/80 mt-3">Telegram / Calls / Maps</span>
             </div>
 
             {/* Step 4: In-Store POS Scans & Sales */}
-            <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-100 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/50 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                   Stage 4 • Redemptions
                 </span>
-                <div className="text-2xl font-black text-amber-950 mt-1 font-mono">
+                <div className="text-2xl font-black text-amber-950 dark:text-amber-200 mt-1 font-mono">
                   {activeMetrics.salesCount.toLocaleString()}
                 </div>
               </div>
-              <span className="text-[11px] text-amber-700/80 mt-3">Verified Receipts</span>
+              <span className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-3">Verified Receipts</span>
             </div>
 
             {/* Step 5: Gross Revenue */}
-            <div className="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
                   Stage 5 • Net Sales
                 </span>
-                <div className="text-xl sm:text-2xl font-black text-emerald-950 mt-1 font-mono">
+                <div className="text-xl sm:text-2xl font-black text-emerald-950 dark:text-emerald-200 mt-1 font-mono">
                   {formatETB(activeMetrics.totalRevenueETB)}
                 </div>
               </div>
-              <span className="text-[11px] text-emerald-700/80 mt-3 font-mono">
+              <span className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-3 font-mono">
                 AOV: {formatETB(activeMetrics.aovETB)}
               </span>
             </div>
@@ -346,14 +434,14 @@ export function AnalyticsView({
 
         {/* Omnichannel Channel Share */}
         <div>
-          <h3 className="font-headline font-bold text-sm text-slate-800 uppercase tracking-wider mb-3 px-1">
+          <h3 className="font-headline font-bold text-sm text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3 px-1">
             Omnichannel Touchpoint Breakdown
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500">Telegram Clicks</div>
-                <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Telegram Clicks</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.telegramClicks}
                 </div>
               </div>
@@ -362,38 +450,38 @@ export function AnalyticsView({
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500">Phone Calls</div>
-                <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Phone Calls</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.callClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center">
                 <Phone className="w-5 h-5" />
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500">Map Views</div>
-                <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Map Views</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.mapClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <MapPin className="w-5 h-5" />
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-500">Code Copies</div>
-                <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Code Copies</div>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.copyCodeClicks}
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Copy className="w-5 h-5" />
               </div>
             </div>
@@ -401,13 +489,13 @@ export function AnalyticsView({
         </div>
 
         {/* Campaign Attribution & Creator Comparison Table */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-              <h3 className="font-headline font-bold text-base text-slate-900">
+              <h3 className="font-headline font-bold text-base text-slate-900 dark:text-white">
                 Campaign Attribution &amp; Creator Leaderboard
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Granular multi-touch breakdown per campaign, promo code, and assigned creators
               </p>
             </div>
@@ -420,14 +508,14 @@ export function AnalyticsView({
           </div>
 
           {campaigns.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 text-sm">
+            <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-sm">
               No active campaigns found. Create your first campaign to begin tracking attribution.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                     <th className="py-3 px-3">Campaign</th>
                     <th className="py-3 px-3">Promo Code</th>
                     <th className="py-3 px-3">Assigned Creators</th>
@@ -439,28 +527,28 @@ export function AnalyticsView({
                     <th className="py-3 px-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                   {campaigns.map((camp) => (
-                    <tr key={camp.campaignId} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={camp.campaignId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-3.5 px-3">
-                        <div className="font-bold text-slate-900">{camp.campaignName}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">/c/{camp.slug}</div>
+                        <div className="font-bold text-slate-900 dark:text-white">{camp.campaignName}</div>
+                        <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">/c/{camp.slug}</div>
                       </td>
                       <td className="py-3.5 px-3">
-                        <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                           {camp.promoCode}
                         </span>
                       </td>
                       <td className="py-3.5 px-3">
                         {camp.creators.length === 0 ? (
-                          <span className="text-slate-400 italic">None assigned</span>
+                          <span className="text-slate-400 dark:text-slate-500 italic">None assigned</span>
                         ) : (
                           <div className="space-y-0.5">
                             {camp.creators.map((cr, idx) => (
-                              <div key={idx} className="font-medium text-slate-700">
+                              <div key={idx} className="font-medium text-slate-700 dark:text-slate-300">
                                 {cr.name}
                                 {cr.telegramUsername && (
-                                  <span className="text-[11px] text-slate-400 ml-1">
+                                  <span className="text-[11px] text-slate-400 dark:text-slate-500 ml-1">
                                     (@{cr.telegramUsername})
                                   </span>
                                 )}
@@ -469,27 +557,27 @@ export function AnalyticsView({
                           </div>
                         )}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-mono text-slate-600">
+                      <td className="py-3.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
                         {camp.pageViews.toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-mono text-slate-600">
+                      <td className="py-3.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
                         {camp.totalClicks.toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-bold text-slate-900">
+                      <td className="py-3.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
                         {camp.salesCount.toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-bold text-emerald-700">
+                      <td className="py-3.5 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
                         {formatETB(camp.totalRevenueETB)}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-semibold text-slate-700">
+                      <td className="py-3.5 px-3 text-right font-mono font-semibold text-slate-700 dark:text-slate-300">
                         {camp.salesConversionRate}%
                       </td>
                       <td className="py-3.5 px-3 text-center">
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${
                             camp.status === "ACTIVE"
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
                           }`}
                         >
                           {camp.status}
@@ -503,6 +591,16 @@ export function AnalyticsView({
           )}
         </div>
       </main>
+
+      {/* Official Executive Attribution Report Modal */}
+      <ExecutiveReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        brandName={brandName}
+        summary={summary}
+        campaigns={campaigns}
+        selectedCampaignId={selectedCampaignId}
+      />
     </div>
   );
 }

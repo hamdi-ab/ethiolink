@@ -101,3 +101,36 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-headline), "Plus Jakarta Sans", sans-serif;
 }
+
+/* Print media rules for executive attribution reports and POS standees */
+@media print {
+  @page {
+    margin: 12mm;
+    size: auto;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header,
+  nav,
+  aside,
+  .no-print {
+    display: none !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

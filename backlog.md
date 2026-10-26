@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-018 - Brand Executive PDF/CSV Campaign Performance Report Generator (kind: feature) (since 2026-10-26)
 ## Queued
 ## Done
 - [x] ticket-9 - feat: admin audit & system health console https://github.com/hamdi-ab/ethiolink/pull/18 blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (merged 2026-10-22)
