@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getSystemHealthDiagnostics, calculatePlatformTotals } from "@/lib/admin";
+import { getSystemHealthDiagnostics, calculatePlatformTotals, calculatePlatformAnalytics } from "@/lib/admin";
 import { AdminDashboardView } from "./AdminDashboardView";
 
 async function AdminServerContent() {
@@ -127,6 +127,12 @@ async function AdminServerContent() {
     sales
   );
 
+  const analytics = calculatePlatformAnalytics(
+    recentEvents,
+    recentSales,
+    recentCreators
+  );
+
   const formattedSales = recentSales.map((s) => ({
     id: s.id,
     amountETB:
@@ -190,6 +196,7 @@ async function AdminServerContent() {
       adminName={session.name}
       stats={totals}
       health={health}
+      analytics={analytics}
       audit={{
         sales: formattedSales,
         campaigns: formattedCampaigns,

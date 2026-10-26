@@ -5,6 +5,7 @@ import { createSessionToken } from "../src/lib/auth.ts";
 import {
   getSystemHealthDiagnostics,
   calculatePlatformTotals,
+  calculatePlatformAnalytics,
 } from "../src/lib/admin.ts";
 import { GET as getAdminOverview } from "../src/app/api/admin/overview/route.ts";
 import { GET as getAdminAudit } from "../src/app/api/admin/audit/route.ts";
@@ -59,6 +60,130 @@ test("calculatePlatformTotals aggregates platform metrics with float-drift prote
     10000.0,
     "4500.10 + 2499.90 + 3000.00 must sum exactly to 10000.00 ETB"
   );
+});
+
+test("calculatePlatformAnalytics handles empty event and sales streams safely", () => {
+  const analytics = calculatePlatformAnalytics([], []);
+
+  assert.equal(analytics.funnel.pageViews, 0);
+  assert.equal(analytics.funnel.uniqueVisitors, 0);
+  assert.equal(analytics.funnel.actionTaps, 0);
+  assert.equal(analytics.funnel.recordedSales, 0);
+  assert.equal(analytics.funnel.totalRevenueETB, 0);
+  assert.equal(analytics.funnel.averageOrderValueETB, 0);
+  assert.equal(analytics.funnel.visitToActionRate, 0);
+  assert.equal(analytics.funnel.actionToSaleRate, 0);
+  assert.equal(analytics.funnel.overallConversionRate, 0);
+  assert.equal(analytics.funnel.channels.total, 0);
+  assert.deepEqual(analytics.topCampaigns, []);
+  assert.deepEqual(analytics.topCreators, []);
+});
+
+test("calculatePlatformAnalytics computes funnel rates, channel distribution, and top performers", () => {
+  const mockEvents = [
+    { eventType: "PAGE_VIEW", visitorId: "vis_1" },
+    { eventType: "PAGE_VIEW", visitorId: "vis_1" }, // duplicate visitor
+    { eventType: "PAGE_VIEW", visitorId: "vis_2" },
+    { eventType: "PAGE_VIEW", visitorId: "vis_3" },
+    { eventType: "PAGE_VIEW", visitorId: "vis_4" },
+    { eventType: "ACTION_TAP", visitorId: "vis_1", metadata: { channel: "TELEGRAM" } },
+    { eventType: "ACTION_TAP", visitorId: "vis_2", metadata: { channel: "PHONE" } },
+    { eventType: "ACTION_TAP", visitorId: "vis_3", metadata: JSON.stringify({ channel: "MAP" }) },
+    { eventType: "ACTION_TAP", visitorId: "vis_4", metadata: { channel: "PROMO_CODE" } },
+  ];
+
+  const mockSales = [
+    {
+      id: "sale_1",
+      amountETB: 1200.5,
+      campaignId: "camp_1",
+      campaign: { id: "camp_1", name: "Tomoca Roast", promoCode: "TOMOCA", brand: { name: "Tomoca Coffee" } },
+    },
+    {
+      id: "sale_2",
+      amountETB: 800.5,
+      campaignId: "camp_1",
+      campaign: { id: "camp_1", name: "Tomoca Roast", promoCode: "TOMOCA", brand: { name: "Tomoca Coffee" } },
+    },
+    {
+      id: "sale_3",
+      amountETB: 1500.0,
+      campaignId: "camp_2",
+      campaign: { id: "camp_2", name: "Bole Leather Bag", promoCode: "BOLE", brand: { name: "Bole Leather" } },
+    },
+  ];
+
+  const mockCreators = [
+    {
+      id: "cr_1",
+      user: { name: "Helen Addis" },
+      telegramUsername: "helen_addis",
+      assignments: [{ campaignId: "camp_1" }],
+    },
+    {
+      id: "cr_2",
+      user: { name: "Abel Tech" },
+      telegramUsername: "abel_tech",
+      assignments: [{ campaignId: "camp_2" }],
+    },
+  ];
+
+  const analytics = calculatePlatformAnalytics(mockEvents, mockSales, mockCreators);
+
+  assert.equal(analytics.funnel.pageViews, 5);
+  assert.equal(analytics.funnel.uniqueVisitors, 4);
+  assert.equal(analytics.funnel.actionTaps, 4);
+  assert.equal(analytics.funnel.recordedSales, 3);
+  assert.equal(analytics.funnel.totalRevenueETB, 3501.0);
+  assert.equal(analytics.funnel.averageOrderValueETB, 1167.0);
+
+  // Conversion rates
+  assert.equal(analytics.funnel.visitToActionRate, 100.0); // 4 actions / 4 unique visitors * 100
+  assert.equal(analytics.funnel.actionToSaleRate, 75.0); // 3 sales / 4 actions * 100
+  assert.equal(analytics.funnel.overallConversionRate, 75.0); // 3 sales / 4 visitors * 100
+
+  // Channels
+  assert.equal(analytics.funnel.channels.telegram, 1);
+  assert.equal(analytics.funnel.channels.phone, 1);
+  assert.equal(analytics.funnel.channels.map, 1);
+  assert.equal(analytics.funnel.channels.promo, 1);
+  assert.equal(analytics.funnel.channels.total, 4);
+
+  // Top campaigns ranked by revenue
+  assert.equal(analytics.topCampaigns.length, 2);
+  assert.equal(analytics.topCampaigns[0].id, "camp_1"); // 1200.5 + 800.5 = 2001.0 ETB
+  assert.equal(analytics.topCampaigns[0].revenueETB, 2001.0);
+  assert.equal(analytics.topCampaigns[1].id, "camp_2"); // 1500.0 ETB
+
+  // Top creators ranked by attributed revenue
+  assert.equal(analytics.topCreators.length, 2);
+  assert.equal(analytics.topCreators[0].name, "Helen Addis");
+  assert.equal(analytics.topCreators[0].attributedRevenueETB, 2001.0);
+  assert.equal(analytics.topCreators[1].name, "Abel Tech");
+  assert.equal(analytics.topCreators[1].attributedRevenueETB, 1500.0);
+});
+
+test("calculatePlatformAnalytics processes Prisma schema EventTypes directly", () => {
+  const schemaEvents = [
+    { eventType: "PAGE_VIEW", visitorId: "u1" },
+    { eventType: "PAGE_VIEW", visitorId: "u2" },
+    { eventType: "TELEGRAM_CLICK", visitorId: "u1" },
+    { eventType: "CALL_CLICK", visitorId: "u1" },
+    { eventType: "MAP_CLICK", visitorId: "u2" },
+    { eventType: "COPY_CODE", visitorId: "u2" },
+  ];
+
+  const analytics = calculatePlatformAnalytics(schemaEvents, []);
+
+  assert.equal(analytics.funnel.pageViews, 2);
+  assert.equal(analytics.funnel.uniqueVisitors, 2);
+  assert.equal(analytics.funnel.actionTaps, 4);
+  assert.equal(analytics.funnel.channels.telegram, 1);
+  assert.equal(analytics.funnel.channels.phone, 1);
+  assert.equal(analytics.funnel.channels.map, 1);
+  assert.equal(analytics.funnel.channels.promo, 1);
+  assert.equal(analytics.funnel.channels.total, 4);
+  assert.equal(analytics.funnel.visitToActionRate, 200.0); // 4 actions / 2 visitors * 100
 });
 
 test("GET /api/admin/overview strictly enforces ADMIN role authorization", async () => {
