@@ -33,3 +33,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - Typecheck: `npm run typecheck` (`tsc --noEmit`)
   - Lint: `npm run lint` (`eslint`)
   - E2E Tests: `npm run test:e2e` (`playwright test`)
+- **Worktree Concurrency (`treehouse`):**
+  - Allocate isolated slots for unblocked tasks via `treehouse.cmd add ethiolink <ticket-id> main`.
+  - Perform work inside `.worktrees/<ticket-id>`, run tests, and release via `treehouse.cmd remove ethiolink <ticket-id>` once merged.
