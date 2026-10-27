@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-021 - Chore: Commit local environment assets, drawings, and turbopack root configuration (kind: chore) (since 2026-10-27)
 ## Queued
 ## Done
 - [x] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards https://github.com/hamdi-ab/ethiolink/pull/28 (kind: chore) (merged 2026-10-26)

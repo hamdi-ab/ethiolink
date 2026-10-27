@@ -1,0 +1,9 @@
+# no-mistakes configuration for EthioLink
+
+commands:
+  lint: "npm.cmd run lint"
+  typecheck: "npm.cmd run typecheck"
+  test: "npm.cmd test"
+
+auto_fix:
+  review: 0
