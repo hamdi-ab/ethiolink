@@ -4,3 +4,6 @@
 
 ## Archived 2026-10-26
 - [x] ticket-2 - feat: public campaign landing page with bilingual toggle https://github.com/hamdi-ab/ethiolink/pull/11 blocked-by: ticket-1 (kind: task) (merged 2026-10-21)
+
+## Archived 2026-10-27
+- [x] ticket-3 - feat: telemetry ingestion & deduplication pipeline https://github.com/hamdi-ab/ethiolink/pull/12 blocked-by: ticket-2 (kind: task) (merged 2026-10-21)
