@@ -14,6 +14,11 @@ export interface Translations {
   notFoundDesc: string;
   backHome: string;
   creatorTag: string;
+  concludedTitle: string;
+  concludedDesc: string;
+  pausedTitle: string;
+  pausedDesc: string;
+  contactStore: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -32,6 +37,13 @@ export const translations: Record<Language, Translations> = {
       "This promotional link is inactive, expired, or may have been paused by the business.",
     backHome: "Go to Homepage",
     creatorTag: "Promoted by",
+    concludedTitle: "Promotion Concluded",
+    concludedDesc:
+      "This promotional campaign has ended. Stay tuned for upcoming offers from the business.",
+    pausedTitle: "Promotion Temporarily Paused",
+    pausedDesc:
+      "This promotion is currently paused by the merchant. Please check back soon or reach out directly.",
+    contactStore: "Contact Store Directly",
   },
   am: {
     offerBadge: "ልዩ ቅናሽ",
@@ -48,5 +60,12 @@ export const translations: Record<Language, Translations> = {
       "ይህ የማስተዋወቂያ ሊንክ ልክ ያልሆነ ነው፣ ጊዜው አልፏል ወይም በነጋዴው ለጊዜው ቆሟል።",
     backHome: "ወደ መነሻ ገጽ ይመለሱ",
     creatorTag: "በአስተዋዋቂው",
+    concludedTitle: "ማስተዋወቂያው ተጠናቋል",
+    concludedDesc:
+      "ይህ የማስተዋወቂያ ዘመቻ ተጠናቋል። ወደፊት ከነጋዴው የሚወጡ አዳዲስ ቅናሾችን ይጠብቁ።",
+    pausedTitle: "ማስተዋወቂያው ለጊዜው ቆሟል",
+    pausedDesc:
+      "ይህ ማስተዋወቂያ በነጋዴው ለጊዜው ቆሟል። እባክዎ ቆየት ብለው በድጋሚ ይሞክሩ ወይም በቀጥታ ያነጋግሩ።",
+    contactStore: "ሱቁን በቀጥታ ያነጋግሩ",
   },
 };

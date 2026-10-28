@@ -5,8 +5,10 @@ import { db } from "@/lib/db";
 import {
   CampaignLanding,
   CampaignNotFound,
+  CampaignConcluded,
   CampaignData,
 } from "@/components/campaign/CampaignLanding";
+import { evaluateCampaignLifecycle } from "@/lib/lifecycle";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -28,10 +30,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     });
 
-    if (!campaign || campaign.status !== "ACTIVE") {
+    if (!campaign) {
       return {
         title: "Campaign Not Found | EthioLink",
-        description: "This campaign is inactive or expired.",
+        description: "This campaign does not exist or has been removed.",
+      };
+    }
+
+    const lifecycle = evaluateCampaignLifecycle(campaign);
+    if (!lifecycle.active) {
+      return {
+        title: `${campaign.name} - Concluded | ${campaign.brand.name} - EthioLink`,
+        description: `This promotion from ${campaign.brand.name} has concluded or is paused.`,
       };
     }
 
@@ -121,8 +131,23 @@ async function CampaignView({ params }: PageProps) {
     return <CampaignNotFound />;
   }
 
-  if (!campaign || campaign.status !== "ACTIVE") {
+  if (!campaign) {
     return <CampaignNotFound />;
+  }
+
+  const lifecycle = evaluateCampaignLifecycle(campaign);
+  if (!lifecycle.active) {
+    return (
+      <CampaignConcluded
+        campaign={{
+          name: campaign.name,
+          brand: campaign.brand,
+          phoneNumber: campaign.phoneNumber,
+          telegramUrl: campaign.telegramUrl,
+        }}
+        effectiveStatus={lifecycle.effectiveStatus}
+      />
+    );
   }
 
   const campaignData: CampaignData = {

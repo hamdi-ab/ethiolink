@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import { AuditLogEntry, generateSummaryCSV, generateAuditCSV, downloadCSV } from "@/lib/reports";
 import { ExecutiveReportModal } from "@/components/brand/ExecutiveReportModal";
+import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import {
   BarChart3,
   Send,
@@ -651,15 +652,18 @@ export function AnalyticsView({
                         {camp.salesConversionRate}%
                       </td>
                       <td className="py-3.5 px-3 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${
-                            camp.status === "ACTIVE"
-                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
-                          }`}
-                        >
-                          {camp.status}
-                        </span>
+                        {(() => {
+                          const effectiveStatus = getEffectiveStatus(camp);
+                          const badge = getStatusBadgeConfig(effectiveStatus);
+                          return (
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide ${badge.badgeClass}`}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${badge.dotClass}`} />
+                              {badge.label}
+                            </span>
+                          );
+                        })()}
                       </td>
                     </tr>
                   ))}

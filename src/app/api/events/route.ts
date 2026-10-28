@@ -5,6 +5,7 @@ import {
   isValidEventType,
   DEDUPLICATION_WINDOW_MS,
 } from "@/lib/telemetry";
+import { evaluateCampaignLifecycle } from "@/lib/lifecycle";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,17 +51,30 @@ export async function POST(req: NextRequest) {
     if (typeof campaignSlug === "string" && campaignSlug) {
       targetCampaign = await db.campaign.findUnique({
         where: { slug: campaignSlug },
-        select: { id: true, status: true },
+        select: { id: true, status: true, startDate: true, endDate: true },
       });
     } else if (typeof campaignId === "string" && campaignId) {
       targetCampaign = await db.campaign.findUnique({
         where: { id: campaignId },
-        select: { id: true, status: true },
+        select: { id: true, status: true, startDate: true, endDate: true },
       });
     }
 
     if (!targetCampaign) {
       return Response.json({ error: "Campaign not found" }, { status: 404 });
+    }
+
+    const lifecycle = evaluateCampaignLifecycle(targetCampaign);
+    if (!lifecycle.active) {
+      return Response.json(
+        {
+          status: "rejected",
+          recorded: false,
+          reason: `Campaign is ${lifecycle.effectiveStatus.toLowerCase()}`,
+          effectiveStatus: lifecycle.effectiveStatus,
+        },
+        { status: 410 }
+      );
     }
 
     // Extract IP and generate daily-salted SHA-256 hash

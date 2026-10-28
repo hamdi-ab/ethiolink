@@ -17,6 +17,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import type { CampaignLifecycleStatus } from "@/lib/lifecycle";
 
 export interface CampaignData {
   id: string;
@@ -351,6 +352,126 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
           </p>
         </footer>
       </main>
+    </div>
+  );
+}
+
+export interface CampaignConcludedProps {
+  campaign: {
+    name: string;
+    brand: {
+      name: string;
+      ownerName: string;
+    };
+    phoneNumber?: string | null;
+    telegramUrl?: string | null;
+  };
+  effectiveStatus: CampaignLifecycleStatus | string;
+}
+
+export function CampaignConcluded({
+  campaign,
+  effectiveStatus,
+}: CampaignConcludedProps) {
+  const [lang, setLang] = useState<Language>("am");
+  const t = translations[lang];
+  const isPaused = effectiveStatus === "PAUSED";
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col items-center px-4 py-6 sm:py-12 transition-colors duration-200">
+      <header className="w-full max-w-md flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <span className="font-headline font-black text-lg tracking-tight text-slate-900 dark:text-white">
+            Ethio<span className="text-emerald-600 dark:text-emerald-400">Link</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle size="sm" />
+          <button
+            type="button"
+            data-testid="lang-toggle"
+            onClick={() => setLang(lang === "en" ? "am" : "en")}
+            className="flex items-center gap-1.5 text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-full px-3 py-1.5 shadow-2xs transition-all cursor-pointer"
+          >
+            <span>{lang === "en" ? "አማርኛ" : "English"}</span>
+          </button>
+        </div>
+      </header>
+
+      <main className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm p-6 sm:p-8 flex flex-col items-center text-center">
+        <div
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 ${
+            isPaused
+              ? "bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+          }`}
+        >
+          {isPaused ? (
+            <Clock className="w-8 h-8 text-amber-500" />
+          ) : (
+            <Calendar className="w-8 h-8 text-slate-500 dark:text-slate-400" />
+          )}
+        </div>
+
+        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 mb-2">
+          {campaign.brand.name}
+        </span>
+
+        <h1 className="font-headline text-xl sm:text-2xl font-black text-slate-900 dark:text-white mb-2">
+          {campaign.name}
+        </h1>
+
+        <h2 className="font-headline text-sm font-bold text-amber-700 dark:text-amber-400 mb-2">
+          {isPaused ? t.pausedTitle : t.concludedTitle}
+        </h2>
+
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+          {isPaused ? t.pausedDesc : t.concludedDesc}
+        </p>
+
+        {(campaign.phoneNumber || campaign.telegramUrl) && (
+          <div className="w-full pt-4 border-t border-slate-100 dark:border-slate-800/80 mb-6 space-y-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+              {t.contactStore}
+            </p>
+            {campaign.phoneNumber && (
+              <a
+                href={`tel:${campaign.phoneNumber}`}
+                className="w-full h-11 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>{t.callBtn}: {campaign.phoneNumber}</span>
+              </a>
+            )}
+            {campaign.telegramUrl && (
+              <a
+                href={campaign.telegramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-11 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Send className="w-4 h-4 text-[#229ED9]" />
+                <span>{t.telegramBtn}</span>
+              </a>
+            )}
+          </div>
+        )}
+
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 font-bold text-xs transition-all shadow-xs"
+        >
+          {t.backHome}
+        </Link>
+      </main>
+
+      <footer className="mt-8 text-center flex flex-col items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+        <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Verified by EthioLink Attribution Engine</span>
+        </div>
+        <p className="text-[11px]">{t.poweredBy} • Addis Ababa, Ethiopia</p>
+      </footer>
     </div>
   );
 }

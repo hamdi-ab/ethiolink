@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls (kind: feature) (since 2026-10-27)
 ## Queued
 ## Done
 - [x] ETL-021 - Chore: Commit local environment assets, drawings, and turbopack root configuration https://github.com/hamdi-ab/ethiolink/pull/29 (kind: chore) (merged 2026-10-27)

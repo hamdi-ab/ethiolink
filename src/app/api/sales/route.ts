@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { parseAmountETB } from "@/lib/sales";
 import { handleApiError } from "@/lib/api-errors";
 import { Prisma } from "@prisma/client";
+import { evaluateCampaignLifecycle } from "@/lib/lifecycle";
 
 export async function GET(req: NextRequest) {
   const session = await getSession(req);
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const { amountETB, campaignId, promoCode, notes } = body;
+    const { amountETB, campaignId, promoCode, notes, override } = body;
 
     const parsedAmount = parseAmountETB(amountETB);
     if (parsedAmount === null) {
@@ -104,6 +105,8 @@ export async function POST(req: NextRequest) {
           name: true,
           promoCode: true,
           status: true,
+          startDate: true,
+          endDate: true,
         },
       });
     } else if (typeof promoCode === "string" && promoCode.trim()) {
@@ -121,6 +124,8 @@ export async function POST(req: NextRequest) {
           name: true,
           promoCode: true,
           status: true,
+          startDate: true,
+          endDate: true,
         },
       });
     }
@@ -132,19 +137,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (campaign.status !== "ACTIVE") {
+    const lifecycle = evaluateCampaignLifecycle(campaign);
+    if (!lifecycle.active) {
+      const isOwnerOrAdmin = session.role === "OWNER" || session.role === "ADMIN";
+      if (!override || !isOwnerOrAdmin) {
       return NextResponse.json(
-        { error: `Cannot attribute sales to a ${campaign.status.toLowerCase()} campaign` },
+        {
+          error: `Cannot attribute sales to a ${lifecycle.effectiveStatus.toLowerCase()} campaign without merchant override`,
+          effectiveStatus: lifecycle.effectiveStatus,
+        },
         { status: 400 }
       );
     }
+
+    }
+
+    const trimmedNotes = typeof notes === "string" && notes.trim() ? notes.trim() : null;
+    const effectiveNotes = !lifecycle.active
+      ? (trimmedNotes ? `[OVERRIDE: ${lifecycle.effectiveStatus}] ${trimmedNotes}` : `[OVERRIDE: ${lifecycle.effectiveStatus}]`)
+      : trimmedNotes;
 
     const sale = await db.sale.create({
       data: {
         campaignId: campaign.id,
         loggedById: session.userId,
         amountETB: new Prisma.Decimal(parsedAmount),
-        notes: typeof notes === "string" && notes.trim() ? notes.trim() : null,
+        notes: effectiveNotes,
       },
       include: {
         campaign: {
