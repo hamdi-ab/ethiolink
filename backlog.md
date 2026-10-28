@@ -1,9 +1,9 @@
 # Backlog
 
 ## In flight
-- [ ] ETL-023 - feat: in-store sales voiding, transaction corrections, and audit ledger (since 2026-10-28)
 ## Queued
 ## Done
+- [x] ETL-023 - feat: in-store sales voiding, transaction corrections, and audit ledger https://github.com/hamdi-ab/ethiolink/pull/31 (merged 2026-10-28)
 - [x] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls https://github.com/hamdi-ab/ethiolink/pull/30 (kind: feature) (merged 2026-10-28)
 - [x] ETL-021 - Chore: Commit local environment assets, drawings, and turbopack root configuration https://github.com/hamdi-ab/ethiolink/pull/29 (kind: chore) (merged 2026-10-27)
 - [x] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards https://github.com/hamdi-ab/ethiolink/pull/28 (kind: chore) (merged 2026-10-26)
@@ -13,5 +13,3 @@
 - [x] ticket-8 - feat: creator portal & magic-link onboarding https://github.com/hamdi-ab/ethiolink/pull/17 blocked-by: ticket-5 blocked-by: ticket-7 (kind: task) (merged 2026-10-22)
 - [x] ticket-7 - feat: brand performance funnel & analytics dashboard https://github.com/hamdi-ab/ethiolink/pull/16 blocked-by: ticket-3 blocked-by: ticket-6 (kind: task) (merged 2026-10-22)
 - [x] ticket-6 - feat: in-store manual sales logging in ETB https://github.com/hamdi-ab/ethiolink/pull/15 blocked-by: ticket-4 blocked-by: ticket-5 (kind: task) (merged 2026-10-22)
-- [x] ticket-5 - feat: campaign management & creator invite link generation https://github.com/hamdi-ab/ethiolink/pull/14 blocked-by: ticket-1 blocked-by: ticket-4 (kind: task) (merged 2026-10-22)
-- [x] ticket-4 - feat: authentication & two-tier role guards (Owner & Staff) https://github.com/hamdi-ab/ethiolink/pull/13 blocked-by: ticket-1 (kind: task) (merged 2026-10-21)
