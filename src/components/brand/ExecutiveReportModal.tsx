@@ -15,6 +15,7 @@ import {
   Phone,
   MapPin,
   Copy,
+  Info,
 } from "lucide-react";
 
 interface ExecutiveReportModalProps {
@@ -147,19 +148,19 @@ export function ExecutiveReportModal({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 print:break-inside-avoid">
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
-                Attributed Gross Sales
+                Reported Gross Sales
               </span>
               <div className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400 print:text-emerald-800 mt-1">
                 {formatETB(metrics.totalRevenueETB)}
               </div>
               <div className="text-[10px] text-slate-500 print:text-slate-600 mt-1">
-                Verified in-store &amp; POS
+                Merchant-recorded in-store &amp; POS
               </div>
             </div>
 
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
-                Verified Conversions
+                Merchant-Recorded Orders
               </span>
               <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white print:text-black mt-1">
                 {metrics.salesCount.toLocaleString()}
@@ -352,6 +353,28 @@ export function ExecutiveReportModal({
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Attribution Limitations & Methodology Notes (PRD FR-025 / FR-029) */}
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-[11px] space-y-2 print:border-slate-300 print:bg-slate-50 print:break-inside-avoid">
+            <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200 print:text-black">
+              <Info className="w-3.5 h-3.5 text-emerald-600 print:text-black shrink-0" />
+              <span>Attribution Limitations &amp; Methodology Transparency (PRD FR-025 / FR-029)</span>
+            </div>
+            <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 print:text-slate-700 leading-relaxed">
+              <li>
+                <strong>Merchant-Recorded Redemptions:</strong> Sales and revenue values reflect in-store transaction receipts manually recorded by store staff upon promo code or QR presentation, rather than independent bank/clearinghouse settlements.
+              </li>
+              <li>
+                <strong>Aggregate Funnel Progression:</strong> The 5-stage conversion pipeline measures aggregate traffic volume and channel touchpoints, not deterministic end-to-end individual consumer tracking.
+              </li>
+              <li>
+                <strong>Multi-Touch Causality:</strong> Transactions are attributed to promotional campaigns; EthioLink does not claim that every recorded sale was exclusively caused by an individual creator.
+              </li>
+              <li>
+                <strong>Gross Revenue Scope:</strong> Reported revenue represents gross recorded sales volume (PRD FR-030) before merchant cost of goods, taxes, or operating expenses, and is not a measure of net merchant profit.
+              </li>
+            </ul>
           </div>
 
           {/* Verification & Legal Footer */}

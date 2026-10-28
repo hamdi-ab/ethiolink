@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-025 - feat: campaign comparison matrix, cohort benchmarking, and attribution disclaimers (kind: feature) (since 2026-10-28)
 ## Queued
 ## Done
 - [x] ETL-024 - feat: merchant campaign editing, destination updates, and immutability guardrails https://github.com/hamdi-ab/ethiolink/pull/32 (merged 2026-10-28)

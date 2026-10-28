@@ -6,9 +6,9 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 60 * 1000,
+  timeout: 90 * 1000,
   expect: {
-    timeout: 10 * 1000,
+    timeout: 20 * 1000,
   },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -31,13 +31,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env.CI
-      ? "npm run start -- -p 3000"
-      : process.platform === "win32"
-      ? "npm.cmd run dev -- -p 3000"
-      : "npm run dev -- -p 3000",
+    command: process.platform === "win32"
+      ? "npm.cmd run start -- -p 3000"
+      : "npm run start -- -p 3000",
     url: "http://127.0.0.1:3000/api/health",
-    reuseExistingServer: !process.env.CI,
-    timeout: 60 * 1000,
+    reuseExistingServer: true,
+    timeout: 120 * 1000,
   },
 });

@@ -401,13 +401,16 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
           )}
         </div>
 
-        {/* Financial Attribution Disclaimer */}
-        <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-slate-600 text-xs flex items-start gap-3">
-          <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-          <div className="leading-relaxed">
-            <span className="font-bold text-slate-800">EthioLink Attribution Guarantee:</span> All reported
-            sales are verified against merchant Point-of-Sale logs and digital checkout records in Addis Ababa.
-            Payout settlements are fulfilled automatically to your connected Telebirr mobile wallet.
+        {/* Attribution Limitations & Methodology Transparency (PRD FR-025 / FR-029) */}
+        <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs flex items-start gap-3 transition-colors">
+          <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+          <div className="leading-relaxed space-y-1">
+            <span className="font-bold text-slate-800 dark:text-slate-200 block">
+              EthioLink Attribution & Verification Notice (PRD FR-025 / FR-029):
+            </span>
+            <p>
+              Reported sales and earnings reflect merchant-recorded in-store redemptions and digital checkout logs attributed to your promo code and campaign links. Funnel metrics represent aggregate promotional engagement rather than individual bank-cleared transactions. Payouts are reconciled per merchant agreement terms via your connected Telebirr mobile wallet upon merchant verification.
+            </p>
           </div>
         </div>
       </main>
