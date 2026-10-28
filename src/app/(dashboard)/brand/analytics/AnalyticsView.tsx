@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import { AuditLogEntry, generateSummaryCSV, generateAuditCSV, downloadCSV } from "@/lib/reports";
 import { ExecutiveReportModal } from "@/components/brand/ExecutiveReportModal";
-import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
+import { CampaignComparisonMatrix } from "@/components/brand/CampaignComparisonMatrix";
 import {
   BarChart3,
   Send,
@@ -24,9 +24,11 @@ import {
   Users,
   FileText,
   ChevronDown,
+  ChevronUp,
   Printer,
   Table,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
 interface AnalyticsViewProps {
@@ -45,6 +47,7 @@ export function AnalyticsView({
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>("all");
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState<boolean>(false);
+  const [isDisclaimerExpanded, setIsDisclaimerExpanded] = useState<boolean>(false);
   const exportDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close export dropdown on click outside
@@ -260,13 +263,76 @@ export function AnalyticsView({
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Attribution Limitations & Methodology Transparency Banner (PRD FR-025 / FR-029) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-headline font-bold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                    Attribution Methodology &amp; Reporting Scope
+                  </h3>
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                    PRD FR-025 / FR-029
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Conversions and revenue represent merchant-recorded in-store redemptions and digital orders, rather than automated bank/card clearance. Event progressions reflect aggregate touchpoints, not 100% deterministic individual consumer journeys.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsDisclaimerExpanded((prev) => !prev)}
+              className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            >
+              <span>{isDisclaimerExpanded ? "Hide Details" : "Read Methodology"}</span>
+              {isDisclaimerExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+
+          {isDisclaimerExpanded && (
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
+                  1. Merchant-Recorded Redemptions
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Sales are recorded by retail cashiers and store staff matching promotional codes or QR scans. Figures represent reported merchant volume rather than independently verified third-party banking records.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
+                  2. Aggregate Event Progression
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+                  The 5-stage conversion pipeline measures aggregate traffic volume and channel touchpoints. The system does not claim that every recorded sale was exclusively caused by a single creator.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block mb-1">
+                  3. Gross Revenue vs Profit (FR-030)
+                </span>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Campaign revenue equals the gross sum of eligible recorded transactions. Figures do not deduct merchant product cost of goods, taxes, or store overhead, and are not a measure of business profit.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Top Bento KPI Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Attributed Gross Sales */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Attributed Gross Sales
+                Reported Gross Sales
               </span>
               <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
                 ETB
@@ -278,16 +344,16 @@ export function AnalyticsView({
               </div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1.5">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>Verified in-store &amp; digital orders</span>
+                <span>Merchant-recorded in-store &amp; POS orders</span>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Verified Conversions */}
+          {/* Card 2: Merchant-Recorded Conversions */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Verified Conversions
+                Merchant-Recorded Orders
               </span>
               <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
                 <CheckCircle2 className="w-4 h-4" />
@@ -376,7 +442,7 @@ export function AnalyticsView({
             <div className="p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent hover:border-slate-200/80 dark:hover:border-slate-700/60 flex flex-col justify-between transition-all">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Stage 1 • Views
+                  Stage 1 &bull; Views
                 </span>
                 <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 font-mono">
                   {activeMetrics.pageViews.toLocaleString()}
@@ -389,7 +455,7 @@ export function AnalyticsView({
             <div className="p-4 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-transparent hover:border-indigo-200/60 dark:hover:border-indigo-800/40 flex flex-col justify-between transition-all">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
-                  Stage 2 • Visitors
+                  Stage 2 &bull; Visitors
                 </span>
                 <div className="text-2xl font-black text-indigo-950 dark:text-indigo-200 mt-1 font-mono">
                   {activeMetrics.uniqueVisitors.toLocaleString()}
@@ -402,7 +468,7 @@ export function AnalyticsView({
             <div className="p-4 rounded-xl bg-sky-50/40 dark:bg-sky-950/20 border border-transparent hover:border-sky-200/60 dark:hover:border-sky-800/40 flex flex-col justify-between transition-all">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-                  Stage 3 • Action Intent
+                  Stage 3 &bull; Action Intent
                 </span>
                 <div className="text-2xl font-black text-sky-950 dark:text-sky-200 mt-1 font-mono">
                   {activeMetrics.totalClicks.toLocaleString()}
@@ -415,20 +481,20 @@ export function AnalyticsView({
             <div className="p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-transparent hover:border-amber-200/60 dark:hover:border-amber-800/40 flex flex-col justify-between transition-all">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                  Stage 4 • Redemptions
+                  Stage 4 &bull; Redemptions
                 </span>
                 <div className="text-2xl font-black text-amber-950 dark:text-amber-200 mt-1 font-mono">
                   {activeMetrics.salesCount.toLocaleString()}
                 </div>
               </div>
-              <span className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-3">Verified Receipts</span>
+              <span className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-3">Merchant POS Logs</span>
             </div>
 
             {/* Step 5: Gross Revenue */}
             <div className="p-4 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-transparent hover:border-emerald-200/60 dark:hover:border-emerald-800/40 flex flex-col justify-between transition-all">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-                  Stage 5 • Net Sales
+                  Stage 5 &bull; Reported Sales
                 </span>
                 <div className="text-xl sm:text-2xl font-black text-emerald-950 dark:text-emerald-200 mt-1 font-mono">
                   {formatETB(activeMetrics.totalRevenueETB)}
@@ -567,111 +633,12 @@ export function AnalyticsView({
           </div>
         </div>
 
-        {/* Campaign Attribution & Creator Comparison Table */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div>
-              <h3 className="font-headline font-bold text-base text-slate-900 dark:text-white">
-                Campaign Attribution &amp; Creator Leaderboard
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Granular multi-touch breakdown per campaign, promo code, and assigned creators
-              </p>
-            </div>
-            <Link
-              href="/brand/campaigns/new"
-              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
-            >
-              <span>+ New Campaign</span>
-            </Link>
-          </div>
-
-          {campaigns.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-sm">
-              No active campaigns found. Create your first campaign to begin tracking attribution.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    <th className="py-3 px-3">Campaign</th>
-                    <th className="py-3 px-3">Promo Code</th>
-                    <th className="py-3 px-3">Assigned Creators</th>
-                    <th className="py-3 px-3 text-right">Views</th>
-                    <th className="py-3 px-3 text-right">Taps</th>
-                    <th className="py-3 px-3 text-right">Orders</th>
-                    <th className="py-3 px-3 text-right">Gross Sales (ETB)</th>
-                    <th className="py-3 px-3 text-right">Conv. Rate</th>
-                    <th className="py-3 px-3 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                  {campaigns.map((camp) => (
-                    <tr key={camp.campaignId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-3.5 px-3">
-                        <div className="font-bold text-slate-900 dark:text-white">{camp.campaignName}</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">/c/{camp.slug}</div>
-                      </td>
-                      <td className="py-3.5 px-3">
-                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                          {camp.promoCode}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-3">
-                        {camp.creators.length === 0 ? (
-                          <span className="text-slate-400 dark:text-slate-500 italic">None assigned</span>
-                        ) : (
-                          <div className="space-y-0.5">
-                            {camp.creators.map((cr, idx) => (
-                              <div key={idx} className="font-medium text-slate-700 dark:text-slate-300">
-                                {cr.name}
-                                {cr.telegramUsername && (
-                                  <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1">
-                                    (@{cr.telegramUsername})
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                        {camp.pageViews.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                        {camp.totalClicks.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        {camp.salesCount.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                        {formatETB(camp.totalRevenueETB)}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-mono font-semibold text-slate-700 dark:text-slate-300">
-                        {camp.salesConversionRate}%
-                      </td>
-                      <td className="py-3.5 px-3 text-center">
-                        {(() => {
-                          const effectiveStatus = getEffectiveStatus(camp);
-                          const badge = getStatusBadgeConfig(effectiveStatus);
-                          return (
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide ${badge.badgeClass}`}
-                            >
-                              <span className={`w-1.5 h-1.5 rounded-full ${badge.dotClass}`} />
-                              {badge.label}
-                            </span>
-                          );
-                        })()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        {/* PRD FR-031: Comparative Campaign Performance Matrix & Cohort Benchmarks */}
+        <CampaignComparisonMatrix
+          campaigns={campaigns}
+          brandName={brandName}
+          onSelectCampaign={(id) => setSelectedCampaignId(id)}
+        />
       </main>
 
       {/* Official Executive Attribution Report Modal */}

@@ -62,6 +62,10 @@ export function generateSummaryCSV(
     `# Total Attributed Revenue: ETB ${formattedRevenue}`,
     `# Total Verified Conversions: ${summary.salesCount}`,
     `# Funnel Efficiency: ${summary.salesConversionRate}%`,
+    "# Attribution Methodology & Limitations (PRD FR-025 / FR-029):",
+    "# - Sales reflect merchant-recorded in-store redemptions, not independently processed bank/card transactions.",
+    "# - Event journeys represent aggregate touchpoints, not 100% deterministic individual consumer journeys.",
+    "# - Reported revenue equals gross recorded sales (PRD FR-030) and does not represent net merchant profit.",
     "#",
   ].join("\n");
 
@@ -127,6 +131,9 @@ export function generateAuditCSV(
     `# EthioLink Omnichannel Audit & Redemption Ledger - ${brandName}`,
     `# Generated At: ${formatReportTimestamp(generatedAt)}`,
     `# Total Records: ${entries.length}`,
+    "# Attribution Methodology & Limitations (PRD FR-025 / FR-029):",
+    "# - Audit entries represent timestamped telemetry actions and merchant-recorded in-store POS redemptions.",
+    "# - Telemetry touchpoints capture aggregate interaction intent, not exclusive single-touch causality.",
     "#",
   ].join("\n");
 

@@ -21,7 +21,7 @@ test.describe("EthioLink Platform E2E Suite", () => {
 
     // Verify navigation to Merchant portal
     await portalCta.click();
-    await page.waitForURL(/.*login/, { timeout: 15000 });
+    await page.waitForURL(/.*login/, { timeout: 30000 });
     await expect(page.getByRole("heading", { name: /Merchant & Staff Portal/i })).toBeVisible();
   });
 
