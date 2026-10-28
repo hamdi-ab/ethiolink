@@ -52,7 +52,7 @@ async function SalesView() {
             promoCode: true,
           },
         },
-        loggedBy: {
+        voidedBy: { select: { id: true, name: true } }, loggedBy: {
           select: {
             id: true,
             name: true,
@@ -70,6 +70,10 @@ async function SalesView() {
       createdAt: s.createdAt.toISOString(),
       campaign: s.campaign,
       loggedBy: s.loggedBy,
+      voidedBy: s.voidedBy,
+      isVoided: s.isVoided,
+      voidReason: s.voidReason,
+      voidedAt: s.voidedAt ? s.voidedAt.toISOString() : null,
     }));
   } catch {
     // Database offline fallback

@@ -52,7 +52,8 @@ model User {
   magicToken   String?     @unique
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  loggedSales  Sale[]
+  loggedSales  Sale[]      @relation("LoggedSales")
+  voidedSales  Sale[]      @relation("VoidedSales")
   creator      Creator?
 }
 
@@ -111,15 +112,21 @@ model Event {
 }
 
 model Sale {
-  id         String   @id @default(cuid())
-  campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  loggedById String
-  loggedBy   User     @relation(fields: [loggedById], references: [id])
-  amountETB  Decimal  @db.Decimal(12, 2)
-  notes      String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String    @id @default(cuid())
+  campaignId  String
+  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  loggedById  String
+  loggedBy    User      @relation("LoggedSales", fields: [loggedById], references: [id])
+  amountETB   Decimal   @db.Decimal(12, 2)
+  notes       String?
+  isVoided    Boolean   @default(false)
+  voidReason  String?
+  voidedAt    DateTime?
+  voidedById  String?
+  voidedBy    User?     @relation("VoidedSales", fields: [voidedById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
+  @@index([campaignId, isVoided, createdAt])
   @@index([campaignId, createdAt])
 }

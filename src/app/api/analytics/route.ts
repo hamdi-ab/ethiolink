@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
         sales: {
           select: {
             amountETB: true,
+            isVoided: true,
           },
         },
         creators: {

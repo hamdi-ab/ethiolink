@@ -146,6 +146,8 @@ async function AdminServerContent() {
     loggedByName: s.loggedBy?.name || "System POS",
     loggedByRole: s.loggedBy?.role || "STAFF",
     notes: s.notes,
+    isVoided: s.isVoided,
+    voidReason: s.voidReason,
     recordedAt: s.createdAt.toISOString(),
   }));
 

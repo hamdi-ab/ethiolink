@@ -10,6 +10,8 @@ export interface AuditLogEntry {
   amountETB?: number | null;
   staffName?: string | null;
   notes?: string | null;
+  isVoided?: boolean | null;
+  voidReason?: string | null;
 }
 
 /**
@@ -138,6 +140,8 @@ export function generateAuditCSV(
     "Amount (ETB)",
     "Cashier / Staff",
     "Notes",
+    "Void Status",
+    "Void Reason",
   ].join(",");
 
   const rows = entries.map((entry) => {
@@ -151,6 +155,8 @@ export function generateAuditCSV(
       entry.amountETB !== null && entry.amountETB !== undefined ? escapeCSV(entry.amountETB) : "",
       escapeCSV(entry.staffName || ""),
       escapeCSV(entry.notes || ""),
+      escapeCSV(entry.recordType === "SALE" ? (entry.isVoided ? "VOIDED" : "VALID") : ""),
+      escapeCSV(entry.voidReason || ""),
     ].join(",");
   });
 

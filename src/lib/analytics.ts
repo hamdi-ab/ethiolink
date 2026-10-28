@@ -36,6 +36,7 @@ export interface RawEvent {
 
 export interface RawSale {
   amountETB: number | { toNumber(): number } | string;
+  isVoided?: boolean;
 }
 
 /**
@@ -80,11 +81,12 @@ export function calculateFunnelMetrics(
 
   const totalClicks = telegramClicks + callClicks + mapClicks + copyCodeClicks;
   const uniqueVisitors = uniqueVisitorIds.size;
-  const salesCount = sales.length;
+  const activeSales = sales.filter((s) => !s.isVoided);
+  const salesCount = activeSales.length;
 
   // Compute exact total revenue in cents (cents/centimes) to eliminate floating point inaccuracies
   let totalCents = 0;
-  for (const sale of sales) {
+  for (const sale of activeSales) {
     const rawVal =
       typeof sale.amountETB === "object" && sale.amountETB !== null && "toNumber" in sale.amountETB
         ? sale.amountETB.toNumber()

@@ -19,6 +19,9 @@ import {
   Banknote,
   ShieldCheck,
   Check,
+  Ban,
+  X,
+
 } from "lucide-react";
 
 export interface ActiveCampaign {
@@ -32,6 +35,13 @@ export interface RecentSale {
   amountETB: number;
   notes: string | null;
   createdAt: string;
+  isVoided?: boolean;
+  voidReason?: string | null;
+  voidedAt?: string | null;
+  voidedBy?: {
+    id?: string;
+    name?: string;
+  } | null;
   campaign: {
     id: string;
     name: string;
@@ -59,6 +69,57 @@ export function SalesTerminal({
   initialSales,
 }: SalesTerminalProps) {
   const isOwner = userRole === "OWNER";
+  const canVoid = userRole === "OWNER" || userRole === "ADMIN";
+  const [voidModalSale, setVoidModalSale] = useState<RecentSale | null>(null);
+  const [voidReason, setVoidReason] = useState("");
+  const [voidSubmitting, setVoidSubmitting] = useState(false);
+  const [voidError, setVoidError] = useState<string | null>(null);
+
+  const handleConfirmVoid = async () => {
+    if (!voidModalSale) return;
+    if (!voidReason.trim() || voidReason.trim().length < 3) {
+      setVoidError("A void reason of at least 3 characters is required");
+      return;
+    }
+
+    setVoidSubmitting(true);
+    setVoidError(null);
+
+    try {
+      const res = await fetch(`/api/sales/${voidModalSale.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: voidReason.trim() }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to void transaction");
+      }
+
+      setSalesList((prev) =>
+        prev.map((s) =>
+          s.id === voidModalSale.id
+            ? {
+                ...s,
+                isVoided: true,
+                voidReason: voidReason.trim(),
+                voidedAt: new Date().toISOString(),
+                voidedBy: { name: userName },
+              }
+            : s
+        )
+      );
+
+      setVoidModalSale(null);
+      setVoidReason("");
+    } catch (err: unknown) {
+      setVoidError(formatClientError(err, "Failed to void transaction."));
+    } finally {
+      setVoidSubmitting(false);
+    }
+  };
 
   const [amountInput, setAmountInput] = useState("");
   const [selectedCampaignId, setSelectedCampaignId] = useState(
@@ -147,7 +208,9 @@ export function SalesTerminal({
     }
   };
 
-  const totalETBToday = salesList.reduce((sum, s) => sum + s.amountETB, 0);
+  const totalETBToday = salesList
+    .filter((s) => !s.isVoided)
+    .reduce((sum, s) => sum + s.amountETB, 0);
   const activeSelectedCampaign = initialCampaigns.find((c) => c.id === selectedCampaignId);
 
   return (
@@ -474,40 +537,86 @@ export function SalesTerminal({
               No sales logged yet for this shift.
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 overflow-x-auto">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 overflow-x-auto">
               {salesList.map((sale) => (
                 <div
                   key={sale.id}
-                  className="py-3 px-2 flex items-center justify-between text-xs hover:bg-slate-50/80 transition-colors"
+                  className={`py-3 px-2 flex items-center justify-between text-xs transition-colors ${
+                    sale.isVoided
+                      ? "bg-rose-50/40 dark:bg-rose-950/20 opacity-75"
+                      : "hover:bg-slate-50/80 dark:hover:bg-slate-900/50"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs font-mono">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs font-mono ${
+                        sale.isVoided
+                          ? "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400"
+                          : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                      }`}
+                    >
                       ETB
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900">
-                        {sale.campaign.name}
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 dark:text-white">
+                          {sale.campaign.name}
+                        </span>
+                        {sale.isVoided && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                            VOIDED
+                          </span>
+                        )}
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
                         Code:{" "}
-                        <span className="font-mono font-bold text-emerald-700">
+                        <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
                           {sale.campaign.promoCode}
                         </span>
                         {sale.notes && ` • ${sale.notes}`}
+                        {sale.isVoided && sale.voidReason && (
+                          <span className="text-rose-600 dark:text-rose-400 font-medium">
+                            {" "}• Reason: {sale.voidReason}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="font-mono font-black text-sm text-slate-900">
-                      {formatETB(sale.amountETB)}
+                  <div className="flex items-center gap-3 text-right">
+                    <div>
+                      <div
+                        className={`font-mono font-black text-sm ${
+                          sale.isVoided
+                            ? "line-through text-slate-400 dark:text-slate-500"
+                            : "text-slate-900 dark:text-white"
+                        }`}
+                      >
+                        {formatETB(sale.amountETB)}
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        {new Date(sale.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-slate-400">
-                      {new Date(sale.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
+
+                    {canVoid && !sale.isVoided && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVoidModalSale(sale);
+                          setVoidReason("");
+                          setVoidError(null);
+                        }}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
+                        title="Void Transaction"
+                        aria-label={`Void sale ${sale.id}`}
+                      >
+                        <Ban className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -515,6 +624,102 @@ export function SalesTerminal({
           )}
         </div>
       </main>
+
+      {/* Void Confirmation Modal */}
+      {voidModalSale && (
+        <div
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="void-modal-title"
+        >
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+                <AlertCircle className="w-5 h-5" />
+                <h3 id="void-modal-title" className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                  Void In-Store Sale
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setVoidModalSale(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close dialog"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Voiding this sale will exclude it from attributed store revenue, AOV, and creator conversion metrics while preserving it in the audit trail.
+            </p>
+
+            {/* Sale summary box */}
+            <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs space-y-1">
+              <div className="flex justify-between font-mono">
+                <span className="text-slate-500">Receipt / ID:</span>
+                <span className="font-bold text-slate-700 dark:text-slate-300">{voidModalSale.id.slice(-8)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Campaign:</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{voidModalSale.campaign.name} ({voidModalSale.campaign.promoCode})</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Amount:</span>
+                <span className="font-mono font-bold text-rose-600 dark:text-rose-400">{formatETB(voidModalSale.amountETB)}</span>
+              </div>
+            </div>
+
+            {voidError && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{voidError}</span>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="void-reason" className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Void Reason (Required)
+              </label>
+              <textarea
+                id="void-reason"
+                rows={3}
+                value={voidReason}
+                onChange={(e) => setVoidReason(e.target.value)}
+                placeholder="e.g. Customer returned coffee beans, cashier duplicate entry..."
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setVoidModalSale(null)}
+                disabled={voidSubmitting}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmVoid}
+                disabled={voidSubmitting || voidReason.trim().length < 3}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              >
+                {voidSubmitting ? (
+                  <span>Voiding...</span>
+                ) : (
+                  <>
+                    <Ban className="w-3.5 h-3.5" />
+                    <span>Confirm Void</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

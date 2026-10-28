@@ -48,6 +48,7 @@ async function CreatorServerContent() {
               sales: {
                 select: {
                   amountETB: true,
+                  isVoided: true,
                 },
               },
             },
@@ -84,6 +85,7 @@ async function CreatorServerContent() {
                 sales: {
                   select: {
                     amountETB: true,
+                  isVoided: true,
                   },
                 },
               },
