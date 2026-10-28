@@ -34,6 +34,13 @@ export async function GET(req: NextRequest) {
             role: true,
           },
         },
+        voidedBy: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -45,9 +52,13 @@ export async function GET(req: NextRequest) {
         id: s.id,
         amountETB: s.amountETB.toNumber(),
         notes: s.notes,
+        isVoided: s.isVoided,
+        voidReason: s.voidReason,
+        voidedAt: s.voidedAt ? s.voidedAt.toISOString() : null,
         createdAt: s.createdAt.toISOString(),
         campaign: s.campaign,
         loggedBy: s.loggedBy,
+        voidedBy: s.voidedBy,
       })),
     });
   } catch (error) {

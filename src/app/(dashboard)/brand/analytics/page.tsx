@@ -47,6 +47,9 @@ async function AnalyticsServerContent() {
           select: {
             id: true,
             amountETB: true,
+            isVoided: true,
+            voidReason: true,
+            voidedAt: true,
             notes: true,
             createdAt: true,
             loggedBy: {
@@ -125,6 +128,8 @@ async function AnalyticsServerContent() {
               : Number(s.amountETB),
           staffName: s.loggedBy?.name || "Cashier",
           notes: s.notes || null,
+          isVoided: s.isVoided,
+          voidReason: s.voidReason,
         }))
       ),
     ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());

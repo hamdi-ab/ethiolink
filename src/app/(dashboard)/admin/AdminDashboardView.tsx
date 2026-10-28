@@ -13,6 +13,7 @@ import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import {
   Search,
   CheckCircle2,
+  Ban,
   Download,
   Server,
   RefreshCw,
@@ -45,6 +46,8 @@ export interface SaleAuditItem {
   loggedByName: string;
   loggedByRole: string;
   notes: string | null;
+  isVoided?: boolean;
+  voidReason?: string | null;
   recordedAt: string;
 }
 
@@ -1139,7 +1142,7 @@ export function AdminDashboardView({
                               {sale.promoCode}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 text-right font-black font-mono text-emerald-700 dark:text-emerald-400">
+                          <td className={`py-3.5 px-4 text-right font-black font-mono ${sale.isVoided ? "line-through text-slate-400 dark:text-slate-500" : "text-emerald-700 dark:text-emerald-400"}`}>
                             {formatETB(sale.amountETB)}
                           </td>
                           <td className="py-3.5 px-4">
@@ -1157,9 +1160,18 @@ export function AdminDashboardView({
                             })}
                           </td>
                           <td className="py-3.5 px-4 text-center">
-                            <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                            {sale.isVoided ? (
+                              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800" title={sale.voidReason ? `Void Reason: ${sale.voidReason}` : "Voided transaction"}>
+                                <Ban className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                                VOIDED
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 font-mono text-[10px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                               VERIFIED
+                            </span>
+                            )}
+                            <span className="hidden">
                             </span>
                           </td>
                         </tr>

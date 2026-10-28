@@ -115,11 +115,12 @@ export function calculatePlatformTotals(
   creatorCount: number,
   campaigns: Array<{ status: string }>,
   eventCount: number,
-  sales: Array<{ amountETB: number | { toNumber(): number } | string }>
+  sales: Array<{ amountETB: number | { toNumber(): number } | string; isVoided?: boolean }>
 ): PlatformOverviewStats {
+  const activeSales = sales.filter((s) => !s.isVoided);
   let totalCents = 0;
 
-  for (const sale of sales) {
+  for (const sale of activeSales) {
     const rawVal =
       typeof sale.amountETB === "object" && sale.amountETB !== null && "toNumber" in sale.amountETB
         ? sale.amountETB.toNumber()
@@ -139,7 +140,7 @@ export function calculatePlatformTotals(
     totalCampaigns: campaigns.length,
     activeCampaigns,
     totalEvents: eventCount,
-    totalSalesCount: sales.length,
+    totalSalesCount: activeSales.length,
     totalRevenueETB: totalCents / 100,
   };
 }
@@ -153,6 +154,7 @@ export function calculatePlatformAnalytics(
     id: string;
     amountETB: number | { toNumber(): number } | string;
     campaignId: string;
+    isVoided?: boolean;
     campaign?: { id: string; name: string; promoCode: string; brand?: { name: string } | null } | null;
   }>,
   creators?: Array<{
@@ -227,6 +229,7 @@ export function calculatePlatformAnalytics(
   }
 
   const uniqueVisitors = uniqueVisitorsSet.size;
+  const activeSales = sales.filter((s) => !s.isVoided);
   let totalCents = 0;
   const campaignMap = new Map<string, {
     name: string;
@@ -236,7 +239,7 @@ export function calculatePlatformAnalytics(
     cents: number;
   }>();
 
-  for (const sale of sales) {
+  for (const sale of activeSales) {
     const rawVal =
       typeof sale.amountETB === "object" && sale.amountETB !== null && "toNumber" in sale.amountETB
         ? sale.amountETB.toNumber()
@@ -259,7 +262,7 @@ export function calculatePlatformAnalytics(
     }
   }
 
-  const recordedSales = sales.length;
+  const recordedSales = activeSales.length;
   const totalRevenueETB = totalCents / 100;
   const averageOrderValueETB =
     recordedSales > 0 ? Math.round((totalRevenueETB / recordedSales) * 100) / 100 : 0;

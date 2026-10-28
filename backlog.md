@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-023 - feat: in-store sales voiding, transaction corrections, and audit ledger (since 2026-10-28)
 ## Queued
 ## Done
 - [x] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls https://github.com/hamdi-ab/ethiolink/pull/30 (kind: feature) (merged 2026-10-28)
