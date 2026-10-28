@@ -1,9 +1,9 @@
 # Backlog
 
 ## In flight
-- [ ] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls (kind: feature) (since 2026-10-27)
 ## Queued
 ## Done
+- [x] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls https://github.com/hamdi-ab/ethiolink/pull/30 (kind: feature) (merged 2026-10-28)
 - [x] ETL-021 - Chore: Commit local environment assets, drawings, and turbopack root configuration https://github.com/hamdi-ab/ethiolink/pull/29 (kind: chore) (merged 2026-10-27)
 - [x] ETL-020 - Environment & Guardrails Hardening: Husky Pre-commit, Playwright CI, and Coding Standards https://github.com/hamdi-ab/ethiolink/pull/28 (kind: chore) (merged 2026-10-26)
 - [x] ETL-019 - Impeccable UI Polish: Flatten Funnel Steps, Channel Share Bar, and Contrast Tune https://github.com/hamdi-ab/ethiolink/pull/27 (kind: polish) (merged 2026-10-26)
