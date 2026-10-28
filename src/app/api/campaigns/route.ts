@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         mapUrl: typeof mapUrl === "string" ? mapUrl.trim() : null,
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
-        status: "ACTIVE",
+        status: body.status === "DRAFT" || body.status === "PAUSED" ? body.status : "ACTIVE",
       },
       include: {
         brand: {

@@ -18,6 +18,7 @@ enum CampaignStatus {
   ACTIVE
   PAUSED
   COMPLETED
+  EXPIRED
 }
 
 enum EventType {

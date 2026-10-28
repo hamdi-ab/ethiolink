@@ -6,6 +6,7 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BrandCampaignActions } from "./BrandCampaignActions";
+import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import {
   Store,
   Users,
@@ -14,6 +15,7 @@ import {
   Shield,
   LogOut,
   Tag,
+  Calendar,
 } from "lucide-react";
 
 async function BrandView() {
@@ -36,6 +38,8 @@ async function BrandView() {
     slug: string;
     promoCode: string;
     status: string;
+    startDate: Date | null;
+    endDate: Date | null;
     _count?: { events: number; sales: number };
   }> = [];
 
@@ -99,37 +103,42 @@ async function BrandView() {
               E
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
-                {brand?.name || "Brand Console"}
-              </h1>
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <span>{session.name}</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  <Shield className="w-3 h-3" />
-                  Owner
+              <div className="flex items-center gap-2">
+                <span className="font-headline font-black text-lg text-slate-900 dark:text-white leading-tight">
+                  Ethio<span className="text-emerald-600 dark:text-emerald-400">Link</span>
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  Merchant
                 </span>
               </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {brand?.name} • Portal
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/brand/analytics"
-              className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/80 px-3 py-2 rounded-xl transition-all"
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Performance Funnel</span>
-            </Link>
-
-            <ThemeToggle />
-
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex flex-col text-right">
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{session.name}</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500">{session.role}</span>
+            </div>
+            {session.role === "ADMIN" && (
+              <Link
+                href="/admin"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 rounded-xl transition-all"
+              >
+                <Shield className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span>Admin Console</span>
+              </Link>
+            )}
+            <ThemeToggle size="sm" />
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-2 rounded-xl transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Log out</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </form>
           </div>
@@ -137,15 +146,15 @@ async function BrandView() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Metric Cards Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
             <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
               <span className="text-xs font-semibold uppercase tracking-wider">Active Campaigns</span>
               <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{campaigns.length}</div>
+            <div className="text-3xl font-black text-slate-900 dark:text-white">{brand?._count?.campaigns || 0}</div>
             <Link
               href="/brand/analytics"
               className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 mt-3"
@@ -208,40 +217,57 @@ async function BrandView() {
             </div>
           ) : (
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {campaigns.map((camp) => (
-                <div key={camp.id} className="py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-900 dark:text-white text-sm">{camp.name}</h3>
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                        <Tag className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                        {camp.promoCode}
-                      </span>
-                      <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                        {camp.status}
-                      </span>
+              {campaigns.map((camp) => {
+                const effectiveStatus = getEffectiveStatus(camp);
+                const badgeConfig = getStatusBadgeConfig(effectiveStatus);
+
+                return (
+                  <div key={camp.id} className="py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-sm">{camp.name}</h3>
+                        <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                          <Tag className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          {camp.promoCode}
+                        </span>
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${badgeConfig.badgeClass}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${badgeConfig.dotClass}`} />
+                          {badgeConfig.label}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                        <span>Slug: /{camp.slug}</span>
+                        <span>•</span>
+                        <span>{camp._count?.events || 0} customer events</span>
+                        <span>•</span>
+                        <span>{camp._count?.sales || 0} sales</span>
+                        {camp.endDate && (
+                          <>
+                            <span>•</span>
+                            <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                              <Calendar className="w-3 h-3" />
+                              Ends {new Date(camp.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                      <span>Slug: /{camp.slug}</span>
-                      <span>•</span>
-                      <span>{camp._count?.events || 0} customer events</span>
-                      <span>•</span>
-                      <span>{camp._count?.sales || 0} sales</span>
-                    </div>
+                    <BrandCampaignActions
+                      campaign={{
+                        id: camp.id,
+                        name: camp.name,
+                        slug: camp.slug,
+                        promoCode: camp.promoCode,
+                        brandName: brand?.name || "Merchant",
+                        status: camp.status,
+                        effectiveStatus,
+                      }}
+                    />
                   </div>
-
-                  <BrandCampaignActions
-                    campaign={{
-                      id: camp.id,
-                      name: camp.name,
-                      slug: camp.slug,
-                      promoCode: camp.promoCode,
-                      brandName: brand?.name || "Merchant",
-                    }}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -255,7 +281,7 @@ export default function BrandDashboardPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >
