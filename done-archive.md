@@ -14,3 +14,6 @@
 
 ## Archived 2026-10-28
 - [x] ticket-6 - feat: in-store manual sales logging in ETB https://github.com/hamdi-ab/ethiolink/pull/15 blocked-by: ticket-4 blocked-by: ticket-5 (kind: task) (merged 2026-10-22)
+
+## Archived 2026-10-28
+- [x] ticket-7 - feat: brand performance funnel & analytics dashboard https://github.com/hamdi-ab/ethiolink/pull/16 blocked-by: ticket-3 blocked-by: ticket-6 (kind: task) (merged 2026-10-22)
