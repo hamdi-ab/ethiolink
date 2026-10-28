@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Share2, QrCode, Play, Pause, Loader2 } from "lucide-react";
+import { ExternalLink, Share2, QrCode, Play, Pause, Loader2, Pencil } from "lucide-react";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
+import { EditCampaignModal } from "@/components/campaign/EditCampaignModal";
 
 export interface BrandCampaignActionsProps {
   campaign: {
@@ -16,12 +17,18 @@ export interface BrandCampaignActionsProps {
     status: string;
     effectiveStatus?: string;
     description?: string | null;
+    telegramUrl?: string | null;
+    phoneNumber?: string | null;
+    mapUrl?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
   };
 }
 
 export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>(campaign.status);
   const [isToggling, setIsToggling] = useState(false);
   const [toggleError, setToggleError] = useState<string | null>(null);
@@ -106,6 +113,16 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
             <span>Preview</span>
           </Link>
 
+          <button
+            type="button"
+            onClick={() => setIsEditModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            title="Edit Campaign Details & Destinations"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            <span>Edit</span>
+          </button>
+
           <Link
             href={`/brand/campaigns/new?reinvite=${campaign.id}`}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
@@ -125,6 +142,12 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
       <CampaignShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
+        campaign={campaign}
+      />
+
+      <EditCampaignModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         campaign={campaign}
       />
     </>

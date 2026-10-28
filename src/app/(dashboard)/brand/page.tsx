@@ -38,6 +38,10 @@ async function BrandView() {
     slug: string;
     promoCode: string;
     status: string;
+    description?: string | null;
+    telegramUrl?: string | null;
+    phoneNumber?: string | null;
+    mapUrl?: string | null;
     startDate: Date | null;
     endDate: Date | null;
     _count?: { events: number; sales: number };
@@ -263,6 +267,12 @@ async function BrandView() {
                         brandName: brand?.name || "Merchant",
                         status: camp.status,
                         effectiveStatus,
+                        description: camp.description,
+                        telegramUrl: camp.telegramUrl,
+                        phoneNumber: camp.phoneNumber,
+                        mapUrl: camp.mapUrl,
+                        startDate: camp.startDate ? camp.startDate.toISOString() : null,
+                        endDate: camp.endDate ? camp.endDate.toISOString() : null,
                       }}
                     />
                   </div>
