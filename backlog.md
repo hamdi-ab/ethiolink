@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-026 - feat: creator dashboard PRD FR-036 compliance, impact statement, and recent activity feed (kind: feature) (since 2026-10-28)
 ## Queued
 ## Done
 - [x] ETL-025 - feat: campaign comparison matrix, cohort benchmarking, and attribution disclaimers https://github.com/hamdi-ab/ethiolink/pull/33 (kind: feature) (merged 2026-10-28)

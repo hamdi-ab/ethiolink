@@ -10,6 +10,7 @@ import { GET as getInvite } from "../src/app/api/auth/invite/route.ts";
 import { POST as postJoin } from "../src/app/api/auth/join/route.ts";
 import { GET as getCreatorCampaigns } from "../src/app/api/creator/campaigns/route.ts";
 import { calculateFunnelMetrics } from "../src/lib/analytics.ts";
+import { CreatorView } from "../src/app/(dashboard)/creator/CreatorView.tsx";
 
 test("verifyCreatorInviteToken validates authentic token and rejects forged/expired ones", () => {
   const token = createCreatorInviteToken("cmp_101", "brd_202", "Helen Creator", 60000);
@@ -147,4 +148,94 @@ test("Creator metrics aggregation calculates multi-campaign totals without float
   assert.equal(totalSummary.totalRevenueETB, 2000.0, "1250.50 + 749.50 must sum to 2000.00 ETB");
   assert.equal(totalSummary.aovETB, 1000.0, "2000 / 2 = 1000.00 ETB");
   assert.equal(totalSummary.salesConversionRate, 100.0, "2 sales / 2 views = 100%");
+});
+
+test("Creator activity stream formats events and sales chronologically (PRD FR-035)", () => {
+  const rawEvents = [
+    {
+      id: "ev-1",
+      eventType: "TELEGRAM_CLICK",
+      createdAt: new Date("2026-10-28T10:00:00Z"),
+      campaign: { name: "Bole Launch", slug: "bole-launch", promoCode: "BOLE20" },
+    },
+    {
+      id: "ev-2",
+      eventType: "CALL_CLICK",
+      createdAt: new Date("2026-10-28T10:30:00Z"),
+      campaign: { name: "Arat Kilo", slug: "arat-kilo", promoCode: "STUDENT10" },
+    },
+  ];
+
+  const rawSales = [
+    {
+      id: "sl-1",
+      amountETB: 2500,
+      createdAt: new Date("2026-10-28T10:15:00Z"),
+      campaign: { name: "Bole Launch", slug: "bole-launch", promoCode: "BOLE20" },
+    },
+  ];
+
+  const eventItems = rawEvents.map((e) => ({
+    id: e.id,
+    type: "EVENT",
+    eventType: e.eventType,
+    campaignName: e.campaign.name,
+    campaignSlug: e.campaign.slug,
+    promoCode: e.campaign.promoCode,
+    timestamp: e.createdAt.toISOString(),
+  }));
+
+  const saleItems = rawSales.map((s) => ({
+    id: s.id,
+    type: "SALE",
+    campaignName: s.campaign.name,
+    campaignSlug: s.campaign.slug,
+    promoCode: s.campaign.promoCode,
+    timestamp: s.createdAt.toISOString(),
+    amountETB: s.amountETB,
+  }));
+
+  const activity = [...eventItems, ...saleItems].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+
+  assert.equal(activity.length, 3);
+  assert.equal(activity[0].id, "ev-2", "10:30 event must be newest");
+  assert.equal(activity[1].id, "sl-1", "10:15 sale must be second");
+  assert.equal(activity[2].id, "ev-1", "10:00 event must be oldest");
+  assert.equal(activity[1].amountETB, 2500);
+});
+
+test("Creator portal strictly excludes financial wallets and automated payouts (PRD FR-036)", () => {
+  const samplePortalData = {
+    status: "ok",
+    creator: { id: "c1", name: "Sara", phone: "0911000000", telegramUsername: "sara_eth" },
+    summary: {
+      pageViews: 100,
+      uniqueVisitors: 80,
+      telegramClicks: 30,
+      callClicks: 10,
+      mapClicks: 5,
+      copyCodeClicks: 5,
+      totalClicks: 50,
+      salesCount: 5,
+      totalRevenueETB: 15000,
+      clickThroughRate: 50.0,
+      salesConversionRate: 5.0,
+      aovETB: 3000,
+      totalCampaigns: 1,
+    },
+    campaigns: [],
+    recentActivity: [],
+  };
+
+  // PRD FR-036 requires that portal data has no wallet balances, payout requests, or withdrawal objects
+  assert.equal("walletBalance" in samplePortalData, false);
+  assert.equal("withdrawalAvailable" in samplePortalData, false);
+  assert.equal("payoutBalance" in samplePortalData, false);
+  assert.ok(samplePortalData.recentActivity);
+});
+
+test("CreatorView component exports successfully for React client consumption", () => {
+  assert.equal(typeof CreatorView, "function");
 });

@@ -6,10 +6,16 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { calculateFunnelMetrics } from "@/lib/analytics";
 import { CreatorView } from "./CreatorView";
-import type { CreatorPortalResponse, CreatorCampaignItem } from "@/app/api/creator/campaigns/route";
+import type {
+  CreatorPortalResponse,
+  CreatorCampaignItem,
+  CreatorActivityItem,
+} from "@/app/api/creator/campaigns/route";
 
 async function CreatorServerContent() {
-  try { await connection(); } catch {}
+  try {
+    await connection();
+  } catch {}
   const session = await getSession();
 
   if (!session) {
@@ -85,7 +91,7 @@ async function CreatorServerContent() {
                 sales: {
                   select: {
                     amountETB: true,
-                  isVoided: true,
+                    isVoided: true,
                   },
                 },
               },
@@ -120,6 +126,76 @@ async function CreatorServerContent() {
     };
   });
 
+  // Query recent audience activity across assigned campaigns (PRD FR-035)
+  const campaignIds = creator.assignments.map((a) => a.campaignId);
+  let recentActivity: CreatorActivityItem[] = [];
+
+  if (campaignIds.length > 0) {
+    const [recentEvents, recentSales] = await Promise.all([
+      db.event.findMany({
+        where: {
+          campaignId: { in: campaignIds },
+          eventType: { not: "PAGE_VIEW" },
+        },
+        take: 20,
+        orderBy: { createdAt: "desc" },
+        include: {
+          campaign: {
+            select: {
+              name: true,
+              slug: true,
+              promoCode: true,
+            },
+          },
+        },
+      }),
+      db.sale.findMany({
+        where: {
+          campaignId: { in: campaignIds },
+          isVoided: false,
+        },
+        take: 20,
+        orderBy: { createdAt: "desc" },
+        include: {
+          campaign: {
+            select: {
+              name: true,
+              slug: true,
+              promoCode: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    const eventItems: CreatorActivityItem[] = recentEvents.map((e) => ({
+      id: e.id,
+      type: "EVENT",
+      eventType: e.eventType,
+      campaignName: e.campaign.name,
+      campaignSlug: e.campaign.slug,
+      promoCode: e.campaign.promoCode,
+      timestamp: e.createdAt.toISOString(),
+    }));
+
+    const saleItems: CreatorActivityItem[] = recentSales.map((s) => ({
+      id: s.id,
+      type: "SALE",
+      campaignName: s.campaign.name,
+      campaignSlug: s.campaign.slug,
+      promoCode: s.campaign.promoCode,
+      timestamp: s.createdAt.toISOString(),
+      amountETB:
+        typeof s.amountETB === "object" && s.amountETB !== null && "toNumber" in s.amountETB
+          ? (s.amountETB as { toNumber(): number }).toNumber()
+          : Number(s.amountETB),
+    }));
+
+    recentActivity = [...eventItems, ...saleItems]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 20);
+  }
+
   const portalData: CreatorPortalResponse = {
     status: "ok",
     creator: {
@@ -133,6 +209,7 @@ async function CreatorServerContent() {
       totalCampaigns: creator.assignments.length,
     },
     campaigns: campaignItems,
+    recentActivity,
   };
 
   const headerList = await headers();
@@ -148,11 +225,8 @@ export default function CreatorPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl mb-4 animate-bounce">
-            E
-          </div>
-          <div className="text-sm font-bold text-slate-700">Loading Creator Portal...</div>
-          <div className="text-xs text-slate-400 mt-1">Aggregating campaign analytics</div>
+          <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+          <p className="mt-3 text-xs text-slate-500 font-medium">Loading Creator Portal...</p>
         </div>
       }
     >

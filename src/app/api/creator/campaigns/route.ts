@@ -16,6 +16,17 @@ export interface CreatorCampaignItem {
   metrics: FunnelMetrics;
 }
 
+export interface CreatorActivityItem {
+  id: string;
+  type: "EVENT" | "SALE";
+  eventType?: string;
+  campaignName: string;
+  campaignSlug: string;
+  promoCode: string;
+  timestamp: string;
+  amountETB?: number | null;
+}
+
 export interface CreatorPortalResponse {
   status: "ok";
   creator: {
@@ -28,6 +39,7 @@ export interface CreatorPortalResponse {
     totalCampaigns: number;
   };
   campaigns: CreatorCampaignItem[];
+  recentActivity: CreatorActivityItem[];
 }
 
 export async function GET(req: NextRequest) {
@@ -109,6 +121,76 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    // Query recent audience activity across assigned campaigns (PRD FR-035)
+    const campaignIds = creator.assignments.map((a) => a.campaignId);
+    let recentActivity: CreatorActivityItem[] = [];
+
+    if (campaignIds.length > 0) {
+      const [recentEvents, recentSales] = await Promise.all([
+        db.event.findMany({
+          where: {
+            campaignId: { in: campaignIds },
+            eventType: { not: "PAGE_VIEW" },
+          },
+          take: 20,
+          orderBy: { createdAt: "desc" },
+          include: {
+            campaign: {
+              select: {
+                name: true,
+                slug: true,
+                promoCode: true,
+              },
+            },
+          },
+        }),
+        db.sale.findMany({
+          where: {
+            campaignId: { in: campaignIds },
+            isVoided: false,
+          },
+          take: 20,
+          orderBy: { createdAt: "desc" },
+          include: {
+            campaign: {
+              select: {
+                name: true,
+                slug: true,
+                promoCode: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      const eventItems: CreatorActivityItem[] = recentEvents.map((e) => ({
+        id: e.id,
+        type: "EVENT",
+        eventType: e.eventType,
+        campaignName: e.campaign.name,
+        campaignSlug: e.campaign.slug,
+        promoCode: e.campaign.promoCode,
+        timestamp: e.createdAt.toISOString(),
+      }));
+
+      const saleItems: CreatorActivityItem[] = recentSales.map((s) => ({
+        id: s.id,
+        type: "SALE",
+        campaignName: s.campaign.name,
+        campaignSlug: s.campaign.slug,
+        promoCode: s.campaign.promoCode,
+        timestamp: s.createdAt.toISOString(),
+        amountETB:
+          typeof s.amountETB === "object" && s.amountETB !== null && "toNumber" in s.amountETB
+            ? (s.amountETB as { toNumber(): number }).toNumber()
+            : Number(s.amountETB),
+      }));
+
+      recentActivity = [...eventItems, ...saleItems]
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 20);
+    }
+
     const responseData: CreatorPortalResponse = {
       status: "ok",
       creator: {
@@ -122,6 +204,7 @@ export async function GET(req: NextRequest) {
         totalCampaigns: creator.assignments.length,
       },
       campaigns: campaignItems,
+      recentActivity,
     };
 
     return NextResponse.json(responseData, { status: 200 });
