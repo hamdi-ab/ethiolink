@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-027 - feat: operational issue management & merchant discrepancy reporting (PRD FR-040, FR-038) (kind: feature) (since 2026-10-29)
 ## Queued
 ## Done
 - [x] ETL-026 - feat: creator dashboard PRD FR-036 compliance, impact statement, and recent activity feed https://github.com/hamdi-ab/ethiolink/pull/34 (kind: feature) (merged 2026-10-28)

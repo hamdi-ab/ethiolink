@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
+  LifeBuoy,
 } from "lucide-react";
 
 export type AdminTab =
@@ -25,6 +26,7 @@ export type AdminTab =
   | "campaigns"
   | "merchants"
   | "creators"
+  | "issues"
   | "telemetry"
   | "health";
 
@@ -50,6 +52,7 @@ export interface AdminSidebarProps {
     merchants: number;
     creators: number;
     events: number;
+    issues?: number;
   };
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -112,6 +115,12 @@ export function AdminSidebar({
           label: "Creator Directory",
           icon: Users,
           badge: counts.creators,
+        },
+        {
+          id: "issues",
+          label: "Operational Issues",
+          icon: LifeBuoy,
+          badge: counts.issues,
         },
       ],
     },

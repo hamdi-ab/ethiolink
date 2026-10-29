@@ -29,6 +29,28 @@ enum EventType {
   COPY_CODE
 }
 
+enum IssueCategory {
+  CAMPAIGN_LINK_DOWN
+  ATTRIBUTION_DISCREPANCY
+  TRANSACTION_DISPUTE
+  TECHNICAL_BUG
+  GENERAL_INQUIRY
+}
+
+enum IssueStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum IssuePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 model Brand {
   id           String     @id @default(cuid())
   name         String
@@ -42,19 +64,20 @@ model Brand {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  brandId      String?
-  brand        Brand?      @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  name         String
-  phone        String      @unique
-  role         UserRole    @default(STAFF)
-  passwordHash String?
-  magicToken   String?     @unique
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  loggedSales  Sale[]      @relation("LoggedSales")
-  voidedSales  Sale[]      @relation("VoidedSales")
-  creator      Creator?
+  id             String             @id @default(cuid())
+  brandId        String?
+  brand          Brand?             @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name           String
+  phone          String             @unique
+  role           UserRole           @default(STAFF)
+  passwordHash   String?
+  magicToken     String?            @unique
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  loggedSales    Sale[]             @relation("LoggedSales")
+  voidedSales    Sale[]             @relation("VoidedSales")
+  creator        Creator?
+  reportedIssues OperationalIssue[]
 }
 
 model Creator {
@@ -86,6 +109,7 @@ model Campaign {
   creators    CampaignAssignment[]
   events      Event[]
   sales       Sale[]
+  issues      OperationalIssue[]
 }
 
 model CampaignAssignment {
@@ -112,21 +136,45 @@ model Event {
 }
 
 model Sale {
-  id          String    @id @default(cuid())
+  id          String             @id @default(cuid())
   campaignId  String
-  campaign    Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign    Campaign           @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   loggedById  String
-  loggedBy    User      @relation("LoggedSales", fields: [loggedById], references: [id])
-  amountETB   Decimal   @db.Decimal(12, 2)
+  loggedBy    User               @relation("LoggedSales", fields: [loggedById], references: [id])
+  amountETB   Decimal            @db.Decimal(12, 2)
   notes       String?
-  isVoided    Boolean   @default(false)
+  isVoided    Boolean            @default(false)
   voidReason  String?
   voidedAt    DateTime?
   voidedById  String?
-  voidedBy    User?     @relation("VoidedSales", fields: [voidedById], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  voidedBy    User?              @relation("VoidedSales", fields: [voidedById], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  issues      OperationalIssue[]
 
   @@index([campaignId, isVoided, createdAt])
   @@index([campaignId, createdAt])
+}
+
+model OperationalIssue {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  saleId      String?
+  sale        Sale?         @relation(fields: [saleId], references: [id], onDelete: SetNull)
+  category    IssueCategory @default(GENERAL_INQUIRY)
+  status      IssueStatus   @default(OPEN)
+  priority    IssuePriority @default(MEDIUM)
+  title       String
+  description String
+  adminNotes  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status, priority, createdAt])
+  @@index([userId, createdAt])
+  @@index([campaignId])
 }

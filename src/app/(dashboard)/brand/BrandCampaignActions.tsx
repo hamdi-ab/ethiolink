@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Share2, QrCode, Play, Pause, Loader2, Pencil } from "lucide-react";
+import { ExternalLink, Share2, QrCode, Play, Pause, Loader2, Pencil, LifeBuoy } from "lucide-react";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import { EditCampaignModal } from "@/components/campaign/EditCampaignModal";
+import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 
 export interface BrandCampaignActionsProps {
   campaign: {
@@ -29,6 +30,7 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>(campaign.status);
   const [isToggling, setIsToggling] = useState(false);
   const [toggleError, setToggleError] = useState<string | null>(null);
@@ -130,6 +132,16 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
             <Share2 className="w-3.5 h-3.5" />
             <span>Invite</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setIsReportModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            title="Report Campaign Discrepancy or Link Downtime to Ops"
+          >
+            <LifeBuoy className="w-3.5 h-3.5 text-amber-500" />
+            <span>Report</span>
+          </button>
         </div>
 
         {toggleError && (
@@ -149,6 +161,13 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         campaign={campaign}
+      />
+
+      <ReportIssueModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        campaigns={[{ id: campaign.id, name: campaign.name, promoCode: campaign.promoCode }]}
+        defaultCampaignId={campaign.id}
       />
     </>
   );

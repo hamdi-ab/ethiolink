@@ -23,7 +23,9 @@ import {
   Activity,
   ShieldCheck,
   Filter,
+  LifeBuoy,
 } from "lucide-react";
+import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 
 interface CreatorViewProps {
   initialData: CreatorPortalResponse;
@@ -60,6 +62,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
     promoCode: string;
     brandName: string;
   } | null>(null);
+  const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -184,8 +187,19 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-mono font-bold bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 px-3 py-1.5 rounded-xl">
-              <span>{summary.salesConversionRate}% Blended CVR</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 px-3 py-1.5 rounded-xl">
+                <span>{summary.salesConversionRate}% Blended CVR</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReportIssueOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer shadow-2xs"
+                title="Report Campaign Discrepancy or Link Downtime to Ops"
+              >
+                <LifeBuoy className="w-3.5 h-3.5 text-amber-300" />
+                <span>Report Discrepancy</span>
+              </button>
             </div>
           </div>
 
@@ -554,6 +568,17 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
         onClose={() => setSelectedShareCampaign(null)}
         campaign={selectedShareCampaign}
         origin={origin}
+      />
+
+      {/* Operational Issue & Discrepancy Reporting Modal (PRD FR-040) */}
+      <ReportIssueModal
+        isOpen={isReportIssueOpen}
+        onClose={() => setIsReportIssueOpen(false)}
+        campaigns={campaigns.map((c) => ({
+          id: c.campaignId,
+          name: c.campaignName,
+          promoCode: c.promoCode,
+        }))}
       />
     </div>
   );

@@ -17,11 +17,15 @@ test("Prisma schema contains all required domain models and enums", () => {
   assert.match(schema, /model CampaignAssignment\s+\{/);
   assert.match(schema, /model Event\s+\{/);
   assert.match(schema, /model Sale\s+\{/);
+  assert.match(schema, /model OperationalIssue\s+\{/);
 
   // Enums
   assert.match(schema, /enum UserRole\s+\{/);
   assert.match(schema, /enum CampaignStatus\s+\{/);
   assert.match(schema, /enum EventType\s+\{/);
+  assert.match(schema, /enum IssueCategory\s+\{/);
+  assert.match(schema, /enum IssueStatus\s+\{/);
+  assert.match(schema, /enum IssuePriority\s+\{/);
 });
 
 test("Prisma Client exports all required model delegates", () => {
@@ -36,4 +40,5 @@ test("Prisma Client exports all required model delegates", () => {
   assert.ok(typeof prisma.campaignAssignment !== "undefined", "campaignAssignment delegate must exist");
   assert.ok(typeof prisma.event !== "undefined", "event delegate must exist");
   assert.ok(typeof prisma.sale !== "undefined", "sale delegate must exist");
+  assert.ok(typeof prisma.operationalIssue !== "undefined", "operationalIssue delegate must exist");
 });
