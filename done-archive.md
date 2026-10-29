@@ -20,3 +20,6 @@
 
 ## Archived 2026-10-28
 - [x] ticket-8 - feat: creator portal & magic-link onboarding https://github.com/hamdi-ab/ethiolink/pull/17 blocked-by: ticket-5 blocked-by: ticket-7 (kind: task) (merged 2026-10-22)
+
+## Archived 2026-10-29
+- [x] ticket-9 - feat: admin audit & system health console https://github.com/hamdi-ab/ethiolink/pull/18 blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (merged 2026-10-22)
