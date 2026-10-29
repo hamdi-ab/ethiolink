@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { formatETB } from "@/lib/sales";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -17,6 +17,12 @@ import {
   CheckCircle2,
   QrCode,
   Send,
+  Phone,
+  MapPin,
+  Receipt,
+  Activity,
+  ShieldCheck,
+  Filter,
 } from "lucide-react";
 
 interface CreatorViewProps {
@@ -24,11 +30,29 @@ interface CreatorViewProps {
   origin: string;
 }
 
+function formatRelativeTime(dateString: string): string {
+  try {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffSec < 60) return "Just now";
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toISOString().slice(0, 10);
+  } catch {
+    return dateString;
+  }
+}
+
 export function CreatorView({ initialData, origin }: CreatorViewProps) {
-  const { creator, summary, campaigns } = initialData;
+  const { creator, summary, campaigns, recentActivity = [] } = initialData;
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [lang, setLang] = useState<"en" | "am">("en");
-  const [payoutRequested, setPayoutRequested] = useState(false);
+  const [selectedCampaignFilter, setSelectedCampaignFilter] = useState<string>("all");
   const [selectedShareCampaign, setSelectedShareCampaign] = useState<{
     id: string;
     name: string;
@@ -47,8 +71,10 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
     }
   };
 
-  // 10% standard creator commission model for Ethiopian creator economy
-  const estimatedCommissionETB = Math.round(summary.totalRevenueETB * 0.1 * 100) / 100;
+  const filteredActivity = useMemo(() => {
+    if (selectedCampaignFilter === "all") return recentActivity;
+    return recentActivity.filter((act) => act.campaignSlug === selectedCampaignFilter);
+  }, [recentActivity, selectedCampaignFilter]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
@@ -115,87 +141,86 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Creator Profile Summary Bar */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg border-2 border-emerald-400">
               {creator.name.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-bold text-sm text-slate-900">
+                <span className="font-headline font-bold text-sm text-slate-900 dark:text-white">
                   {creator.name}
                 </span>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                  Level 2 Top Creator
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                  Verified Influencer
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Addis Ababa • Influencer Attribution Tier 1
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Addis Ababa &bull; Promotional Attribution Partner
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Real-Time Commission Tracking Active</span>
+            <span>Real-Time Campaign Attribution Active</span>
           </div>
         </div>
 
-        {/* Hero Earnings Card with Telebirr Instant Payout */}
-        <div className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+        {/* Promotional Attribution Impact Hero Card (PRD FR-034 & FR-036) */}
+        <div className="bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden space-y-6">
           <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-64 h-64 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-600/50 pb-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-emerald-700/50 pb-6">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-emerald-200">
-                Available Telebirr Commission Balance
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+                Promotional Attribution Impact
               </span>
               <div className="font-mono font-black text-3xl sm:text-4xl text-white tracking-tight mt-1">
-                {formatETB(estimatedCommissionETB)}
+                {formatETB(summary.totalRevenueETB)}
               </div>
               <p className="text-xs text-emerald-200 mt-1">
-                Based on {formatETB(summary.totalRevenueETB)} in gross attributed sales (10% commission rate)
+                Driven across {summary.salesCount} verified in-store redemptions &amp; {campaigns.length} assigned campaigns
               </p>
             </div>
 
-            <button
-              onClick={() => {
-                setPayoutRequested(true);
-                setTimeout(() => setPayoutRequested(false), 3000);
-              }}
-              className="h-12 px-6 bg-white hover:bg-emerald-50 text-emerald-900 font-headline font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
-            >
-              {payoutRequested ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-600" />
-                  <span>Telebirr Settlement Queued!</span>
-                </>
-              ) : (
-                <>
-                  <QrCode className="w-4 h-4 text-emerald-700" />
-                  <span>Instant Cashout via Telebirr</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-2 text-xs font-mono font-bold bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 px-3 py-1.5 rounded-xl">
+              <span>{summary.salesConversionRate}% Blended CVR</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          {/* PRD FR-036 Non-Financial Policy Transparency Box */}
+          <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-700/40 text-xs text-emerald-200 flex items-start gap-2.5 leading-relaxed">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <span className="text-emerald-300">Total Attributed Gross:</span>
-              <div className="font-mono font-bold text-sm text-white mt-0.5">
-                {formatETB(summary.totalRevenueETB)}
+              <strong className="text-white">Attribution Transparency (PRD FR-036):</strong> EthioLink measures marketing attribution and in-store customer engagement for brand partners. In-app wallets, simulated balances, and automated withdrawals are excluded. Commercial partner compensation and creator payouts are handled directly by business partners per off-platform agreements.
+            </div>
+          </div>
+
+          {/* 4 Impact Dimensions */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs pt-1">
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-emerald-300">In-Store Orders:</span>
+              <div className="font-mono font-bold text-base text-white mt-0.5">
+                {summary.salesCount.toLocaleString()}
               </div>
             </div>
-            <div>
-              <span className="text-emerald-300">Verified Purchases:</span>
-              <div className="font-mono font-bold text-sm text-white mt-0.5">
-                {summary.salesCount.toLocaleString()} orders
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-emerald-300">Average Order (AOV):</span>
+              <div className="font-mono font-bold text-base text-white mt-0.5">
+                {formatETB(summary.aovETB)}
               </div>
             </div>
-            <div>
-              <span className="text-emerald-300">Next Auto-Settlement:</span>
-              <div className="font-mono font-bold text-sm text-white mt-0.5">
-                Daily at 9:00 AM (EAT)
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-emerald-300">Action Intent Taps:</span>
+              <div className="font-mono font-bold text-base text-white mt-0.5">
+                {summary.totalClicks.toLocaleString()}
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-emerald-300">Audience CTR:</span>
+              <div className="font-mono font-bold text-base text-white mt-0.5">
+                {summary.clickThroughRate}%
               </div>
             </div>
           </div>
@@ -203,56 +228,164 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
 
         {/* 4-Card Performance Bento Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Active Campaigns
             </span>
-            <div className="text-2xl font-black text-slate-900 mt-2">
+            <div className="text-2xl font-black text-slate-900 dark:text-white mt-2">
               {campaigns.length}
             </div>
-            <span className="text-[11px] text-slate-500 mt-1">Brand partnerships</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Brand partnerships</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Link Visits
             </span>
-            <div className="text-2xl font-black font-mono text-slate-900 mt-2">
+            <div className="text-2xl font-black font-mono text-slate-900 dark:text-white mt-2">
               {summary.pageViews.toLocaleString()}
             </div>
-            <span className="text-[11px] text-slate-500 mt-1">Total page impressions</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Total page impressions</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Action Intent Clicks
             </span>
-            <div className="text-2xl font-black font-mono text-sky-700 mt-2">
+            <div className="text-2xl font-black font-mono text-sky-700 dark:text-sky-400 mt-2">
               {summary.totalClicks.toLocaleString()}
             </div>
-            <span className="text-[11px] text-slate-500 mt-1">Telegram &amp; phone taps</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Telegram &amp; phone taps</span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Attributed Sales
             </span>
-            <div className="text-2xl font-black font-mono text-emerald-700 mt-2">
+            <div className="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400 mt-2">
               {summary.salesCount.toLocaleString()}
             </div>
-            <span className="text-[11px] text-slate-500 mt-1">Verified redemptions</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Verified redemptions</span>
           </div>
+        </div>
+
+        {/* PRD FR-035: Recent Audience Activity & Redemptions Feed */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Recent Audience Activity &amp; Redemptions</span>
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Real-time chronological stream of customer actions attributed to your campaign links and promo codes
+              </p>
+            </div>
+
+            {campaigns.length > 1 && (
+              <div className="flex items-center gap-2 text-xs">
+                <Filter className="w-3.5 h-3.5 text-slate-400" />
+                <select
+                  value={selectedCampaignFilter}
+                  onChange={(e) => setSelectedCampaignFilter(e.target.value)}
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                >
+                  <option value="all">All Campaigns ({campaigns.length})</option>
+                  {campaigns.map((c) => (
+                    <option key={c.campaignId} value={c.slug}>
+                      {c.campaignName} ({c.promoCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {filteredActivity.length === 0 ? (
+            <div className="p-8 text-center rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto">
+                <Activity className="w-5 h-5" />
+              </div>
+              <p className="font-semibold text-slate-700 dark:text-slate-300">
+                No audience activity recorded yet.
+              </p>
+              <p className="max-w-md mx-auto text-[11px]">
+                Share your promo code and campaign link with your Telegram or social media audience to start generating tracked actions.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+              {filteredActivity.map((act) => {
+                const isSale = act.type === "SALE";
+                return (
+                  <div
+                    key={act.id}
+                    className="py-3 flex items-center justify-between gap-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 rounded-xl px-2 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {isSale ? (
+                        <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                          <Receipt className="w-4 h-4" />
+                        </div>
+                      ) : act.eventType === "TELEGRAM_CLICK" ? (
+                        <div className="w-8 h-8 rounded-xl bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center">
+                          <Send className="w-4 h-4" />
+                        </div>
+                      ) : act.eventType === "CALL_CLICK" ? (
+                        <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                          <Phone className="w-4 h-4" />
+                        </div>
+                      ) : act.eventType === "MAP_CLICK" ? (
+                        <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center">
+                          <MapPin className="w-4 h-4" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                          <Copy className="w-4 h-4" />
+                        </div>
+                      )}
+
+                      <div>
+                        <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                          {isSale ? (
+                            <span>In-Store Redemption ({formatETB(act.amountETB || 0)})</span>
+                          ) : act.eventType === "TELEGRAM_CLICK" ? (
+                            <span>Telegram Channel Tap</span>
+                          ) : act.eventType === "CALL_CLICK" ? (
+                            <span>Direct Store Call</span>
+                          ) : act.eventType === "MAP_CLICK" ? (
+                            <span>Store Directions View</span>
+                          ) : (
+                            <span>Promo Code Copied</span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          <span>{act.campaignName}</span>
+                          <span>&bull;</span>
+                          <span className="font-mono text-emerald-700 dark:text-emerald-400">{act.promoCode}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right text-[11px] font-mono text-slate-400 dark:text-slate-500 shrink-0">
+                      {formatRelativeTime(act.timestamp)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Active Campaigns & Share Tools */}
         <div className="space-y-4">
-          <h2 className="font-headline font-bold text-base text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
+          <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Assigned Campaigns &amp; Omnichannel Share Tools</span>
           </h2>
 
           {campaigns.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
               You are not currently assigned to any active brand campaigns. Ask your merchant partner for an invite link.
             </div>
           ) : (
@@ -265,17 +398,17 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                 return (
                   <div
                     key={camp.campaignId}
-                    className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6"
+                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-6"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                             {camp.brandName}
                           </span>
-                          <span className="text-xs font-bold text-slate-400">Active Campaign</span>
+                          <span className="text-xs font-bold text-slate-400 dark:text-slate-500">Active Campaign</span>
                         </div>
-                        <h3 className="font-headline font-black text-xl text-slate-900 mt-1">
+                        <h3 className="font-headline font-black text-xl text-slate-900 dark:text-white mt-1">
                           {camp.campaignName}
                         </h3>
                       </div>
@@ -311,8 +444,8 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                     {/* Share Cards: Tracking Link & Promo Code */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Tracking Link Card */}
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 space-y-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           Your Direct Attribution Link
                         </span>
                         <div className="flex items-center gap-2">
@@ -348,12 +481,12 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                       </div>
 
                       {/* Promo Code Card */}
-                      <div className="p-4 rounded-2xl bg-emerald-50/50 border-2 border-dashed border-emerald-300 space-y-2 text-center flex flex-col justify-between">
+                      <div className="p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-dashed border-emerald-300 dark:border-emerald-800 space-y-2 text-center flex flex-col justify-between">
                         <div>
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
                             Your In-Store &amp; Online Promo Code
                           </span>
-                          <div className="font-mono font-black text-2xl tracking-widest text-emerald-800 mt-1 select-all">
+                          <div className="font-mono font-black text-2xl tracking-widest text-emerald-800 dark:text-emerald-300 mt-1 select-all">
                             {camp.promoCode}
                           </div>
                         </div>
@@ -368,28 +501,28 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                     </div>
 
                     {/* Campaign Performance Summary Strip */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 text-xs">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                       <div>
                         <span className="text-slate-400">Page Views:</span>
-                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                        <div className="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                           {camp.metrics.pageViews.toLocaleString()}
                         </div>
                       </div>
                       <div>
                         <span className="text-slate-400">Action Clicks:</span>
-                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                        <div className="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                           {camp.metrics.totalClicks.toLocaleString()}
                         </div>
                       </div>
                       <div>
                         <span className="text-slate-400">Attributed Orders:</span>
-                        <div className="font-mono font-bold text-slate-800 mt-0.5">
+                        <div className="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                           {camp.metrics.salesCount.toLocaleString()}
                         </div>
                       </div>
                       <div>
                         <span className="text-slate-400">Attributed Gross:</span>
-                        <div className="font-mono font-bold text-emerald-700 mt-0.5">
+                        <div className="font-mono font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
                           {formatETB(camp.metrics.totalRevenueETB)}
                         </div>
                       </div>
@@ -401,15 +534,15 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
           )}
         </div>
 
-        {/* Attribution Limitations & Methodology Transparency (PRD FR-025 / FR-029) */}
+        {/* Attribution Limitations & Methodology Transparency (PRD FR-025 / FR-029 / FR-036) */}
         <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs flex items-start gap-3 transition-colors">
           <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
           <div className="leading-relaxed space-y-1">
             <span className="font-bold text-slate-800 dark:text-slate-200 block">
-              EthioLink Attribution & Verification Notice (PRD FR-025 / FR-029):
+              EthioLink Attribution &amp; Verification Notice (PRD FR-025 / FR-029 / FR-036):
             </span>
             <p>
-              Reported sales and earnings reflect merchant-recorded in-store redemptions and digital checkout logs attributed to your promo code and campaign links. Funnel metrics represent aggregate promotional engagement rather than individual bank-cleared transactions. Payouts are reconciled per merchant agreement terms via your connected Telebirr mobile wallet upon merchant verification.
+              Reported sales and campaign metrics reflect merchant-recorded in-store redemptions and digital checkout logs attributed to your promo code and campaign links. Funnel metrics represent aggregate promotional engagement rather than individual bank-cleared transactions. Payouts and commercial agreements are fulfilled directly by merchant partners off-platform.
             </p>
           </div>
         </div>
