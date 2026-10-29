@@ -44,13 +44,14 @@ async function AdminServerContent() {
     getSystemHealthDiagnostics(),
   ]);
 
-  // Batch 2: Audit Records & Event Streams (5 items <= 10 tuple overload)
+  // Batch 2: Audit Records, Event Streams, and Operational Issues (6 items <= 10 tuple overload)
   const [
     recentSales,
     recentCampaigns,
     recentBrands,
     recentCreators,
     recentEvents,
+    recentIssues,
   ] = await Promise.all([
     db.sale.findMany({
       take: 50,
@@ -114,6 +115,15 @@ async function AdminServerContent() {
             brand: { select: { name: true } },
           },
         },
+      },
+    }),
+    db.operationalIssue.findMany({
+      take: 50,
+      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
+      include: {
+        user: { select: { id: true, name: true, phone: true, role: true } },
+        campaign: { select: { id: true, name: true, slug: true, promoCode: true } },
+        sale: { select: { id: true, amountETB: true, isVoided: true, createdAt: true } },
       },
     }),
   ]);
@@ -193,6 +203,28 @@ async function AdminServerContent() {
     timestamp: e.createdAt.toISOString(),
   }));
 
+  const formattedIssues = (recentIssues || []).map((i) => ({
+    id: i.id,
+    title: i.title,
+    description: i.description,
+    category: i.category,
+    status: i.status,
+    priority: i.priority,
+    reporterName: i.user.name,
+    reporterPhone: i.user.phone,
+    reporterRole: i.user.role,
+    campaignName: i.campaign?.name || null,
+    campaignPromoCode: i.campaign?.promoCode || null,
+    saleAmountETB: i.sale
+      ? typeof i.sale.amountETB === "object" && i.sale.amountETB !== null && "toNumber" in i.sale.amountETB
+        ? i.sale.amountETB.toNumber()
+        : Number(i.sale.amountETB)
+      : null,
+    adminNotes: i.adminNotes,
+    resolvedAt: i.resolvedAt ? i.resolvedAt.toISOString() : null,
+    createdAt: i.createdAt.toISOString(),
+  }));
+
   return (
     <AdminDashboardView
       adminName={session.name}
@@ -205,6 +237,7 @@ async function AdminServerContent() {
         brands: formattedBrands,
         creators: formattedCreators,
         events: formattedEvents,
+        issues: formattedIssues,
       }}
     />
   );

@@ -34,6 +34,10 @@ import {
   Activity,
   Award,
   QrCode,
+  LifeBuoy,
+  Clock,
+  Filter,
+  X,
 } from "lucide-react";
 
 export interface SaleAuditItem {
@@ -93,6 +97,24 @@ export interface EventAuditItem {
   timestamp: string;
 }
 
+export interface IssueAuditItem {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  priority: string;
+  reporterName: string;
+  reporterPhone: string;
+  reporterRole: string;
+  campaignName?: string | null;
+  campaignPromoCode?: string | null;
+  saleAmountETB?: number | null;
+  adminNotes?: string | null;
+  resolvedAt?: string | null;
+  createdAt: string;
+}
+
 export interface AdminDashboardViewProps {
   adminName: string;
   stats: PlatformOverviewStats;
@@ -104,6 +126,7 @@ export interface AdminDashboardViewProps {
     brands: BrandAuditItem[];
     creators: CreatorAuditItem[];
     events: EventAuditItem[];
+    issues?: IssueAuditItem[];
   };
 }
 
@@ -126,6 +149,84 @@ export function AdminDashboardView({
     promoCode: string;
     brandName: string;
   } | null>(null);
+
+  const [issuesList, setIssuesList] = useState<IssueAuditItem[]>(audit.issues || []);
+  const [issueStatusFilter, setIssueStatusFilter] = useState<string>("ALL");
+  const [issuePriorityFilter, setIssuePriorityFilter] = useState<string>("ALL");
+  const [selectedIssueForTriage, setSelectedIssueForTriage] = useState<IssueAuditItem | null>(null);
+  const [triageNotes, setTriageNotes] = useState<string>("");
+  const [triageLoading, setTriageLoading] = useState<boolean>(false);
+
+  const filteredIssues = useMemo(() => {
+    let list = issuesList;
+    if (issueStatusFilter !== "ALL") {
+      list = list.filter((i) => i.status === issueStatusFilter);
+    }
+    if (issuePriorityFilter !== "ALL") {
+      list = list.filter((i) => i.priority === issuePriorityFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (i) =>
+          i.title.toLowerCase().includes(q) ||
+          i.description.toLowerCase().includes(q) ||
+          i.reporterName.toLowerCase().includes(q) ||
+          i.reporterPhone.toLowerCase().includes(q) ||
+          Boolean(i.campaignName && i.campaignName.toLowerCase().includes(q)) ||
+          Boolean(i.campaignPromoCode && i.campaignPromoCode.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [issuesList, issueStatusFilter, issuePriorityFilter, searchQuery]);
+
+  const handleUpdateIssueStatus = async (issueId: string, status: string, notes?: string) => {
+    setTriageLoading(true);
+    try {
+      const res = await fetch(`/api/support/issues/${issueId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status,
+          ...(notes !== undefined ? { adminNotes: notes } : {}),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update issue");
+      }
+      setIssuesList((prev) =>
+        prev.map((item) =>
+          item.id === issueId
+            ? {
+                ...item,
+                status: data.issue.status,
+                priority: data.issue.priority,
+                adminNotes: data.issue.adminNotes,
+                resolvedAt: data.issue.resolvedAt,
+              }
+            : item
+        )
+      );
+      if (selectedIssueForTriage?.id === issueId) {
+        setSelectedIssueForTriage((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: data.issue.status,
+                priority: data.issue.priority,
+                adminNotes: data.issue.adminNotes,
+                resolvedAt: data.issue.resolvedAt,
+              }
+            : null
+        );
+      }
+    } catch (err) {
+      console.error("Triage error:", err);
+    } finally {
+      setTriageLoading(false);
+    }
+  };
 
   // Search filters
   const filteredSales = useMemo(() => {
@@ -244,6 +345,8 @@ export function AdminDashboardView({
         return "Registered Brands";
       case "creators":
         return "Creator Directory";
+      case "issues":
+        return "Operational Issues & Discrepancies";
       case "telemetry":
         return "Raw Telemetry Stream";
       case "health":
@@ -265,6 +368,7 @@ export function AdminDashboardView({
           merchants: audit.brands.length,
           creators: audit.creators.length,
           events: audit.events.length,
+          issues: issuesList.filter((i) => i.status === "OPEN" || i.status === "IN_REVIEW").length,
         }}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
@@ -1518,6 +1622,365 @@ export function AdminDashboardView({
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 7: OPERATIONAL ISSUES & DISCREPANCY TRIAGE (PRD FR-040, FR-038) */}
+          {activeTab === "issues" && (
+            <div className="space-y-6">
+              {/* Triage Header Card */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <LifeBuoy className="w-5 h-5 text-amber-500" />
+                      <h3 className="font-headline font-bold text-base text-slate-900 dark:text-slate-100">
+                        Operational Issue Management &amp; Discrepancy Triage
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        PRD FR-040
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Triage reported campaign link outages, influencer attribution disputes, cashier errors, and merchant flags.
+                    </p>
+                  </div>
+
+                  {/* Filter Selectors */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                      <Filter className="w-3.5 h-3.5 text-slate-400" />
+                      <select
+                        value={issueStatusFilter}
+                        onChange={(e) => setIssueStatusFilter(e.target.value)}
+                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                      >
+                        <option value="ALL">All Statuses ({issuesList.length})</option>
+                        <option value="OPEN">Open</option>
+                        <option value="IN_REVIEW">In Review</option>
+                        <option value="RESOLVED">Resolved</option>
+                        <option value="DISMISSED">Dismissed</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                      <select
+                        value={issuePriorityFilter}
+                        onChange={(e) => setIssuePriorityFilter(e.target.value)}
+                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                      >
+                        <option value="ALL">All Priorities</option>
+                        <option value="URGENT">Urgent</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Status Bento Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6">
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Total Issues
+                    </span>
+                    <div className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
+                      {issuesList.length}
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+                      Open &amp; Action Required
+                    </span>
+                    <div className="text-xl font-bold font-mono text-blue-800 dark:text-blue-300 mt-1">
+                      {issuesList.filter((i) => i.status === "OPEN").length}
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                      In Review / Investigating
+                    </span>
+                    <div className="text-xl font-bold font-mono text-amber-800 dark:text-amber-300 mt-1">
+                      {issuesList.filter((i) => i.status === "IN_REVIEW").length}
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                      Resolved &amp; Closed
+                    </span>
+                    <div className="text-xl font-bold font-mono text-emerald-800 dark:text-emerald-300 mt-1">
+                      {issuesList.filter((i) => i.status === "RESOLVED").length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Issues Data Table */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+                {filteredIssues.length === 0 ? (
+                  <div className="p-12 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+                      <LifeBuoy className="w-6 h-6" />
+                    </div>
+                    <h4 className="font-headline font-bold text-sm text-slate-900 dark:text-white">
+                      No Operational Issues Matching Filters
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                      All campaign destinations, merchant sales records, and telemetry flows are operating without reported discrepancies.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold">
+                        <tr>
+                          <th className="py-3 px-4">Category &amp; Priority</th>
+                          <th className="py-3 px-4">Summary &amp; Context</th>
+                          <th className="py-3 px-4">Reporter</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4">Reported</th>
+                          <th className="py-3 px-4 text-right">Triage Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                        {filteredIssues.map((issue) => (
+                          <tr
+                            key={issue.id}
+                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                          >
+                            <td className="py-3.5 px-4 align-top">
+                              <div className="flex flex-col gap-1 items-start">
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${
+                                    issue.category === "ATTRIBUTION_DISCREPANCY"
+                                      ? "bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                                      : issue.category === "CAMPAIGN_LINK_DOWN"
+                                      ? "bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800"
+                                      : issue.category === "TRANSACTION_DISPUTE"
+                                      ? "bg-purple-50 text-purple-800 dark:bg-purple-950/40 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+                                      : "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                                  }`}
+                                >
+                                  {issue.category.replace(/_/g, " ")}
+                                </span>
+                                <span
+                                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                                    issue.priority === "URGENT"
+                                      ? "bg-rose-600 text-white"
+                                      : issue.priority === "HIGH"
+                                      ? "bg-orange-500 text-white"
+                                      : issue.priority === "MEDIUM"
+                                      ? "bg-amber-500 text-white"
+                                      : "bg-slate-400 text-white"
+                                  }`}
+                                >
+                                  {issue.priority}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 align-top max-w-xs">
+                              <div className="font-semibold text-slate-900 dark:text-slate-100">
+                                {issue.title}
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">
+                                {issue.description}
+                              </p>
+                              {(issue.campaignName || issue.saleAmountETB) && (
+                                <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                  {issue.campaignName && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                      <Tag className="w-2.5 h-2.5" />
+                                      {issue.campaignName} ({issue.campaignPromoCode})
+                                    </span>
+                                  )}
+                                  {issue.saleAmountETB && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                      <Receipt className="w-2.5 h-2.5" />
+                                      {formatETB(issue.saleAmountETB)}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              {issue.adminNotes && (
+                                <div className="mt-1.5 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                  <strong className="text-slate-800 dark:text-slate-200">Admin Note:</strong>{" "}
+                                  {issue.adminNotes}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                              <div className="font-medium text-slate-900 dark:text-slate-100">
+                                {issue.reporterName}
+                              </div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                                {issue.reporterPhone}
+                              </div>
+                              <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                {issue.reporterRole}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                                  issue.status === "OPEN"
+                                    ? "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-900/50"
+                                    : issue.status === "IN_REVIEW"
+                                    ? "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-900/50"
+                                    : issue.status === "RESOLVED"
+                                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50"
+                                    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                                }`}
+                              >
+                                {issue.status === "OPEN" && <Clock className="w-3 h-3" />}
+                                {issue.status === "IN_REVIEW" && <RefreshCw className="w-3 h-3" />}
+                                {issue.status === "RESOLVED" && <CheckCircle2 className="w-3 h-3" />}
+                                {issue.status.replace(/_/g, " ")}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 align-top text-slate-400 font-mono text-[11px] whitespace-nowrap">
+                              {new Date(issue.createdAt).toLocaleString("en-US", {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })}
+                            </td>
+                            <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedIssueForTriage(issue);
+                                    setTriageNotes(issue.adminNotes || "");
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                                  title="Inspect issue details and resolution notes"
+                                >
+                                  Details
+                                </button>
+                                {issue.status === "OPEN" && (
+                                  <button
+                                    type="button"
+                                    disabled={triageLoading}
+                                    onClick={() => handleUpdateIssueStatus(issue.id, "IN_REVIEW")}
+                                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-colors"
+                                  >
+                                    Review
+                                  </button>
+                                )}
+                                {issue.status !== "RESOLVED" && (
+                                  <button
+                                    type="button"
+                                    disabled={triageLoading}
+                                    onClick={() => handleUpdateIssueStatus(issue.id, "RESOLVED")}
+                                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors"
+                                  >
+                                    Resolve
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Triage Detail & Admin Resolution Modal */}
+          {selectedIssueForTriage && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+                onClick={() => !triageLoading && setSelectedIssueForTriage(null)}
+              />
+              <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden z-10 animate-in fade-in-50 zoom-in-95 duration-200">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                  <div className="flex items-center gap-2.5">
+                    <LifeBuoy className="w-5 h-5 text-amber-500" />
+                    <h3 className="font-headline font-bold text-sm text-slate-900 dark:text-slate-100">
+                      Issue Triage &amp; Resolution
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIssueForTriage(null)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-4 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Title</span>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
+                      {selectedIssueForTriage.title}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Description</span>
+                    <p className="text-slate-700 dark:text-slate-300 mt-0.5 whitespace-pre-wrap leading-relaxed p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      {selectedIssueForTriage.description}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Reporter</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-200">
+                        {selectedIssueForTriage.reporterName} ({selectedIssueForTriage.reporterRole})
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 text-[10px] block">Phone</span>
+                      <span className="font-mono text-slate-800 dark:text-slate-200">
+                        {selectedIssueForTriage.reporterPhone}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                      Admin Resolution Notes
+                    </label>
+                    <textarea
+                      value={triageNotes}
+                      onChange={(e) => setTriageNotes(e.target.value)}
+                      rows={3}
+                      placeholder="Record root cause, communication with merchant, or fix applied..."
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        disabled={triageLoading}
+                        onClick={() => handleUpdateIssueStatus(selectedIssueForTriage.id, "DISMISSED", triageNotes)}
+                        className="px-3 py-1.5 rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400"
+                      >
+                        Dismiss
+                      </button>
+                      <button
+                        type="button"
+                        disabled={triageLoading}
+                        onClick={() => handleUpdateIssueStatus(selectedIssueForTriage.id, "IN_REVIEW", triageNotes)}
+                        className="px-3 py-1.5 rounded-xl font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                      >
+                        In Review
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={triageLoading}
+                      onClick={() => handleUpdateIssueStatus(selectedIssueForTriage.id, "RESOLVED", triageNotes)}
+                      className="px-4 py-1.5 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                    >
+                      Resolve Issue
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
