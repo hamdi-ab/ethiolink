@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-028 - feat: production database backup pipeline, telemetry retention engine, and privacy policy (PRD Section 10.3, 16, FR-020) (kind: feature) (since 2026-10-29)
 ## Queued
 ## Done
 - [x] ETL-027 - feat: operational issue management & merchant discrepancy reporting (PRD FR-040, FR-038) https://github.com/hamdi-ab/ethiolink/pull/35 (kind: feature) (merged 2026-10-29)

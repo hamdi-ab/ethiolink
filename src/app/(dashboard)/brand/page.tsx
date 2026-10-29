@@ -281,6 +281,19 @@ async function BrandView() {
             </div>
           )}
         </div>
+
+        {/* Attribution Limitations & Data Governance Notice (PRD FR-020 / FR-025) */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+          <p>
+            Reported revenue represents merchant-logged in-store transactions. Raw customer interaction telemetry is systematically purged after 90 days.
+          </p>
+          <Link
+            href="/privacy"
+            className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline shrink-0"
+          >
+            Privacy &amp; Data Practices &rarr;
+          </Link>
+        </div>
       </main>
     </div>
   );

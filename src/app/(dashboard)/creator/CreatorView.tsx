@@ -556,7 +556,10 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               EthioLink Attribution &amp; Verification Notice (PRD FR-025 / FR-029 / FR-036):
             </span>
             <p>
-              Reported sales and campaign metrics reflect merchant-recorded in-store redemptions and digital checkout logs attributed to your promo code and campaign links. Funnel metrics represent aggregate promotional engagement rather than individual bank-cleared transactions. Payouts and commercial agreements are fulfilled directly by merchant partners off-platform.
+              Reported sales and campaign metrics reflect merchant-recorded in-store redemptions and digital checkout logs attributed to your promo code and campaign links. Funnel metrics represent aggregate promotional engagement rather than individual bank-cleared transactions. Payouts and commercial agreements are fulfilled directly by merchant partners off-platform.{" "}
+              <Link href="/privacy" className="underline hover:text-emerald-600 dark:hover:text-emerald-400 font-medium">
+                Learn more about our Data Retention &amp; Privacy Practices &rarr;
+              </Link>
             </p>
           </div>
         </div>
