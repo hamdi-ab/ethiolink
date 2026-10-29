@@ -23,3 +23,6 @@
 
 ## Archived 2026-10-29
 - [x] ticket-9 - feat: admin audit & system health console https://github.com/hamdi-ab/ethiolink/pull/18 blocked-by: ticket-7 blocked-by: ticket-8 (kind: task) (merged 2026-10-22)
+
+## Archived 2026-10-29
+- [x] ETL-018 - Brand Executive PDF/CSV Campaign Performance Report Generator https://github.com/hamdi-ab/ethiolink/pull/26 (kind: feature) (merged 2026-10-26)
