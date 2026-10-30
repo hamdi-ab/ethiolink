@@ -3,7 +3,26 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, UserPlus, QrCode, Play, Pause, Loader2, Pencil, LifeBuoy } from "lucide-react";
+import {
+  ExternalLink,
+  UserPlus,
+  QrCode,
+  Play,
+  Pause,
+  Loader2,
+  Pencil,
+  LifeBuoy,
+  MoreHorizontal,
+} from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import { EditCampaignModal } from "@/components/campaign/EditCampaignModal";
 import { InviteCampaignModal } from "@/components/campaign/InviteCampaignModal";
@@ -35,7 +54,6 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>(campaign.status);
   const [isToggling, setIsToggling] = useState(false);
-  const [toggleError, setToggleError] = useState<string | null>(null);
 
   const isActive = currentStatus === "ACTIVE";
   const isTerminal = currentStatus === "COMPLETED" || currentStatus === "EXPIRED";
@@ -44,7 +62,6 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
     if (isToggling || isTerminal) return;
     const nextStatus = isActive ? "PAUSED" : "ACTIVE";
     setIsToggling(true);
-    setToggleError(null);
 
     try {
       const res = await fetch(`/api/campaigns/${campaign.id}`, {
@@ -60,11 +77,15 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
       }
 
       setCurrentStatus(nextStatus);
+      toast.success(
+        nextStatus === "ACTIVE"
+          ? `Campaign "${campaign.name}" resumed`
+          : `Campaign "${campaign.name}" paused`
+      );
       router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to toggle status";
-      setToggleError(msg);
-      setTimeout(() => setToggleError(null), 4000);
+      toast.error(msg);
     } finally {
       setIsToggling(false);
     }
@@ -72,87 +93,83 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
 
   return (
     <>
-      <div className="flex flex-col items-end gap-1 shrink-0">
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Pause / Resume Lifecycle Toggle */}
-          {!isTerminal && (
-            <button
-              type="button"
-              onClick={handleToggleStatus}
-              disabled={isToggling}
-              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 ${
-                isActive
-                  ? "bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 focus-visible:ring-amber-500"
-                  : "bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 focus-visible:ring-emerald-500"
-              }`}
-              title={isActive ? "Pause Campaign Telemetry & Public Promotion" : "Resume Campaign"}
-            >
-              {isToggling ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : isActive ? (
-                <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              ) : (
-                <Play className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              )}
-              <span>{isActive ? "Pause" : "Resume"}</span>
-            </button>
-          )}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Primary Action: POS QR & Share */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsShareModalOpen(true)}
+          className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/60 border-emerald-200/80 dark:border-emerald-800/80 font-semibold cursor-pointer shadow-2xs"
+        >
+          <QrCode className="w-3.5 h-3.5" />
+          <span>POS QR &amp; Share</span>
+        </Button>
 
-          <button
-            type="button"
-            onClick={() => setIsShareModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/80 px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-            title="Open POS QR Code & Telegram Sharing Suite"
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>POS QR &amp; Share</span>
-          </button>
-
-          <Link
-            href={`/c/${campaign.slug}`}
-            target="_blank"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
+        {/* Secondary Action: Landing Preview Link */}
+        <Button variant="ghost" size="sm" asChild className="cursor-pointer">
+          <Link href={`/c/${campaign.slug}`} target="_blank">
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
             <span>Preview</span>
           </Link>
+        </Button>
 
-          <button
-            type="button"
-            onClick={() => setIsEditModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-            title="Edit Campaign Details & Destinations"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-            <span>Edit</span>
-          </button>
+        {/* Overflow Management Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`More actions for campaign ${campaign.name}`}
+              className="cursor-pointer text-slate-500 hover:text-slate-900 dark:hover:text-white"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              onClick={() => setIsInviteModalOpen(true)}
+              className="cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4 mr-2 text-violet-500" />
+              <span>Invite Creator</span>
+            </DropdownMenuItem>
 
-          <button
-            type="button"
-            onClick={() => setIsInviteModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-            title="Generate a magic invite link for a creator"
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>Invite</span>
-          </button>
+            <DropdownMenuItem
+              onClick={() => setIsEditModalOpen(true)}
+              className="cursor-pointer"
+            >
+              <Pencil className="w-4 h-4 mr-2 text-slate-500" />
+              <span>Edit Campaign</span>
+            </DropdownMenuItem>
 
-          <button
-            type="button"
-            onClick={() => setIsReportModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-            title="Report Campaign Discrepancy or Link Downtime to Ops"
-          >
-            <LifeBuoy className="w-3.5 h-3.5 text-amber-500" />
-            <span>Report</span>
-          </button>
-        </div>
+            {!isTerminal && (
+              <DropdownMenuItem
+                onClick={handleToggleStatus}
+                disabled={isToggling}
+                className="cursor-pointer"
+              >
+                {isToggling ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin text-slate-400" />
+                ) : isActive ? (
+                  <Pause className="w-4 h-4 mr-2 text-amber-500" />
+                ) : (
+                  <Play className="w-4 h-4 mr-2 text-emerald-500" />
+                )}
+                <span>{isActive ? "Pause Campaign" : "Resume Campaign"}</span>
+              </DropdownMenuItem>
+            )}
 
-        {toggleError && (
-          <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
-            {toggleError}
-          </span>
-        )}
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={() => setIsReportModalOpen(true)}
+              className="cursor-pointer text-slate-600 dark:text-slate-400"
+            >
+              <LifeBuoy className="w-4 h-4 mr-2 text-amber-500" />
+              <span>Report Issue</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <InviteCampaignModal

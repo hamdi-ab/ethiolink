@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-031 - feat(ui): integrate shadcn/ui primitives, modernize brand campaign actions, and add accessible dialogs (kind: feature) (since 2026-10-30)
 ## Queued
 ## Done
 - [x] ETL-030 - polish(ui): universal tokens for sidebar, navbars, and page horizontal padding https://github.com/hamdi-ab/ethiolink/pull/38 (kind: polish) (merged 2026-10-30)

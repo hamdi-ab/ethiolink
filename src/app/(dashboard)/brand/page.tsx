@@ -6,6 +6,8 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BrandCampaignActions } from "./BrandCampaignActions";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import {
   Store,
@@ -196,13 +198,12 @@ async function BrandView() {
               <h2 className="text-base font-bold text-slate-900 dark:text-white">Campaign Management</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">Oversee your Ethiopian influencer promotions and attribution links</p>
             </div>
-            <Link
-              href="/brand/campaigns/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-all"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Create Campaign</span>
-            </Link>
+            <Button asChild size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer shadow-xs">
+              <Link href="/brand/campaigns/new">
+                <PlusCircle className="w-4 h-4" />
+                <span>Create Campaign</span>
+              </Link>
+            </Button>
           </div>
 
           {campaigns.length === 0 ? (
@@ -234,10 +235,13 @@ async function BrandView() {
                           <Tag className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           {camp.promoCode}
                         </span>
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${badgeConfig.badgeClass}`}>
+                        <Badge
+                          variant="outline"
+                          className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full border ${badgeConfig.badgeClass}`}
+                        >
                           <span className={`w-1.5 h-1.5 rounded-full ${badgeConfig.dotClass}`} />
                           {badgeConfig.label}
-                        </span>
+                        </Badge>
                       </div>
 
                       <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
