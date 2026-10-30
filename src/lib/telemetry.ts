@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getTelemetrySalt, TELEMETRY_DEDUP_WINDOW_MS } from "@/lib/config";
 
 export const EVENT_TYPES = [
   "PAGE_VIEW",
@@ -21,7 +22,7 @@ export function isValidEventType(type: unknown): type is EventType {
 export function hashIpWithDailySalt(
   ip: string,
   date: Date = new Date(),
-  secret: string = process.env.TELEMETRY_SALT || "ethiolink-daily-salt"
+  secret: string = getTelemetrySalt()
 ): string {
   const dayKey = date.toISOString().slice(0, 10); // YYYY-MM-DD
   const normalizedIp = ip?.trim() || "127.0.0.1";
@@ -31,4 +32,4 @@ export function hashIpWithDailySalt(
     .digest("hex");
 }
 
-export const DEDUPLICATION_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+export const DEDUPLICATION_WINDOW_MS = TELEMETRY_DEDUP_WINDOW_MS;

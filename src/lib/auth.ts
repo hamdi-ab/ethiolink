@@ -2,6 +2,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse, connection } from "next/server";
+import { getAuthSecret } from "@/lib/config";
 
 export type UserRole = "OWNER" | "STAFF" | "CREATOR" | "ADMIN";
 
@@ -15,7 +16,7 @@ export interface SessionPayload {
 }
 
 export const SESSION_COOKIE_NAME = "ethiolink_session";
-const AUTH_SECRET = process.env.AUTH_SECRET || "ethiolink-super-secret-auth-key-production-ready";
+const AUTH_SECRET = getAuthSecret();
 
 /**
  * Hash a plain text password using bcrypt

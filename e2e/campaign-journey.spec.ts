@@ -132,4 +132,9 @@ test.describe("EthioLink Platform E2E Suite", () => {
     await registerLink.click();
     await expect(page).toHaveURL(/.*register/);
   });
+
+  test("Live demo route /c/demo-promo renders interactive showcase with promo code and action links", async ({ page }) => {
+    await page.goto("/c/demo-promo");
+    await expect(page.getByText("DEMO2026")).toBeVisible();
+  });
 });

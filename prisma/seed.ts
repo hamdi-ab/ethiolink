@@ -161,6 +161,22 @@ async function main() {
     },
   });
 
+  const demoCampaign = await prisma.campaign.create({
+    data: {
+      brandId: tomocaBrand.id,
+      slug: "demo-promo",
+      name: "EthioLink Interactive Showcase",
+      promoCode: "DEMO2026",
+      description: "Interactive campaign showcase for prospective brands and creators. Experience one-tap Telegram messaging, in-store map routing, and promotional code attribution.",
+      telegramUrl: "https://t.me/tomocacoffee_bot",
+      phoneNumber: "+251911111111",
+      mapUrl: "https://maps.google.com/?q=Tomoca+Coffee+Addis+Ababa",
+      status: CampaignStatus.ACTIVE,
+      startDate: new Date("2026-10-01"),
+      endDate: new Date("2026-12-31"),
+    },
+  });
+
   // 5. Assign Creators to Campaigns
   console.log("🔗 Assigning Creators to Campaigns...");
   await prisma.campaignAssignment.create({
@@ -174,6 +190,13 @@ async function main() {
     data: {
       campaignId: leatherCampaign.id,
       creatorId: creator2.id,
+    },
+  });
+
+  await prisma.campaignAssignment.create({
+    data: {
+      campaignId: demoCampaign.id,
+      creatorId: creator1.id,
     },
   });
 
@@ -300,6 +323,7 @@ async function main() {
   console.log("  • Staff:    +251922222222 (Bole Branch POS Cashier)");
   console.log("  • Creator:  +251933333333 (Helen Lifestyle @helen_addis_lifestyle)");
   console.log("Demo Campaign Routes:");
+  console.log("  • http://localhost:3000/c/demo-promo (Landing Page Showcase)");
   console.log("  • http://localhost:3000/c/tomoca-special-roast");
   console.log("  • http://localhost:3000/c/bole-leather-fall-collection");
   console.log("==================================================");

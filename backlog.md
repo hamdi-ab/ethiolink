@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-029 - chore(core): eliminate mock data, fix hardcoded fallbacks, and centralize environment configuration (kind: chore) (since 2026-10-30)
 ## Queued
 ## Done
 - [x] ETL-028 - feat: production database backup pipeline, telemetry retention engine, and privacy policy (PRD Section 10.3, 16, FR-020) https://github.com/hamdi-ab/ethiolink/pull/36 (kind: feature) (merged 2026-10-29)

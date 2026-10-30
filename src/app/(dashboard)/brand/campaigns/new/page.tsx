@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatClientError } from "@/lib/client-errors";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { getBaseUrl } from "@/lib/config";
 import {
   ArrowLeft,
   Tag,
@@ -75,7 +76,7 @@ export default function NewCampaignPage() {
         throw new Error(data?.error || "Failed to create campaign");
       }
 
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const origin = getBaseUrl();
       setCreatedPublicUrl(`${origin}/c/${data.campaign.slug}`);
       setCreatedInviteUrl(`${origin}${data.creatorInvite.url}`);
     } catch (err: unknown) {

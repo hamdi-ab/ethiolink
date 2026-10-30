@@ -1,3 +1,5 @@
+import { DEFAULT_CURRENCY } from "@/lib/config";
+
 /**
  * Utilities for Ethiopian Birr (ETB) currency parsing, formatting, and validation.
  */
@@ -35,15 +37,15 @@ export function parseAmountETB(input: unknown): number | null {
  * Formats a numeric ETB amount into Ethiopian currency display format (e.g. "1,500.00 ETB")
  */
 export function formatETB(amount: number | string | null | undefined): string {
-  if (amount === null || amount === undefined) return "0.00 ETB";
+  if (amount === null || amount === undefined) return `0.00 ${DEFAULT_CURRENCY}`;
 
   const num = typeof amount === "number" ? amount : parseFloat(String(amount));
-  if (!Number.isFinite(num)) return "0.00 ETB";
+  if (!Number.isFinite(num)) return `0.00 ${DEFAULT_CURRENCY}`;
 
   const formatted = num.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  return `${formatted} ETB`;
+  return `${formatted} ${DEFAULT_CURRENCY}`;
 }

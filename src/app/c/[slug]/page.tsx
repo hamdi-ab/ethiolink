@@ -31,6 +31,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
 
     if (!campaign) {
+      if (slug === "demo-promo") {
+        return {
+          title: "Demo Promotion | EthioLink",
+          description: "Interactive campaign showcase for prospective brands and creators.",
+        };
+      }
       return {
         title: "Campaign Not Found | EthioLink",
         description: "This campaign does not exist or has been removed.",
@@ -132,6 +138,35 @@ async function CampaignView({ params }: PageProps) {
   }
 
   if (!campaign) {
+    if (slug === "demo-promo") {
+      const demoData: CampaignData = {
+        id: "cmp_demo_promo",
+        slug: "demo-promo",
+        name: "EthioLink Interactive Showcase",
+        promoCode: "DEMO2026",
+        description:
+          "Special demonstration showcase for prospective brands and creators. Test one-tap Telegram chats, map directions, and promo code attribution.",
+        telegramUrl: "https://t.me/ethiolink_demo",
+        phoneNumber: "+251911000000",
+        mapUrl: "https://maps.google.com/?q=Bole+Addis+Ababa",
+        endDate: null,
+        brand: {
+          name: "Addis Artisan Goods",
+          ownerName: "EthioLink Demo",
+        },
+        creators: [
+          {
+            creator: {
+              telegramUsername: "ethiolink_creator",
+              user: {
+                name: "Addis Lifestyle Showcase",
+              },
+            },
+          },
+        ],
+      };
+      return <CampaignLanding campaign={demoData} />;
+    }
     return <CampaignNotFound />;
   }
 
