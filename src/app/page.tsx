@@ -338,6 +338,9 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Privacy &amp; Data Practices
+            </Link>
             <Link href="/api/health" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               System Health
             </Link>

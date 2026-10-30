@@ -348,7 +348,13 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
             <span>Verified by EthioLink Attribution Engine</span>
           </div>
           <p className="text-[11px] text-slate-400 dark:text-slate-500">
-            {t.poweredBy} • Addis Ababa, Ethiopia
+            {t.poweredBy} • Addis Ababa, Ethiopia &bull;{" "}
+            <Link
+              href="/privacy"
+              className="underline hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            >
+              Privacy Practices
+            </Link>
           </p>
         </footer>
       </main>
