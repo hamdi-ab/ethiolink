@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Share2, QrCode, Play, Pause, Loader2, Pencil, LifeBuoy } from "lucide-react";
+import { ExternalLink, UserPlus, QrCode, Play, Pause, Loader2, Pencil, LifeBuoy } from "lucide-react";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import { EditCampaignModal } from "@/components/campaign/EditCampaignModal";
+import { InviteCampaignModal } from "@/components/campaign/InviteCampaignModal";
 import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 
 export interface BrandCampaignActionsProps {
@@ -30,6 +31,7 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>(campaign.status);
   const [isToggling, setIsToggling] = useState(false);
@@ -125,13 +127,15 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
             <span>Edit</span>
           </button>
 
-          <Link
-            href={`/brand/campaigns/new?reinvite=${campaign.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+          <button
+            type="button"
+            onClick={() => setIsInviteModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            title="Generate a magic invite link for a creator"
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <UserPlus className="w-3.5 h-3.5" />
             <span>Invite</span>
-          </Link>
+          </button>
 
           <button
             type="button"
@@ -150,6 +154,12 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
           </span>
         )}
       </div>
+
+      <InviteCampaignModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        campaign={{ id: campaign.id, name: campaign.name }}
+      />
 
       <CampaignShareModal
         isOpen={isShareModalOpen}
