@@ -26,3 +26,6 @@
 
 ## Archived 2026-10-29
 - [x] ETL-018 - Brand Executive PDF/CSV Campaign Performance Report Generator https://github.com/hamdi-ab/ethiolink/pull/26 (kind: feature) (merged 2026-10-26)
+
+## Archived 2026-10-30
+- [x] ETL-019 - Impeccable UI Polish: Flatten Funnel Steps, Channel Share Bar, and Contrast Tune https://github.com/hamdi-ab/ethiolink/pull/27 (kind: polish) (merged 2026-10-26)
