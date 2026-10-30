@@ -138,7 +138,9 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Telemetry ingestion failed:", error);
+    if (process.env.NODE_ENV !== "test") {
+      console.error("Telemetry ingestion failed:", error);
+    }
     return Response.json(
       { error: "Internal server error" },
       { status: 500 }

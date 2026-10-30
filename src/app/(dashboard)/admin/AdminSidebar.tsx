@@ -152,7 +152,7 @@ export function AdminSidebar({
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300">
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
+      <div className="h-[var(--navbar-height)] flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="w-9 h-9 shrink-0 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-base shadow-xs">
             EL
@@ -351,7 +351,7 @@ export function AdminSidebar({
       {/* Desktop Sticky Sidebar */}
       <aside
         className={`hidden lg:block shrink-0 h-screen sticky top-0 z-30 transition-all duration-300 ${
-          isCollapsed ? "w-[72px]" : "w-64"
+          isCollapsed ? "w-[var(--sidebar-collapsed-width)]" : "w-[var(--sidebar-width)]"
         }`}
       >
         {sidebarContent}

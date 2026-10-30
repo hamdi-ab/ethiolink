@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body transition-colors">
       {/* Navigation Header */}
       <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="navbar-shell max-w-4xl mx-auto">
           <Link
             href="/"
             className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
       </header>
 
       {/* Hero Banner */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+      <main className="max-w-4xl mx-auto px-[var(--page-px)] py-10 space-y-10">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
             <ShieldCheck className="w-3.5 h-3.5" />

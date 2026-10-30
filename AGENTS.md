@@ -29,6 +29,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Coding Standards:**
   - `CODING_STANDARDS.md` — UI/UX hierarchy, anti-slop rules, WCAG AA typography, and color tokens
 - **Quality Gates & Tests:**
+  - Database Verification: `npm run db:verify` (`scripts/verify-db-drift.mjs`)
   - Unit Tests: `npm test` (`tsx --test tests/*.test.mjs`)
   - Typecheck: `npm run typecheck` (`tsc --noEmit`)
   - Lint: `npm run lint` (`eslint`)

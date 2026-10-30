@@ -42,3 +42,6 @@ playwright/.cache/
 
 # Treehouse Git Worktree Slots
 .worktrees/
+
+# Linter Cache
+.eslintcache
