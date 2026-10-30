@@ -16,7 +16,7 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-body selection:bg-emerald-100 dark:selection:bg-emerald-900/50 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="navbar-shell layout-container px-[var(--page-px)]">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-500/20">
               E
@@ -67,7 +67,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div className="layout-container px-[var(--page-px)] text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs font-semibold mb-6 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Omnichannel Influencer Attribution Platform for Ethiopia</span>
@@ -147,7 +147,7 @@ export default function Home() {
 
       {/* Feature Pillar Grid */}
       <section id="features" className="py-16 sm:py-24 bg-white dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="layout-container px-[var(--page-px)]">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Engineered for Ethiopian Commerce
@@ -218,7 +218,7 @@ export default function Home() {
 
       {/* Roles & Solutions Section */}
       <section id="solutions" className="py-16 sm:py-24 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="layout-container px-[var(--page-px)]">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <h2 className="font-headline text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               One Unified Platform For All Roles
@@ -300,7 +300,7 @@ export default function Home() {
 
       {/* CTA Footer Banner */}
       <section className="bg-slate-900 dark:bg-slate-900/90 text-white py-16 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="layout-container px-[var(--page-px)] text-center">
           <h2 className="font-headline text-3xl sm:text-4xl font-extrabold tracking-tight">
             Ready to stop guessing your influencer marketing ROI?
           </h2>
@@ -327,7 +327,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 text-xs text-slate-500 dark:text-slate-400 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="layout-container px-[var(--page-px)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
               E

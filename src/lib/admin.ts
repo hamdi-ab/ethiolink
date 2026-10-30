@@ -82,7 +82,9 @@ export async function getSystemHealthDiagnostics(): Promise<SystemHealthMetrics>
   try {
     await db.$queryRaw`SELECT 1`;
   } catch (error) {
-    console.error("Database health check ping failed:", error);
+    if (process.env.NODE_ENV !== "test") {
+      console.error("Database health check ping failed:", error);
+    }
     dbStatus = "unreachable";
     status = "degraded";
   }

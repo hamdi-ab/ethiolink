@@ -65,3 +65,26 @@ This document establishes the UI/UX quality bar, design system standards, and co
   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
   ```
 - Never suppress outline or focus styles without replacing them with `focus-visible:ring-2`.
+
+---
+
+## 6. Centralized Environment & Origin Resolution
+
+- **Rule:** Never hardcode `http://localhost:3000` or raw origin strings in pages, API routes, or OpenGraph generators.
+- **Pattern:** Always import and invoke `getBaseUrl()` from `@/lib/config`:
+  ```tsx
+  import { getBaseUrl } from "@/lib/config";
+  const origin = getBaseUrl(request.headers);
+  ```
+
+---
+
+## 7. Universal Layout Tokens & Viewport Geometry
+
+- **Rule:** Always consume the universal layout geometry tokens from `src/app/globals.css`:
+  - **Sidebar:** `w-[var(--sidebar-width)]` (16rem) / `w-[var(--sidebar-collapsed-width)]` (5rem).
+  - **Header / Navigation:** `h-[var(--navbar-height)]` (4rem) and `.navbar-shell`.
+  - **Standard Content Width:** `.layout-container` (max-width `var(--container-max-w)` [80rem / 1280px], padding `var(--page-px)`).
+  - **Admin / Wide Content Width:** `.layout-container-wide` (max-width `var(--container-admin-max-w)` [100rem / 1600px], padding `var(--page-px)`).
+  - **Horizontal Padding:** Fluid `--page-px: clamp(1rem, 2.5vw, 2rem)` prevents awkward cramped margins on tablets while maintaining comfortable gutters on mobile and desktop.
+

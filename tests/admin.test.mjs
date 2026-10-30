@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+
+process.env.NODE_ENV = "test";
 import { NextRequest } from "next/server";
 import { createSessionToken } from "../src/lib/auth.ts";
 import {

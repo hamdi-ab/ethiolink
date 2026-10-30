@@ -83,7 +83,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+        <div className="navbar-shell max-w-4xl mx-auto gap-4">
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -142,7 +142,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="max-w-4xl mx-auto px-[var(--page-px)] py-6 space-y-6">
         {/* Creator Profile Summary Bar */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">

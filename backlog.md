@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-030 - polish(ui): universal tokens for sidebar, navbars, and page horizontal padding (kind: polish) (since 2026-10-30)
 ## Queued
 ## Done
 - [x] ETL-029 - chore(core): eliminate mock data, fix hardcoded fallbacks, and centralize environment configuration https://github.com/hamdi-ab/ethiolink/pull/37 (kind: chore) (merged 2026-10-30)

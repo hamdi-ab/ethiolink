@@ -217,7 +217,7 @@ export function SalesTerminal({
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
       {/* Top Header */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+        <div className="navbar-shell layout-container px-[var(--page-px)]">
           <div className="flex items-center gap-3">
             {isOwner && (
               <Link
@@ -267,7 +267,7 @@ export function SalesTerminal({
       </header>
 
       {/* Main Terminal Grid */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className="layout-container px-[var(--page-px)] py-6 space-y-6">
         {/* Today's Shift Summary Pill */}
         <div className="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2 text-slate-700">
