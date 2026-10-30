@@ -2,6 +2,7 @@
 
 import React, { useState, useId, useMemo } from "react";
 import { generateQRCodeSVG, generateTelegramShareUrl, formatCampaignShareText } from "@/lib/qr";
+import { getBaseUrl } from "@/lib/config";
 import {
   X,
   Download,
@@ -40,7 +41,7 @@ export function CampaignShareModal({
   const [copiedCode, setCopiedCode] = useState(false);
   const printId = useId();
 
-  const baseUrl = origin || (typeof window !== "undefined" ? window.location.origin : "");
+  const baseUrl = origin || getBaseUrl();
   const campaignUrl = campaign ? `${baseUrl}/c/${campaign.slug}` : "";
 
   // Generate SVG string for the QR code

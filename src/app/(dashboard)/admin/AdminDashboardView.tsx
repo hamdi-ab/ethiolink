@@ -8,6 +8,7 @@ import type {
   AdminAnalyticsData,
 } from "@/lib/admin";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { APP_REGION } from "@/lib/config";
 import { AdminSidebar, type AdminTab } from "./AdminSidebar";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import {
@@ -412,7 +413,7 @@ export function AdminDashboardView({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span>Addis Ababa East-1 • {health.dbLatencyMs}ms</span>
+                <span>{APP_REGION} • {health.dbLatencyMs}ms</span>
               </div>
 
               {/* Quick CSV Export */}
@@ -466,7 +467,7 @@ export function AdminDashboardView({
                       Platform Operation Center
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      All cluster nodes and payment gateways reporting nominal telemetry
+                      All ingestion channels and database clusters reporting nominal telemetry
                     </p>
                   </div>
                 </div>
@@ -1984,17 +1985,17 @@ export function AdminDashboardView({
             </div>
           )}
 
-          {/* TAB 8: SYSTEM HEALTH & GATEWAYS */}
+          {/* TAB 8: SYSTEM HEALTH & INFRASTRUCTURE */}
           {activeTab === "health" && (
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 sm:p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-headline font-bold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     <Server className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <span>System Infrastructure Diagnostics &amp; Gateway Watchdog</span>
+                    <span>System Infrastructure Diagnostics &amp; Telemetry Watchdog</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Production health metrics for database clusters, process memory, and national payment rails
+                    Production health metrics for database clusters, telemetry deduplication, and retention engines
                   </p>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
@@ -2041,19 +2042,19 @@ export function AdminDashboardView({
                 </div>
               </div>
 
-              {/* National Payment Gateway Watchdog */}
+              {/* Telemetry & Governance Watchdog */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                 <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                  National Payment Rails Watchdog
+                  Telemetry &amp; Data Governance Watchdog
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
                     <div>
                       <div className="font-bold text-emerald-900 dark:text-emerald-300">
-                        Telebirr Merchant Gateway
+                        Telemetry Ingestion Pipeline
                       </div>
                       <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                        API Latency: 124ms • Auto-settlement active
+                        15-min sliding deduplication • Salted SHA-256 IP hashing active
                       </div>
                     </div>
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -2062,10 +2063,10 @@ export function AdminDashboardView({
                   <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
                     <div>
                       <div className="font-bold text-emerald-900 dark:text-emerald-300">
-                        CBE Birr Notification Webhook
+                        Retention &amp; Snapshot Engine
                       </div>
                       <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                        HMAC-SHA256 verified • Heartbeat nominal
+                        90-day automated rolling prune • SHA-256 backup integrity verified
                       </div>
                     </div>
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />

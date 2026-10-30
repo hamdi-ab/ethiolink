@@ -89,7 +89,7 @@ async function BrandView() {
       });
     } catch {
       brand = {
-        name: "My Brand",
+        name: `${session.name}'s Business`,
         ownerName: session.name,
         _count: { campaigns: 0, users: 1 },
       };

@@ -148,7 +148,7 @@ export function AnalyticsView({
             {/* Live Telemetry Status */}
             <div className="hidden lg:flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-lg">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Attribution Engine Live (2ms)</span>
+              <span>Attribution Engine Active</span>
             </div>
 
             {/* Executive Report Modal Trigger */}

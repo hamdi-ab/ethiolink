@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { DEFAULT_RETENTION_DAYS } from "@/lib/config";
+export { DEFAULT_RETENTION_DAYS };
 
 export interface RetentionPolicyConfig {
   eventRetentionDays: number; // Default 90 days for raw telemetry
@@ -14,7 +16,6 @@ export interface RetentionPruneResult {
   durationMs: number;
 }
 
-export const DEFAULT_RETENTION_DAYS = 90;
 
 /**
  * Calculates cutoff date for telemetry retention.

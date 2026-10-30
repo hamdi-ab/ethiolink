@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { calculateFunnelMetrics } from "@/lib/analytics";
+import { getBaseUrl } from "@/lib/config";
 import { CreatorView } from "./CreatorView";
 import type {
   CreatorPortalResponse,
@@ -213,9 +214,7 @@ async function CreatorServerContent() {
   };
 
   const headerList = await headers();
-  const host = headerList.get("host") || "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") || "http";
-  const origin = `${proto}://${host}`;
+  const origin = getBaseUrl(headerList);
 
   return <CreatorView initialData={portalData} origin={origin} />;
 }
