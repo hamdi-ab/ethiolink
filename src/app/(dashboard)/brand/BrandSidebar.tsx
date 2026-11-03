@@ -11,7 +11,6 @@ import {
   Users,
   LifeBuoy,
   LogOut,
-  Search,
   Shield,
   X,
   ChevronsUpDown,
@@ -61,8 +60,8 @@ export function BrandSidebar({
           isMobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
-        {/* Top: Brand Header & Search Bar (Matchly Pattern) */}
-        <div className="p-3.5 space-y-3">
+        {/* Top: Brand Header */}
+        <div className="p-3.5 pb-2">
           <div className="flex items-center justify-between px-1 pt-0.5">
             <Link href="/brand" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
@@ -86,21 +85,6 @@ export function BrandSidebar({
             >
               <X className="w-5 h-5" />
             </button>
-          </div>
-
-          {/* Search Shortcut Bar */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/60 dark:text-[#9BAAA1] pointer-events-none" />
-            <input
-              type="text"
-              readOnly
-              placeholder="Search campaigns..."
-              className="w-full pl-9 pr-3 h-9 text-xs rounded-xl bg-[#16443D] dark:bg-[#11211C]/90 border border-[#225C52] dark:border-[#20362E] text-slate-100 dark:text-[#F1F5F1] placeholder:text-emerald-200/60 dark:placeholder:text-[#9BAAA1]/70 focus:outline-none cursor-pointer hover:bg-[#1A4E46] dark:hover:bg-[#162B24] hover:border-emerald-400/60 dark:hover:border-[#78B99D]/50 transition-all select-none shadow-2xs"
-              onClick={() => {
-                const el = document.getElementById("campaign-search-input");
-                if (el) el.focus();
-              }}
-            />
           </div>
         </div>
 
