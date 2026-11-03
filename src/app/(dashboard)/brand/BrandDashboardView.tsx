@@ -1013,20 +1013,20 @@ export function BrandDashboardView({
                 </div>
               </div>
 
-              {/* Table Container */}
-              <div className="overflow-x-auto">
+              {/* Polished Table Container */}
+              <div className="overflow-x-auto border border-slate-200/80 dark:border-[#26372F] rounded-xl shadow-2xs">
                 <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="text-[11px] font-bold text-slate-400 dark:text-[#9BAAA1] uppercase tracking-wider border-b border-slate-100 dark:border-[#26372F]">
-                      <th className="pb-3 pl-2">Receipt ID</th>
-                      <th className="pb-3">Creator / Campaign</th>
-                      <th className="pb-3">Channel / Branch</th>
-                      <th className="pb-3">Logged Date</th>
-                      <th className="pb-3 text-right">Amount</th>
-                      <th className="pb-3 text-right pr-2">Attribution</th>
+                  <thead className="bg-[#F8F9F7] dark:bg-[#101C18] border-b border-slate-200/80 dark:border-[#26372F]">
+                    <tr className="text-[10px] font-bold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
+                      <th className="py-2.5 px-3.5 text-left font-bold">Receipt ID</th>
+                      <th className="py-2.5 px-3 text-left font-bold">Creator / Campaign</th>
+                      <th className="py-2.5 px-3 text-left font-bold">Channel / Branch</th>
+                      <th className="py-2.5 px-3 text-left font-bold">Logged Date</th>
+                      <th className="py-2.5 px-3 text-right font-bold">Amount</th>
+                      <th className="py-2.5 px-3.5 text-right font-bold">Attribution</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-[#26372F]">
+                  <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] bg-white dark:bg-[#14211D]">
                     {recentSales.length === 0 ? (
                       <tr>
                         <td
@@ -1040,11 +1040,13 @@ export function BrandDashboardView({
                       recentSales.slice(0, 5).map((sale, idx) => {
                         const avatarImg =
                           creatorImages[idx % creatorImages.length];
-                        const dateFormatted = new Date(
-                          sale.createdAt
-                        ).toLocaleDateString("en-US", {
+                        const dateObj = new Date(sale.createdAt);
+                        const dateFormatted = dateObj.toLocaleDateString("en-US", {
                           day: "numeric",
                           month: "short",
+                          year: "numeric",
+                        });
+                        const timeFormatted = dateObj.toLocaleTimeString("en-US", {
                           hour: "2-digit",
                           minute: "2-digit",
                         });
@@ -1052,46 +1054,69 @@ export function BrandDashboardView({
                         return (
                           <tr
                             key={sale.id}
-                            className="hover:bg-[#F7F8F5] dark:hover:bg-[#1A2A24] transition-colors rounded-xl"
+                            className="hover:bg-slate-50/70 dark:hover:bg-[#1A2A24]/60 transition-colors group"
                           >
-                            <td className="py-3 pl-2 font-mono font-bold text-slate-900 dark:text-[#F1F5F1]">
-                              #{sale.id.slice(-5).toUpperCase()}
+                            <td className="py-3 px-3.5 whitespace-nowrap">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold bg-slate-100 dark:bg-[#1B2924] text-slate-700 dark:text-[#C0CCC4] border border-slate-200/80 dark:border-[#28493D] shadow-2xs group-hover:border-emerald-500/40 transition-colors">
+                                #{sale.id.slice(-5).toUpperCase()}
+                              </span>
                             </td>
-                            <td className="py-3">
-                              <div className="flex items-center gap-2">
+                            <td className="py-3 px-3">
+                              <div className="flex items-center gap-2.5">
                                 <Image
                                   src={avatarImg}
                                   alt="Creator avatar"
-                                  width={24}
-                                  height={24}
+                                  width={28}
+                                  height={28}
                                   unoptimized
-                                  className="w-6 h-6 rounded-full object-cover shrink-0 border border-slate-200 dark:border-[#304239]"
+                                  className="w-7 h-7 rounded-full object-cover shrink-0 ring-1 ring-slate-200/80 dark:ring-[#304239]"
                                 />
                                 <div className="min-w-0">
-                                  <p className="font-semibold text-slate-800 dark:text-[#F1F5F1] leading-snug truncate max-w-[140px]">
+                                  <p className="font-semibold text-slate-900 dark:text-[#F1F5F1] leading-tight truncate max-w-[190px] text-xs">
                                     {sale.campaign.name}
                                   </p>
-                                  <p className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
-                                    CODE: {sale.campaign.promoCode}
-                                  </p>
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                    <Tag className="w-2.5 h-2.5 text-slate-400 dark:text-[#9BAAA1]" />
+                                    {sale.campaign.promoCode}
+                                  </span>
                                 </div>
                               </div>
                             </td>
-                            <td className="py-3">
-                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-700 dark:text-[#C0CCC4]">
-                                <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
-                                Bole Flagship POS
+                            <td className="py-3 px-3 whitespace-nowrap">
+                              <div className="flex flex-col">
+                                <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
+                                  <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                                  Bole Flagship
+                                </span>
+                                <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] pl-5 font-mono">
+                                  In-Store POS
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 whitespace-nowrap">
+                              <div className="flex flex-col text-xs leading-tight">
+                                <span className="font-medium text-slate-700 dark:text-[#C0CCC4]">
+                                  {dateFormatted}
+                                </span>
+                                <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                  {timeFormatted}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 text-right whitespace-nowrap">
+                              <span className="font-bold text-xs text-slate-900 dark:text-[#F1F5F1] font-mono tracking-tight">
+                                {Number(sale.amountETB).toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </span>
+                              <span className="text-[10px] font-medium text-slate-400 dark:text-[#9BAAA1] ml-1 uppercase">
+                                ETB
                               </span>
                             </td>
-                            <td className="py-3 text-[11px] text-slate-500 dark:text-[#9BAAA1] font-mono">
-                              {dateFormatted}
-                            </td>
-                            <td className="py-3 text-right font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
-                              {formatETB(Number(sale.amountETB))}
-                            </td>
-                            <td className="py-3 text-right pr-2">
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5]" />
+                            <td className="py-3 px-3.5 text-right whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-emerald-200/80 dark:border-[#264D3A] shadow-2xs">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5] animate-pulse" />
                                 Verified Sale
                               </span>
                             </td>
@@ -1103,14 +1128,24 @@ export function BrandDashboardView({
                 </table>
               </div>
 
-              <div className="mt-4 pt-3 flex items-center justify-between text-xs text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#26372F]">
-                <span className="font-medium">
+              <div className="mt-4 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-[#9BAAA1]">
+                <span className="font-medium text-[11px]">
                   Showing {recentSales.slice(0, 5).length} of{" "}
                   {recentSales.length || 1240} attributed transactions
                 </span>
-                <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono">
-                  Telebirr Sync v2.4 • CBE Live
-                </span>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/brand/sales"
+                    className="text-[11px] font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>View Sales Ledger</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                  <span className="text-slate-300 dark:text-slate-700">|</span>
+                  <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
+                    Telebirr Sync v2.4 • CBE Live
+                  </span>
+                </div>
               </div>
             </div>
 
