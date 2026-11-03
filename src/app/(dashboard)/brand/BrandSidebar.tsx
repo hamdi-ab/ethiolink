@@ -61,7 +61,7 @@ export function BrandSidebar({
           isMobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
-        {/* Top: Brand Header & Merchant Switcher */}
+        {/* Top: Brand Header & Search Bar (Matchly Pattern) */}
         <div className="p-3.5 space-y-3">
           <div className="flex items-center justify-between px-1 pt-0.5">
             <Link href="/brand" className="flex items-center gap-2.5 group">
@@ -88,40 +88,19 @@ export function BrandSidebar({
             </button>
           </div>
 
-          {/* Stitch Merchant Account Switcher Card */}
-          <div className="bg-[#163E3A] dark:bg-[#142621] rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/40 dark:border-[#28493D] transition-colors hover:bg-[#1C4E49] dark:hover:bg-[#1B322C] cursor-pointer">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
-                <Store className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-semibold text-white truncate leading-tight">
-                  {brandName}
-                </p>
-                <p className="text-[10px] text-emerald-200/70 dark:text-[#9BAAA1] truncate">
-                  {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
-                </p>
-              </div>
-            </div>
-            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-          </div>
-
-          {/* Search Shortcut Bar (Aligned with unified 14px gutters & dedicated ⌘K badge) */}
+          {/* Search Shortcut Bar (Clean Windows-friendly without Mac ⌘K symbol) */}
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/60 dark:text-[#9BAAA1] pointer-events-none" />
             <input
               type="text"
               readOnly
               placeholder="Search campaigns..."
-              className="w-full pl-9 pr-12 h-9 text-xs rounded-xl bg-[#163E3A]/60 dark:bg-[#142621]/60 border border-[#205B50]/40 dark:border-[#28493D] text-slate-200 dark:text-[#F1F5F1] placeholder:text-emerald-200/50 dark:placeholder:text-[#9BAAA1]/70 focus:outline-none cursor-pointer hover:bg-[#163E3A] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 transition-all select-none"
+              className="w-full pl-9 pr-3 h-9 text-xs rounded-xl bg-[#163E3A]/60 dark:bg-[#142621]/60 border border-[#205B50]/40 dark:border-[#28493D] text-slate-200 dark:text-[#F1F5F1] placeholder:text-emerald-200/50 dark:placeholder:text-[#9BAAA1]/70 focus:outline-none cursor-pointer hover:bg-[#163E3A] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 transition-all select-none"
               onClick={() => {
                 const el = document.getElementById("campaign-search-input");
                 if (el) el.focus();
               }}
             />
-            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md bg-[#102F2B] dark:bg-[#0B1512] border border-[#205B50]/60 dark:border-[#28493D] text-emerald-300 dark:text-[#83D1A5] select-none pointer-events-none shadow-2xs">
-              ⌘K
-            </kbd>
           </div>
         </div>
 
@@ -275,27 +254,45 @@ export function BrandSidebar({
           </div>
         </div>
 
-        {/* Bottom: Payment Gateway Status & Merchant Profile */}
-        <div className="p-3.5 border-t border-[#163E3A] dark:border-[#1E332B] bg-[#0c2522]/80 dark:bg-[#08100E] space-y-3">
+        {/* Bottom: Payment Gateway Status, Merchant Switcher & Profile (Matchly Pattern) */}
+        <div className="p-3.5 border-t border-[#163E3A] dark:border-[#1E332B] bg-[#0c2522]/80 dark:bg-[#08100E] space-y-2.5">
+          {/* Matchly Merchant Account Switcher Card */}
+          <div className="bg-[#163E3A] dark:bg-[#142621] rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/40 dark:border-[#28493D] transition-colors hover:bg-[#1C4E49] dark:hover:bg-[#1B322C] cursor-pointer">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
+                <Store className="w-4 h-4" />
+              </div>
+              <div className="truncate">
+                <p className="text-xs font-semibold text-white truncate leading-tight">
+                  {brandName}
+                </p>
+                <p className="text-[10px] text-emerald-200/70 dark:text-[#9BAAA1] truncate">
+                  {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
+                </p>
+              </div>
+            </div>
+            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+          </div>
+
           {/* Telebirr & CBE Birr Live Integration Card (Stitch Spec) */}
-          <div className="bg-[#163E3A]/90 dark:bg-[#142621]/90 rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/30 dark:border-[#28493D]">
+          <div className="bg-[#163E3A]/90 dark:bg-[#142621]/90 rounded-xl p-2 flex items-center justify-between border border-[#205B50]/30 dark:border-[#28493D]">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
               <div className="flex flex-col">
-                <span className="text-[11px] font-semibold text-white leading-tight">
+                <span className="text-[10px] font-semibold text-white leading-tight">
                   Telebirr &amp; CBE Birr
                 </span>
                 <span className="text-[9px] text-emerald-200/70 dark:text-[#9BAAA1]">Gateway Sync v2.4</span>
               </div>
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-950/80 dark:bg-[#193629] px-2 py-0.5 rounded border border-emerald-600/30 dark:border-[#28493D]">
+            <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-950/80 dark:bg-[#193629] px-1.5 py-0.5 rounded border border-emerald-600/30 dark:border-[#28493D]">
               Active
             </span>
           </div>
 
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between pt-0.5">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                 {brandName.charAt(0)}
               </div>
               <div className="min-w-0">
