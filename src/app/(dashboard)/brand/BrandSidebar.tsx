@@ -14,6 +14,8 @@ import {
   Search,
   Shield,
   X,
+  ChevronsUpDown,
+  Layers,
 } from "lucide-react";
 
 export interface BrandSidebarProps {
@@ -48,30 +50,30 @@ export function BrandSidebar({
       {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden"
           onClick={onCloseMobile}
         />
       )}
 
-      {/* Sidebar Container */}
+      {/* Sidebar Container (Stitch Evergreen Theme: #102F2B) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#102F2B] text-white border-r border-[#163E3A] flex flex-col justify-between transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           isMobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
-        {/* Top: Brand Logo & Search */}
-        <div className="p-5 space-y-4">
+        {/* Top: Brand Header & Merchant Switcher */}
+        <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <Link href="/brand" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center font-black text-lg shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                E
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-base shadow-md shadow-emerald-950/40 group-hover:scale-105 transition-transform">
+                <Layers className="w-5 h-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-headline font-black text-lg text-slate-900 dark:text-white leading-none tracking-tight">
-                  Ethio<span className="text-emerald-600 dark:text-emerald-400">Link.</span>
+                <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                  Ethio<span className="text-emerald-400">Link</span>
                 </span>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">
-                  Merchant Console
+                <span className="text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mt-0.5">
+                  Attribution Engine
                 </span>
               </div>
             </Link>
@@ -79,20 +81,39 @@ export function BrandSidebar({
             {/* Mobile Close Button */}
             <button
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#163E3A] transition-colors"
+              aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Search Shortcut Input (Matchly style) */}
+          {/* Stitch Merchant Account Switcher Card */}
+          <div className="bg-[#163E3A] rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/40 transition-colors hover:bg-[#1C4E49] cursor-pointer">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+                <Store className="w-4 h-4" />
+              </div>
+              <div className="truncate">
+                <p className="text-xs font-semibold text-white truncate leading-tight">
+                  {brandName}
+                </p>
+                <p className="text-[10px] text-emerald-200/70 truncate">
+                  {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
+                </p>
+              </div>
+            </div>
+            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 shrink-0" />
+          </div>
+
+          {/* Search Shortcut Input */}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/50" />
             <input
               type="text"
               readOnly
               placeholder="Search campaigns... ⌘K"
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 placeholder:text-slate-400 focus:outline-none cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors select-none"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#163E3A]/60 border border-[#205B50]/40 text-slate-200 placeholder:text-emerald-200/40 focus:outline-none cursor-pointer hover:border-emerald-500/50 transition-colors select-none"
               onClick={() => {
                 const el = document.getElementById("campaign-search-input");
                 if (el) el.focus();
@@ -102,28 +123,32 @@ export function BrandSidebar({
         </div>
 
         {/* Middle Navigation Menus */}
-        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6 sidebar-scroll">
+        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-5 sidebar-scroll">
           {/* Main Menu */}
           <div className="space-y-1">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Main Menu
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+              Cockpit Navigation
             </span>
 
-            <nav className="space-y-1 pt-1.5">
+            <nav className="space-y-1 pt-1">
               <Link
                 href="/brand"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isOverview
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 shadow-2xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
+                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <LayoutGrid className={`w-4 h-4 ${isOverview ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`} />
+                  <LayoutGrid
+                    className={`w-4 h-4 ${
+                      isOverview ? "text-emerald-400" : "text-emerald-200/60"
+                    }`}
+                  />
                   <span>Overview</span>
                 </div>
                 {campaignCount > 0 && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[#102F2B] border border-[#205B50] text-emerald-200">
                     {campaignCount}
                   </span>
                 )}
@@ -133,17 +158,21 @@ export function BrandSidebar({
                 href="/brand/sales"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isSales
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 shadow-2xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
+                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Store className={`w-4 h-4 ${isSales ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`} />
-                  <span>POS Terminal</span>
+                  <Store
+                    className={`w-4 h-4 ${
+                      isSales ? "text-emerald-400" : "text-emerald-200/60"
+                    }`}
+                  />
+                  <span>Sales &amp; Attribution</span>
                 </div>
-                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-300 bg-emerald-900/60 px-1.5 py-0.5 rounded-full border border-emerald-700/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  POS
                 </span>
               </Link>
 
@@ -151,73 +180,69 @@ export function BrandSidebar({
                 href="/brand/analytics"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isAnalytics
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 shadow-2xs"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
+                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <TrendingUp className={`w-4 h-4 ${isAnalytics ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`} />
-                  <span>Analytics Funnel</span>
+                  <TrendingUp
+                    className={`w-4 h-4 ${
+                      isAnalytics ? "text-emerald-400" : "text-emerald-200/60"
+                    }`}
+                  />
+                  <span>Reports &amp; Funnel</span>
                 </div>
               </Link>
 
               <Link
                 href="/creator"
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-all"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <Users className="w-4 h-4 text-slate-400" />
-                  <span>Creator Portal</span>
+                  <Users className="w-4 h-4 text-emerald-200/60" />
+                  <span>Creators Directory</span>
                 </div>
               </Link>
             </nav>
           </div>
 
-          {/* Campaign Sectors (Matchly Category Tags) */}
-          <div className="space-y-1.5">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Campaign Sectors
+          {/* Campaign Sectors & Channels */}
+          <div className="space-y-1">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+              Attribution Channels
             </span>
 
-            <div className="space-y-1 pt-1">
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span>Retail &amp; POS Walk-in</span>
+            <div className="space-y-0.5 pt-1">
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>In-Store POS (Bole)</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono">1</span>
+                <span className="text-[10px] text-emerald-200/60 font-mono">31%</span>
               </div>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+                <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#229ED9]" />
                   <span>Telegram Bots</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono">2</span>
+                <span className="text-[10px] text-emerald-200/60 font-mono">58%</span>
               </div>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-violet-500" />
-                  <span>Fashion &amp; Lifestyle</span>
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>Direct Phone Orders</span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono">1</span>
-              </div>
-
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span>Food &amp; Coffee</span>
-                </div>
-                <span className="text-[10px] text-slate-400 font-mono">2</span>
+                <span className="text-[10px] text-emerald-200/60 font-mono">11%</span>
               </div>
             </div>
           </div>
 
-          {/* Other & Support */}
+          {/* Support & Audit */}
           <div className="space-y-1">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Operations &amp; Help
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+              Governance &amp; Support
             </span>
 
             <nav className="space-y-1 pt-1">
@@ -225,10 +250,10 @@ export function BrandSidebar({
                 <button
                   type="button"
                   onClick={onOpenReportModal}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer text-left"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all cursor-pointer text-left"
                 >
                   <div className="flex items-center gap-2.5">
-                    <LifeBuoy className="w-4 h-4 text-amber-500" />
+                    <LifeBuoy className="w-4 h-4 text-amber-400" />
                     <span>Report Issue</span>
                   </div>
                 </button>
@@ -236,30 +261,46 @@ export function BrandSidebar({
 
               <Link
                 href="/privacy"
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-all"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <Shield className="w-4 h-4 text-slate-400" />
-                  <span>Privacy &amp; Data</span>
+                  <Shield className="w-4 h-4 text-emerald-200/60" />
+                  <span>Privacy &amp; Data Audit</span>
                 </div>
               </Link>
             </nav>
           </div>
         </div>
 
-        {/* Bottom: Merchant Profile & Quick Actions */}
-        <div className="p-4 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+        {/* Bottom: Payment Gateway Status & Merchant Profile */}
+        <div className="p-3 border-t border-[#163E3A] bg-[#0c2522]/80 space-y-3">
+          {/* Telebirr & CBE Birr Live Integration Card (Stitch Spec) */}
+          <div className="bg-[#163E3A]/90 rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/30">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="flex flex-col">
+                <span className="text-[11px] font-semibold text-white leading-tight">
+                  Telebirr &amp; CBE Birr
+                </span>
+                <span className="text-[9px] text-emerald-200/70">Gateway Sync v2.4</span>
+              </div>
+            </div>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-600/30">
+              Active
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                 {brandName.charAt(0)}
               </div>
               <div className="min-w-0">
-                <span className="font-semibold text-xs text-slate-900 dark:text-white block truncate">
-                  {brandName}
+                <span className="font-semibold text-xs text-white block truncate leading-tight">
+                  {ownerName}
                 </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 block truncate">
-                  {ownerName} • {staffCount > 0 ? `${staffCount} staff` : role}
+                <span className="text-[10px] text-emerald-200/60 block truncate">
+                  {role === "OWNER" ? "Brand Merchant" : role}
                 </span>
               </div>
             </div>
@@ -270,7 +311,7 @@ export function BrandSidebar({
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-slate-200/60 dark:border-slate-800 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold text-slate-300 hover:text-rose-300 hover:bg-rose-950/30 border border-[#205B50]/40 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>

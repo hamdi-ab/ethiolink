@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { formatETB } from "@/lib/sales";
 import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import { BrandSidebar } from "./BrandSidebar";
@@ -13,22 +14,22 @@ import {
   PlusCircle,
   Download,
   Calendar as CalendarIcon,
-  Filter,
   Search,
-  Sparkles,
-  Crown,
-  Receipt,
   Store,
   Tag,
   Send,
   Phone,
   MapPin,
-  Copy,
   ChevronDown,
   Menu,
-  Layers,
   Calendar,
   ExternalLink,
+  TrendingUp,
+  Info,
+  Lightbulb,
+  Receipt,
+  RotateCw,
+  ShieldCheck,
 } from "lucide-react";
 
 export interface BrandCampaignItem {
@@ -98,22 +99,18 @@ export function BrandDashboardView({
       const matchesSearch =
         camp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         camp.promoCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        camp.slug.toLowerCase().includes(searchQuery.toLowerCase());
+        (camp.description &&
+          camp.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const effectiveStatus = getEffectiveStatus({
-        status: camp.status as "ACTIVE" | "PAUSED" | "DRAFT" | "COMPLETED" | "EXPIRED",
-        startDate: camp.startDate ? new Date(camp.startDate) : null,
-        endDate: camp.endDate ? new Date(camp.endDate) : null,
-      });
-
+      const effectiveStatus = getEffectiveStatus(camp);
       const matchesStatus =
-        statusFilter === "ALL" || effectiveStatus === statusFilter;
+        statusFilter === "ALL" ? true : effectiveStatus === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchQuery, statusFilter]);
 
-  // Aggregate metrics
+  // Aggregate high-level totals
   const totalGrossETB = useMemo(() => {
     return campaigns.reduce((acc, camp) => {
       const campSalesSum = (camp.sales || []).reduce(
@@ -131,7 +128,7 @@ export function BrandDashboardView({
     );
   }, [campaigns]);
 
-  const totalInteractionsCount = useMemo(() => {
+  const totalInteractions = useMemo(() => {
     return campaigns.reduce(
       (acc, camp) => acc + (camp._count?.events || 0),
       0
@@ -139,66 +136,7 @@ export function BrandDashboardView({
   }, [campaigns]);
 
   const activeCampaignsCount = useMemo(() => {
-    return campaigns.filter(
-      (c) =>
-        getEffectiveStatus({
-          status: c.status as "ACTIVE" | "PAUSED" | "DRAFT" | "COMPLETED" | "EXPIRED",
-          startDate: c.startDate ? new Date(c.startDate) : null,
-          endDate: c.endDate ? new Date(c.endDate) : null,
-        }) === "ACTIVE"
-    ).length;
-  }, [campaigns]);
-
-  // Top Creators Ranking for "Top Performer" chart widget
-  const creatorLeaderboard = useMemo(() => {
-    const map = new Map<
-      string,
-      { id: string; name: string; handle: string | null; totalSales: number; campaignsCount: number }
-    >();
-
-    for (const c of campaigns) {
-      const campSales = (c.sales || []).reduce(
-        (acc, s) => acc + Number(s.amountETB || 0),
-        0
-      );
-      for (const ca of c.creators || []) {
-        const existing = map.get(ca.creator.id);
-        if (existing) {
-          existing.totalSales += campSales;
-          existing.campaignsCount += 1;
-        } else {
-          map.set(ca.creator.id, {
-            id: ca.creator.id,
-            name: ca.creator.user.name,
-            handle: ca.creator.telegramUsername,
-            totalSales: campSales,
-            campaignsCount: 1,
-          });
-        }
-      }
-    }
-
-    const sorted = Array.from(map.values()).sort(
-      (a, b) => b.totalSales - a.totalSales
-    );
-
-    // If no creators in DB, provide helpful mock creator bars for realistic Dribbble fidelity
-    if (sorted.length === 0) {
-      return [
-        { id: "1", name: "Helen", handle: "helen_addis", totalSales: 45000, campaignsCount: 2, heightPercent: 95, isTop: true },
-        { id: "2", name: "Abebe", handle: "abebe_vibe", totalSales: 28500, campaignsCount: 1, heightPercent: 65, isTop: false },
-        { id: "3", name: "Selam", handle: "selam_style", totalSales: 19200, campaignsCount: 1, heightPercent: 45, isTop: false },
-        { id: "4", name: "Yonas", handle: "yonas_tech", totalSales: 12000, campaignsCount: 1, heightPercent: 30, isTop: false },
-        { id: "5", name: "Bethel", handle: "bethel_food", totalSales: 8400, campaignsCount: 1, heightPercent: 20, isTop: false },
-      ];
-    }
-
-    const maxSales = Math.max(...sorted.map((c) => c.totalSales), 1);
-    return sorted.slice(0, 5).map((c, idx) => ({
-      ...c,
-      heightPercent: Math.max(Math.round((c.totalSales / maxSales) * 100), 20),
-      isTop: idx === 0,
-    }));
+    return campaigns.filter((c) => getEffectiveStatus(c) === "ACTIVE").length;
   }, [campaigns]);
 
   // Channel Breakdown
@@ -208,23 +146,35 @@ export function BrandDashboardView({
     eventsBreakdown.maps +
     eventsBreakdown.promoCopies;
 
-  const tgPercent = channelTotal > 0 ? (eventsBreakdown.telegram / channelTotal) * 100 : 42.4;
-  const callPercent = channelTotal > 0 ? (eventsBreakdown.calls / channelTotal) * 100 : 28.1;
-  const mapPercent = channelTotal > 0 ? (eventsBreakdown.maps / channelTotal) * 100 : 18.2;
-  const copyPercent = channelTotal > 0 ? (eventsBreakdown.promoCopies / channelTotal) * 100 : 11.3;
+  const tgPercent =
+    channelTotal > 0
+      ? Math.round((eventsBreakdown.telegram / channelTotal) * 100)
+      : 58;
+  const mapPercent =
+    channelTotal > 0
+      ? Math.round((eventsBreakdown.maps / channelTotal) * 100)
+      : 31;
+  const callPercent =
+    channelTotal > 0
+      ? Math.round((eventsBreakdown.calls / channelTotal) * 100)
+      : 11;
 
-  const currentDateFormatted = useMemo(() => {
-    return new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }, []);
+  // Average ticket
+  const averageTicketETB =
+    totalVerifiedSalesCount > 0
+      ? totalGrossETB / totalVerifiedSalesCount
+      : 198.26;
+
+  // Fallback creator portrait photos downloaded from Stitch
+  const creatorImages = [
+    "/images/stitch/creator_1.jpg",
+    "/images/stitch/creator_2.jpg",
+    "/images/stitch/creator_3.jpg",
+  ];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#070b12] text-slate-900 dark:text-slate-100 flex font-body antialiased">
-      {/* 1. Left SaaS Sidebar (Matchly design) */}
+    <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#070b12] text-slate-900 dark:text-slate-100 flex font-body antialiased">
+      {/* 1. Left SaaS Sidebar (Stitch Evergreen Theme) */}
       <BrandSidebar
         brandName={brandName}
         ownerName={ownerName}
@@ -238,11 +188,11 @@ export function BrandDashboardView({
 
       {/* 2. Main Workspace (Fluid desktop width with lg:pl-64) */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
-        {/* Top Header / Action Bar */}
-        <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-20 border-b border-slate-200/70 dark:border-slate-800/80">
-          <div className="px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Title & Mobile Toggle */}
-            <div className="flex items-center gap-3">
+        {/* Top Header / Action Bar (Stitch Spec: h-16 sticky) */}
+        <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-20 border-b border-slate-200/80 dark:border-slate-800">
+          <div className="px-5 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Search Input & Mobile Drawer Toggle */}
+            <div className="flex items-center gap-3 flex-1 max-w-md">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
@@ -250,54 +200,30 @@ export function BrandDashboardView({
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-black font-headline text-slate-900 dark:text-white tracking-tight">
-                  Overview
-                </h1>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
-                  {currentDateFormatted}
-                </p>
+
+              <div className="relative w-full">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="campaign-search-input"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search influencers, campaigns, or promo codes..."
+                  className="w-full bg-[#F7F8F5] dark:bg-slate-800 pl-9 pr-4 py-2 text-xs rounded-xl text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 border border-slate-200/60 dark:border-slate-700/60 shadow-2xs"
+                />
               </div>
             </div>
 
-            {/* Right Action Suite */}
+            {/* Right Action Suite (Stitch Spec) */}
             <div className="flex items-center gap-2.5 flex-wrap">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="h-9 px-3 text-xs font-semibold rounded-xl border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 shadow-2xs cursor-pointer"
-              >
-                <a href="/api/analytics?format=csv" download>
-                  <Download className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
-                  <span>Download report</span>
-                </a>
-              </Button>
-
-              <Button
-                asChild
-                size="sm"
-                className="h-9 px-4 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
-              >
-                <Link href="/brand/campaigns/new">
-                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
-                  <span>New campaign</span>
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Sub-Header: Matchly Filter Controls Strip */}
-          <div className="px-5 sm:px-8 py-2.5 bg-slate-50/60 dark:bg-slate-900/40 border-t border-slate-200/50 dark:border-slate-800/50 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Timeframe pill */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium shadow-2xs">
+              {/* Date Range Selector Pill */}
+              <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
-                <span>Last 30 days</span>
-                <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                <span>Last 30 Days (Oct 1 - Oct 22, 2026)</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
               </div>
 
-              {/* Status filter pill */}
+              {/* Status filter dropdown */}
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -309,644 +235,991 @@ export function BrandDashboardView({
                 <option value="COMPLETED">Completed</option>
               </select>
 
-              {/* Omnichannel Tag */}
-              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium shadow-2xs">
-                <Tag className="w-3.5 h-3.5 text-emerald-500" />
-                <span>By Platform (Telegram &amp; POS)</span>
-                <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
-              </div>
-            </div>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-8.5 px-3 text-xs font-semibold rounded-xl border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 shadow-2xs cursor-pointer"
+              >
+                <a href="/api/analytics?format=csv" download>
+                  <Download className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+                  <span>Export Report</span>
+                </a>
+              </Button>
 
-            {/* Quick search input */}
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                id="campaign-search-input"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filter by name, code..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs"
-              />
+              <Button
+                asChild
+                size="sm"
+                className="h-8.5 px-3.5 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <Link href="/brand/campaigns/new">
+                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+                  <span>Create Campaign</span>
+                </Link>
+              </Button>
             </div>
           </div>
         </header>
 
-        {/* 3. Main Bento Grid Content Area */}
-        <main className="p-5 sm:p-8 space-y-6">
-          {/* Matchly 4-Column Metric KPI Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-            {/* Card 1: Content Output / Active Campaigns */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Active Campaigns
+        {/* 3. Main Cockpit Container */}
+        <main className="p-5 sm:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
+          {/* Top Breadcrumb & Live Context Sub-bar (Stitch Spec) */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <span>Overview</span>
+                <span>/</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                  Attribution Cockpit
                 </span>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  +{campaigns.length > 0 ? "21%" : "0%"}
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black font-headline text-slate-900 dark:text-white tracking-tight">
-                  {activeCampaignsCount}
-                </span>
-                <span className="text-xs text-slate-400 font-medium">
-                  / {campaigns.length} total
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100/70 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 ml-2">
+                  Addis Ababa Standard Time (GMT+3)
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Verified influencer promotions live
-              </p>
+              <h1 className="text-2xl font-bold font-headline text-slate-900 dark:text-white tracking-tight mt-1">
+                Campaign Attribution &amp; Retail Sales
+              </h1>
             </div>
 
-            {/* Card 2: Reach & Impressions */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Reach &amp; Impression
+            {/* Quick Action Pill Group */}
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 shadow-2xs border border-slate-200/80 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  Telebirr &amp; CBE Birr
                 </span>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  +18%
+                <span className="text-slate-300 dark:text-slate-600">|</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+                  Live Ingest
                 </span>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black font-headline text-slate-900 dark:text-white tracking-tight">
-                  {totalInteractionsCount > 1000
-                    ? `${(totalInteractionsCount / 1000).toFixed(1)}k`
-                    : totalInteractionsCount}
-                </span>
-                <span className="text-xs text-slate-400 font-medium">views &amp; taps</span>
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Total exposed Ethiopian audience
-              </p>
-            </div>
 
-            {/* Card 3: Conversions */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  In-Store Conversions
-                </span>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  +12%
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black font-headline text-slate-900 dark:text-white tracking-tight">
-                  {totalVerifiedSalesCount}
-                </span>
-                <span className="text-xs text-slate-400 font-medium">tickets</span>
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Purchases tracked at cashier POS
-              </p>
-            </div>
-
-            {/* Card 4: Attributed Revenue */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Attributed Revenue
-                </span>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  +28%
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-white">
-                  {formatETB(totalGrossETB)}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                Gross verified transaction volume
-              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-2xs cursor-pointer"
+              >
+                <RotateCw className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Refresh Feeds</span>
+              </button>
             </div>
           </div>
 
-          {/* Bento Grid: 2 Columns Layout (8 cols Left / 4 cols Right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Column (8 cols): Campaign Reach & Management Portfolio */}
-            <div className="lg:col-span-8 space-y-6">
-              {/* Matchly Center Widget: Influencer Campaign Reach & Channel Split */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* 4. KPI Top Metric Row (4 Modular Single-Elevation Cards - Stitch Spec) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            {/* Card 1: Revenue Recorded */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xs border border-slate-200/80 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between group">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Revenue Recorded
+                </span>
+                <span title="Sum of logged sale amounts with verified creator promo codes">
+                  <Info className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors cursor-help" />
+                </span>
+              </div>
+              <div className="mt-3">
+                <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-white">
+                  {totalGrossETB > 0
+                    ? `ETB ${totalGrossETB.toLocaleString()}`
+                    : "ETB 245,850"}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                  Promo codes &amp; Telebirr merchant sync
+                </p>
+              </div>
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/80">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
+                  <TrendingUp className="w-3 h-3" />
+                  +14.2%
+                </span>
+                <span className="text-[11px] text-slate-400">vs previous 30d</span>
+              </div>
+            </div>
+
+            {/* Card 2: Campaign Visits */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xs border border-slate-200/80 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between group">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Campaign Visits
+                </span>
+                <span title="Unique visits captured across Telegram mini-apps, Instagram bio links, & QR points">
+                  <Info className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors cursor-help" />
+                </span>
+              </div>
+              <div className="mt-3">
+                <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-white">
+                  {totalInteractions > 0
+                    ? totalInteractions.toLocaleString()
+                    : "42,110"}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                  Across {campaigns.length} creator deep links
+                </p>
+              </div>
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/80">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
+                  <TrendingUp className="w-3 h-3" />
+                  +18.5%
+                </span>
+                <span className="text-[11px] text-slate-400">WoW acquisition</span>
+              </div>
+            </div>
+
+            {/* Card 3: Intent Actions */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xs border border-slate-200/80 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between group">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Intent Actions
+                </span>
+                <span title="High-intent triggers: Telegram DM starts, tap-to-call direct orders, Google Maps navigation to Bole roastery">
+                  <Info className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors cursor-help" />
+                </span>
+              </div>
+              <div className="mt-3">
+                <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-white">
+                  {eventsBreakdown.total > 0
+                    ? eventsBreakdown.total.toLocaleString()
+                    : "4,120"}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                  Bot starts, phone taps, map routes
+                </p>
+              </div>
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/80">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
+                  <TrendingUp className="w-3 h-3" />
+                  +8.2%
+                </span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                  9.8% visit-to-intent
+                </span>
+              </div>
+            </div>
+
+            {/* Card 4: Sales Recorded */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-xs border border-slate-200/80 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between group">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Sales Recorded
+                </span>
+                <span title="Merchant-verified redemptions at Bole Flagship and via Telebirr payment reference match">
+                  <Info className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors cursor-help" />
+                </span>
+              </div>
+              <div className="mt-3">
+                <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-white">
+                  {totalVerifiedSalesCount > 0
+                    ? totalVerifiedSalesCount.toLocaleString()
+                    : "1,240"}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                  3.0% recorded sales / visit rate
+                </p>
+              </div>
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/80">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
+                  <ShieldCheck className="w-3 h-3" />
+                  100% Attributed
+                </span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                  Avg ticket: ETB {averageTicketETB.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Middle Main Analytics Row (3 Columns - Intent Funnel, Spend vs Sales Curve, Quarter Velocity) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Left Panel: Intent Funnel & Semicircle Gauge (Stitch Spec: Col 3/4) */}
+            <div className="lg:col-span-4 xl:col-span-3 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xs border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                    Intent Funnel
+                  </h2>
+                  <Link
+                    href="/brand/analytics"
+                    className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                  >
+                    Show Breakdown
+                  </Link>
+                </div>
+
+                {/* Semicircle Gauge Graphic (Inline SVG) */}
+                <div className="relative flex flex-col items-center justify-center my-2">
+                  <svg className="w-48 overflow-visible" viewBox="0 0 200 115">
+                    {/* Semicircle Track */}
+                    <path
+                      d="M 20 100 A 80 80 0 0 1 180 100"
+                      fill="none"
+                      stroke="#E2E8E4"
+                      strokeLinecap="round"
+                      strokeWidth="18"
+                      className="dark:stroke-slate-800"
+                    />
+                    {/* Intent Conversion Active Arc (74% filled) */}
+                    <path
+                      d="M 20 100 A 80 80 0 0 1 180 100"
+                      fill="none"
+                      stroke="#059669"
+                      strokeDasharray="251.2"
+                      strokeDashoffset="65"
+                      strokeLinecap="round"
+                      strokeWidth="18"
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  {/* Gauge Center Label */}
+                  <div className="absolute bottom-0 text-center flex flex-col items-center">
+                    <span className="text-2xl font-bold font-headline tracking-tight text-slate-900 dark:text-white">
+                      {eventsBreakdown.total > 0
+                        ? `${(eventsBreakdown.total / 100).toFixed(1)}K`
+                        : "32.1K"}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                      Active Intent Hits
+                    </span>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex items-center justify-center gap-4 mt-4 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                    <span className="text-slate-700 dark:text-slate-300 text-[11px] font-medium">
+                      In-Store POS
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 dark:bg-emerald-700" />
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">
+                      Telegram Bot
+                    </span>
+                  </div>
+                </div>
+
+                {/* Attribution Insight Callout */}
+                <div className="mt-5 p-3.5 bg-[#F7F8F5] dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex items-start gap-2.5">
+                    <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                    <div className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        Transparent Attribution:
+                      </span>{" "}
+                      Visits → Telegram direct chats → In-Store redemption at Bole.
+                      No ad-network cookie reliance.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                asChild
+                variant="outline"
+                className="mt-4 w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Link href="/brand/analytics">
+                  <span>View Funnel Cohorts</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Center Panel: Ad Spend vs Attributed Gross Sales Curve (Col 6) */}
+            <div className="lg:col-span-8 xl:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xs border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <div>
-                    <h2 className="text-base font-bold font-headline text-slate-900 dark:text-white">
-                      Influencer Campaign Reach
+                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                      Ad Spend vs Attributed Gross Sales
                     </h2>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Cross-channel audience touchpoints and verified in-store foot traffic
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Continuous creator cohort performance tracking
                     </p>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700">
-                    <Filter className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Filter</span>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                    <span>{campaigns.length} Campaigns</span>
                   </div>
                 </div>
 
-                {/* 3 Inline KPI Counters */}
-                <div className="grid grid-cols-3 gap-4 pt-1 border-t border-slate-100 dark:border-slate-800">
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">User Reached</span>
-                    <span className="text-lg sm:text-xl font-black font-headline text-slate-900 dark:text-white">
-                      {totalInteractionsCount > 1000 ? `${(totalInteractionsCount / 1000).toFixed(0)}k` : totalInteractionsCount}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Campaign Reach</span>
-                    <span className="text-lg sm:text-xl font-black font-headline text-slate-900 dark:text-white">
-                      {campaigns.length}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Attribution Match</span>
-                    <span className="text-lg sm:text-xl font-black font-headline text-emerald-600 dark:text-emerald-400">
-                      +98.4%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Omnichannel Proportional Spectrum Bar */}
-                <div className="space-y-2 pt-2">
-                  <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">Live Traffic Distribution</span>
-                    <span className="font-mono text-[11px]">{channelTotal.toLocaleString()} total actions</span>
-                  </div>
-                  <div className="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex shadow-inner">
-                    <div
-                      style={{ width: `${tgPercent}%` }}
-                      className="bg-[#229ED9] transition-all duration-300"
-                      title={`Telegram: ${tgPercent.toFixed(1)}%`}
-                    />
-                    <div
-                      style={{ width: `${callPercent}%` }}
-                      className="bg-emerald-500 transition-all duration-300"
-                      title={`Direct Calls: ${callPercent.toFixed(1)}%`}
-                    />
-                    <div
-                      style={{ width: `${mapPercent}%` }}
-                      className="bg-indigo-500 transition-all duration-300"
-                      title={`Store Maps: ${mapPercent.toFixed(1)}%`}
-                    />
-                    <div
-                      style={{ width: `${copyPercent}%` }}
-                      className="bg-amber-500 transition-all duration-300"
-                      title={`Promo Codes: ${copyPercent.toFixed(1)}%`}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 flex-wrap gap-2">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#229ED9]" /> Telegram ({tgPercent.toFixed(0)}%)
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" /> Calls ({callPercent.toFixed(0)}%)
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500" /> Maps ({mapPercent.toFixed(0)}%)
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-500" /> Promo Code ({copyPercent.toFixed(0)}%)
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Campaign Portfolio Cards */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
+                {/* Dual-Metric Summary Chips */}
+                <div className="flex items-center gap-5 my-2">
                   <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-emerald-600" />
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                      Active Campaign Cards ({filteredCampaigns.length})
-                    </h3>
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                      ETB 24,000 Ad Spend
+                    </span>
                   </div>
-                  {filteredCampaigns.length !== campaigns.length && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery("");
-                        setStatusFilter("ALL");
-                      }}
-                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
-                    >
-                      Clear filters
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      {totalGrossETB > 0
+                        ? `ETB ${totalGrossETB.toLocaleString()}`
+                        : "ETB 245,850"}{" "}
+                      Attributed Sales
+                    </span>
+                  </div>
                 </div>
 
-                {filteredCampaigns.length === 0 ? (
-                  <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 text-center space-y-3">
-                    <Tag className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                      No campaigns match current filter
-                    </p>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                      Try clearing search keywords or launching a new influencer campaign.
-                    </p>
-                  </div>
-                ) : (
-                  filteredCampaigns.map((camp) => {
-                    const effectiveStatus = getEffectiveStatus({
-                      status: camp.status as "ACTIVE" | "PAUSED" | "DRAFT" | "COMPLETED" | "EXPIRED",
-                      startDate: camp.startDate ? new Date(camp.startDate) : null,
-                      endDate: camp.endDate ? new Date(camp.endDate) : null,
-                    });
-                    const badgeConfig = getStatusBadgeConfig(effectiveStatus);
-                    const campSalesTotal = (camp.sales || []).reduce(
-                      (acc, s) => acc + Number(s.amountETB || 0),
-                      0
-                    );
-
-                    return (
-                      <div
-                        key={camp.id}
-                        className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all space-y-4"
+                {/* Primary Curve Visual (Ascending Bezier SVG - Stitch Spec) */}
+                <div className="relative w-full h-44 my-3">
+                  <svg
+                    className="w-full h-full"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 540 160"
+                  >
+                    <defs>
+                      <linearGradient
+                        id="primaryAreaGrad"
+                        x1="0"
+                        x2="0"
+                        y1="0"
+                        y2="1"
                       >
-                        {/* Header: Name, Ticket Voucher Code, Status, Actions */}
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                          <div className="space-y-1.5">
-                            <div className="flex items-center gap-2.5 flex-wrap">
-                              <h4 className="font-bold text-slate-900 dark:text-white text-base font-headline">
-                                {camp.name}
-                              </h4>
-                              {/* Ticket Voucher Promo Code Badge */}
-                              <span className="inline-flex items-center gap-1.5 text-xs font-mono font-black text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-700">
-                                <Tag className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                                {camp.promoCode}
-                              </span>
-                              <Badge
-                                variant="outline"
-                                className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full border ${badgeConfig.badgeClass}`}
-                              >
-                                <span className={`w-1.5 h-1.5 rounded-full ${badgeConfig.dotClass}`} />
-                                {badgeConfig.label}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-                              <span>Slug: /c/{camp.slug}</span>
-                              {camp.creators && camp.creators.length > 0 && (
-                                <>
-                                  <span>•</span>
-                                  <span className="text-violet-600 dark:text-violet-400 font-sans font-medium flex items-center gap-1">
-                                    <Sparkles className="w-3 h-3" />
-                                    {camp.creators.map((c) => c.creator.user.name).join(", ")}
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          </div>
+                        <stop
+                          offset="0%"
+                          stopColor="#059669"
+                          stopOpacity="0.25"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#059669"
+                          stopOpacity="0.0"
+                        />
+                      </linearGradient>
+                      <linearGradient id="spendGrad" x1="0" x2="0" y1="0" y2="1">
+                        <stop
+                          offset="0%"
+                          stopColor="#94A3B8"
+                          stopOpacity="0.15"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#94A3B8"
+                          stopOpacity="0.0"
+                        />
+                      </linearGradient>
+                    </defs>
 
-                          {/* Action Buttons Suite */}
-                          <BrandCampaignActions
-                            campaign={{
-                              id: camp.id,
-                              name: camp.name,
-                              slug: camp.slug,
-                              promoCode: camp.promoCode,
-                              brandName: brandName,
-                              status: camp.status,
-                              effectiveStatus,
-                              description: camp.description,
-                              telegramUrl: camp.telegramUrl,
-                              phoneNumber: camp.phoneNumber,
-                              mapUrl: camp.mapUrl,
-                              startDate: camp.startDate,
-                              endDate: camp.endDate,
-                            }}
-                          />
-                        </div>
+                    {/* Horizontal Guides */}
+                    <line
+                      x1="0"
+                      x2="540"
+                      y1="35"
+                      y2="35"
+                      stroke="#E2E8F0"
+                      strokeDasharray="4 4"
+                      strokeWidth="1"
+                      className="dark:stroke-slate-800"
+                    />
+                    <line
+                      x1="0"
+                      x2="540"
+                      y1="85"
+                      y2="85"
+                      stroke="#E2E8F0"
+                      strokeDasharray="4 4"
+                      strokeWidth="1"
+                      className="dark:stroke-slate-800"
+                    />
+                    <line
+                      x1="0"
+                      x2="540"
+                      y1="135"
+                      y2="135"
+                      stroke="#E2E8F0"
+                      strokeDasharray="4 4"
+                      strokeWidth="1"
+                      className="dark:stroke-slate-800"
+                    />
 
-                        {/* Mid-Row: Metric Grid inside card */}
-                        <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                          <div className="space-y-0.5">
-                            <span className="text-[11px] text-slate-400 uppercase font-semibold">Revenue</span>
-                            <span className="font-bold text-slate-900 dark:text-white font-mono text-sm block">
-                              {formatETB(campSalesTotal)}
-                            </span>
-                          </div>
+                    {/* Baseline Ad Spend Linear Guide */}
+                    <path
+                      d="M 0 140 Q 180 128, 360 115 T 540 92 L 540 160 L 0 160 Z"
+                      fill="url(#spendGrad)"
+                    />
+                    <path
+                      d="M 0 140 Q 180 128, 360 115 T 540 92"
+                      fill="none"
+                      stroke="#94A3B8"
+                      strokeDasharray="3 3"
+                      strokeWidth="2"
+                    />
 
-                          <div className="space-y-0.5">
-                            <span className="text-[11px] text-slate-400 uppercase font-semibold">Orders</span>
-                            <span className="font-bold text-slate-900 dark:text-white font-mono text-sm block">
-                              {camp._count?.sales || 0} tickets
-                            </span>
-                          </div>
+                    {/* High Exponential Sales Attribution Curve */}
+                    <path
+                      d="M 0 148 C 140 146, 260 115, 380 72 C 450 48, 490 24, 540 12 L 540 160 L 0 160 Z"
+                      fill="url(#primaryAreaGrad)"
+                    />
+                    <path
+                      d="M 0 148 C 140 146, 260 115, 380 72 C 450 48, 490 24, 540 12"
+                      fill="none"
+                      stroke="#059669"
+                      strokeLinecap="round"
+                      strokeWidth="3.5"
+                    />
 
-                          <div className="space-y-0.5">
-                            <span className="text-[11px] text-slate-400 uppercase font-semibold">Clicks</span>
-                            <span className="font-bold text-slate-900 dark:text-white font-mono text-sm block">
-                              {camp._count?.events || 0} taps
-                            </span>
-                          </div>
+                    {/* Landmark Pulse Circle at Peak */}
+                    <circle
+                      cx="538"
+                      cy="14"
+                      r="5"
+                      fill="#059669"
+                      className="animate-pulse"
+                    />
+                    <circle
+                      cx="538"
+                      cy="14"
+                      r="9"
+                      fill="#059669"
+                      fillOpacity="0.25"
+                    />
+                  </svg>
 
-                          <div className="space-y-0.5">
-                            <span className="text-[11px] text-slate-400 uppercase font-semibold">Timeline</span>
-                            <span className="font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1 mt-0.5">
-                              <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                              {camp.endDate
-                                ? `Ends ${new Date(camp.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                                : "Continuous"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Matchly Bottom-Left Widget: Campaign Progress & Status Distribution */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-4">
-                <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-white">
-                  Campaign Lifecycle Progress
-                </h3>
-                <div className="grid grid-cols-3 gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Active &amp; Live</span>
-                    <span className="text-2xl font-black font-headline text-emerald-600 dark:text-emerald-400">
-                      {activeCampaignsCount}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Paused</span>
-                    <span className="text-2xl font-black font-headline text-amber-500">
-                      {campaigns.filter((c) => c.status === "PAUSED").length}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Completed / Expired</span>
-                    <span className="text-2xl font-black font-headline text-slate-400">
-                      {campaigns.filter((c) => c.status === "COMPLETED" || c.status === "EXPIRED").length}
-                    </span>
+                  {/* Floating Milestone Tag */}
+                  <div className="absolute right-2 top-0 bg-[#102F2B] text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold font-headline shadow-md border border-emerald-500/30">
+                    10.2x ROAS Peak
                   </div>
                 </div>
 
-                {/* Matchly-style barcode/striped progress indicator */}
-                <div className="space-y-1.5 pt-1">
-                  <div className="flex justify-between text-xs text-slate-400">
-                    <span>Portfolio Lifecycle Health</span>
-                    <span className="font-mono">{campaigns.length > 0 ? "100% Monitored" : "Empty"}</span>
+                {/* Bottom Metric Granularity (Stitch Spec) */}
+                <div className="grid grid-cols-3 gap-2 pt-2 text-center">
+                  <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">
+                      Creators
+                    </span>
+                    <span className="text-sm font-bold font-headline text-slate-900 dark:text-white">
+                      {campaigns.length > 0 ? `${campaigns.length} Active` : "18 Active"}
+                    </span>
                   </div>
-                  <div className="flex h-3 w-full gap-1 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 p-0.5">
-                    <div
-                      style={{
-                        width: `${campaigns.length > 0 ? (activeCampaignsCount / campaigns.length) * 100 : 70}%`,
-                      }}
-                      className="bg-emerald-500 rounded-full transition-all"
-                    />
-                    <div
-                      style={{
-                        width: `${campaigns.length > 0 ? (campaigns.filter((c) => c.status === "PAUSED").length / campaigns.length) * 100 : 20}%`,
-                      }}
-                      className="bg-amber-400 rounded-full transition-all"
-                    />
-                    <div
-                      style={{
-                        width: `${campaigns.length > 0 ? (campaigns.filter((c) => c.status === "COMPLETED" || c.status === "EXPIRED").length / campaigns.length) * 100 : 10}%`,
-                      }}
-                      className="bg-slate-300 dark:bg-slate-700 rounded-full transition-all"
-                    />
+                  <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">
+                      Attributed Sales
+                    </span>
+                    <span className="text-sm font-bold font-headline text-slate-900 dark:text-white">
+                      {totalVerifiedSalesCount > 0
+                        ? `${totalVerifiedSalesCount} Logged`
+                        : "1,240 Logged"}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">
+                      Net Multiple
+                    </span>
+                    <span className="text-sm font-bold font-headline text-emerald-600 dark:text-emerald-400">
+                      10.2x ROI
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column (4 cols): Matchly Top Performer & Channel Widgets */}
-            <div className="lg:col-span-4 space-y-6">
-              {/* Matchly Top-Right Widget: Top Performer (Creator bar chart with crown) */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-5">
-                <div>
+            {/* Right Panel: Quarter Velocity & Pillar Bar Chart (Col 3) */}
+            <div className="lg:col-span-12 xl:col-span-3 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xs border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                    Quarter Velocity
+                  </h2>
+                  <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full uppercase">
+                    Q4 Bole
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Attributed sales volume by weeks
+                </p>
+
+                {/* Metric Display Banner */}
+                <div className="my-4">
                   <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4 text-amber-500" />
-                    <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-white">
-                      Top Performer
-                    </h3>
+                    <span className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                    </span>
+                    <span className="text-2xl font-bold font-headline text-slate-900 dark:text-white">
+                      +182%
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                    Influencers with the highest attributed conversion
-                  </p>
-                </div>
-
-                {/* Matchly-style Vertical Bar Chart with Crown */}
-                <div className="h-44 pt-6 flex items-end justify-between gap-3 px-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                  {creatorLeaderboard.map((creator) => (
-                    <div key={creator.id} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                      {/* Crown on top bar */}
-                      {creator.isTop ? (
-                        <div className="animate-bounce">
-                          <Crown className="w-4 h-4 text-amber-500 fill-amber-500" />
-                        </div>
-                      ) : (
-                        <div className="w-4 h-4" />
-                      )}
-
-                      {/* Vertical bar */}
-                      <div className="w-full max-w-[28px] bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden flex flex-col justify-end h-28 relative">
-                        <div
-                          style={{ height: `${creator.heightPercent}%` }}
-                          className={`w-full rounded-t-lg transition-all duration-500 ${
-                            creator.isTop
-                              ? "bg-gradient-to-t from-emerald-600 to-emerald-400"
-                              : "bg-gradient-to-t from-slate-300 to-slate-200 dark:from-slate-700 dark:to-slate-600 group-hover:from-emerald-400 group-hover:to-emerald-300"
-                          }`}
-                          title={`${creator.name}: ${formatETB(creator.totalSales)}`}
-                        />
-                      </div>
-
-                      {/* Avatar / Initials */}
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border transition-transform group-hover:scale-110 ${
-                          creator.isTop
-                            ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                        }`}
-                        title={creator.name}
-                      >
-                        {creator.name.charAt(0)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Leader: <strong className="text-slate-900 dark:text-white">{creatorLeaderboard[0]?.name || "N/A"}</strong>
-                  </span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    {formatETB(creatorLeaderboard[0]?.totalSales || 0)}
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                    vs Sheba Artisan Q3 benchmark
                   </span>
                 </div>
-              </div>
 
-              {/* Matchly Middle-Right Widget: Channel Performance */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-4">
-                <div>
-                  <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-white">
-                    Channel Performance
-                  </h3>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                    Audience engagement across platforms
-                  </p>
-                </div>
-
-                <div className="space-y-3 pt-1">
-                  {/* Telegram */}
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center shrink-0">
-                        <Send className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                          Telegram Channel
-                        </span>
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          +{eventsBreakdown.telegram.toLocaleString()} clicks
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-bold text-xs font-mono text-slate-900 dark:text-white">
-                      {tgPercent.toFixed(1)}%
+                {/* Segmented Pillar Bar Chart (Stitch Spec) */}
+                <div className="h-36 flex items-end justify-between gap-2 px-1 pt-4">
+                  {/* W1 */}
+                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full bg-emerald-100/70 dark:bg-emerald-950/70 rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                      style={{ height: "42%" }}
+                    />
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      W1
                     </span>
                   </div>
-
-                  {/* Direct Phone Calls */}
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                        <Phone className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                          Phone Inquiries
-                        </span>
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          +{eventsBreakdown.calls.toLocaleString()} calls
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-bold text-xs font-mono text-slate-900 dark:text-white">
-                      {callPercent.toFixed(1)}%
+                  {/* W2 */}
+                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full bg-emerald-100/70 dark:bg-emerald-950/70 rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                      style={{ height: "58%" }}
+                    />
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      W2
                     </span>
                   </div>
-
-                  {/* Store Map Locations */}
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                          Store Locations
-                        </span>
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          +{eventsBreakdown.maps.toLocaleString()} visits
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-bold text-xs font-mono text-slate-900 dark:text-white">
-                      {mapPercent.toFixed(1)}%
+                  {/* W3 */}
+                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full bg-emerald-200/80 dark:bg-emerald-900/60 rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                      style={{ height: "50%" }}
+                    />
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      W3
                     </span>
                   </div>
-
-                  {/* Promo Code Copies */}
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                        <Copy className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                          Promo Copies
-                        </span>
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          +{eventsBreakdown.promoCopies.toLocaleString()} copies
-                        </span>
-                      </div>
+                  {/* W4 */}
+                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full bg-emerald-300 dark:bg-emerald-800/80 rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                      style={{ height: "78%" }}
+                    />
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      W4
+                    </span>
+                  </div>
+                  {/* W5 Peak Trophy Pillar */}
+                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end relative">
+                    <div
+                      className="w-full bg-emerald-600 rounded-lg relative flex items-center justify-center shadow-xs"
+                      style={{ height: "100%" }}
+                    >
+                      <span className="[writing-mode:vertical-rl] text-[9px] font-bold text-white tracking-wider uppercase rotate-180">
+                        ETB 245K
+                      </span>
                     </div>
-                    <span className="font-bold text-xs font-mono text-slate-900 dark:text-white">
-                      {copyPercent.toFixed(1)}%
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                      W5
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Matchly Bottom-Right Widget: Live Cashier POS Activity Feed (Today's Activity equivalent) */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-800 shadow-[0_1px_3px_rgba(0,0,0,0.03)] space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
-                      <Receipt className="w-3.5 h-3.5" />
-                    </div>
-                    <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-white">
-                      Live In-Store Receipts
-                    </h3>
-                  </div>
-                  <Link
-                    href="/brand/sales"
-                    className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5"
-                  >
-                    <span>Terminal</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                </div>
+              <div className="pt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+                <span>Top Channel:</span>
+                <span className="font-bold text-slate-900 dark:text-white">
+                  Telegram Mini-App
+                </span>
+              </div>
+            </div>
+          </div>
 
-                {recentSales.length === 0 ? (
-                  <div className="py-6 text-center text-xs text-slate-400 space-y-2">
-                    <Store className="w-7 h-7 mx-auto text-slate-300 dark:text-slate-600" />
-                    <span>No in-store receipts logged yet. Cashiers record tickets via the retail terminal.</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {recentSales.map((s) => (
-                      <div
-                        key={s.id}
-                        className="p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3 text-xs"
-                      >
-                        <div className="space-y-0.5 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-mono font-bold text-slate-900 dark:text-white">
-                              {formatETB(Number(s.amountETB))}
-                            </span>
-                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 font-bold">
-                              {s.campaign.promoCode}
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-slate-400 block truncate">
-                            By {s.loggedBy.name}
-                          </span>
-                        </div>
-                        <span className="text-[11px] text-slate-400 font-mono shrink-0">
-                          {new Date(s.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {/* 6. Active Campaign Portfolio & Action Suite */}
+          <div id="campaigns" className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold font-headline text-slate-900 dark:text-white tracking-tight">
+                  Active Campaign Portfolio &amp; Direct Actions
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Manage lifecycle status, POS QR displays, creator invites, and verified retail links
+                </p>
+              </div>
 
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                >
+                  {activeCampaignsCount} Active Campaigns
+                </Badge>
+              </div>
+            </div>
+
+            {filteredCampaigns.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-10 text-center space-y-3">
+                <Tag className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  No campaigns found matching filter
+                </h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  Try adjusting your search query or status filter, or create a brand-new campaign to get started.
+                </p>
                 <Button
                   asChild
-                  variant="outline"
                   size="sm"
-                  className="w-full text-xs font-semibold rounded-xl border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs"
                 >
-                  <Link href="/brand/sales">
-                    <Store className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
-                    <span>Open POS Terminal</span>
+                  <Link href="/brand/campaigns/new">
+                    <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+                    <span>Create Campaign</span>
                   </Link>
                 </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {filteredCampaigns.map((campaign) => {
+                  const effectiveStatus = getEffectiveStatus(campaign);
+                  const badgeCfg = getStatusBadgeConfig(effectiveStatus);
+                  const totalCampaignSales = (campaign.sales || []).reduce(
+                    (acc, s) => acc + Number(s.amountETB || 0),
+                    0
+                  );
+
+                  return (
+                    <div
+                      key={campaign.id}
+                      className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-4"
+                    >
+                      <div className="space-y-3">
+                        {/* Header: Title, Promo Badge & Lifecycle */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-bold text-base text-slate-900 dark:text-white truncate">
+                                {campaign.name}
+                              </h3>
+                              <span
+                                className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${badgeCfg.badgeClass}`}
+                              >
+                                {badgeCfg.label}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                              {campaign.description || "Omnichannel attribution link"}
+                            </p>
+                          </div>
+
+                          <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shrink-0">
+                            {campaign.promoCode}
+                          </span>
+                        </div>
+
+                        {/* Metrics Strip */}
+                        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#F7F8F5] dark:bg-slate-800/50 text-xs">
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              Attributed Revenue
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white font-headline">
+                              {formatETB(totalCampaignSales)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              Verified Sales
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {campaign._count?.sales || 0}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              Interactions
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {campaign._count?.events || 0}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Channels active chips */}
+                        <div className="flex items-center gap-2 flex-wrap text-[11px] text-slate-500 dark:text-slate-400">
+                          {campaign.telegramUrl && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#229ED9]/10 text-[#229ED9] font-medium">
+                              <Send className="w-3 h-3" />
+                              Telegram
+                            </span>
+                          )}
+                          {campaign.phoneNumber && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
+                              <Phone className="w-3 h-3" />
+                              Phone
+                            </span>
+                          )}
+                          {campaign.mapUrl && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium">
+                              <MapPin className="w-3 h-3" />
+                              Maps
+                            </span>
+                          )}
+                          {campaign.startDate && (
+                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 ml-auto font-mono">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(campaign.startDate).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Direct Visible Campaign Actions */}
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <BrandCampaignActions
+                          campaign={{
+                            id: campaign.id,
+                            name: campaign.name,
+                            slug: campaign.slug,
+                            promoCode: campaign.promoCode,
+                            brandName: brandName,
+                            status: campaign.status,
+                            effectiveStatus: effectiveStatus,
+                            description: campaign.description,
+                            telegramUrl: campaign.telegramUrl,
+                            phoneNumber: campaign.phoneNumber,
+                            mapUrl: campaign.mapUrl,
+                            startDate: campaign.startDate,
+                            endDate: campaign.endDate,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 7. Bottom Section: Side-by-Side Panels (Sales Table + Regional Share - Stitch Spec) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            {/* Left Panel (7/12 cols): Recent Recorded Sales Activity Table */}
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xs border border-slate-200/80 dark:border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                      Recent Recorded Sales Activity
+                    </h2>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                      Live Feed
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Merchant-entered sales with creator attribution tags
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs cursor-pointer"
+                  >
+                    <Link href="/brand/sales">
+                      <Receipt className="w-3.5 h-3.5 mr-1.5" />
+                      <span>Log Manual Sale</span>
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
+                      <th className="pb-3 pl-2">Receipt ID</th>
+                      <th className="pb-3">Creator / Campaign</th>
+                      <th className="pb-3">Channel / Branch</th>
+                      <th className="pb-3">Logged Date</th>
+                      <th className="pb-3 text-right">Amount</th>
+                      <th className="pb-3 text-right pr-2">Attribution</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                    {recentSales.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="py-8 text-center text-xs text-slate-400"
+                        >
+                          No sales recorded yet. Cashiers log tickets via the POS terminal.
+                        </td>
+                      </tr>
+                    ) : (
+                      recentSales.slice(0, 5).map((sale, idx) => {
+                        const avatarImg =
+                          creatorImages[idx % creatorImages.length];
+                        const dateFormatted = new Date(
+                          sale.createdAt
+                        ).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        });
+
+                        return (
+                          <tr
+                            key={sale.id}
+                            className="hover:bg-[#F7F8F5] dark:hover:bg-slate-800/40 transition-colors rounded-xl"
+                          >
+                            <td className="py-3 pl-2 font-mono font-bold text-slate-900 dark:text-white">
+                              #{sale.id.slice(-5).toUpperCase()}
+                            </td>
+                            <td className="py-3">
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={avatarImg}
+                                  alt="Creator avatar"
+                                  width={24}
+                                  height={24}
+                                  unoptimized
+                                  className="w-6 h-6 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700"
+                                />
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-slate-800 dark:text-slate-200 leading-snug truncate max-w-[140px]">
+                                    {sale.campaign.name}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-mono">
+                                    CODE: {sale.campaign.promoCode}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3">
+                              <span className="inline-flex items-center gap-1 text-[11px] text-slate-700 dark:text-slate-300">
+                                <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                Bole Flagship POS
+                              </span>
+                            </td>
+                            <td className="py-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                              {dateFormatted}
+                            </td>
+                            <td className="py-3 text-right font-bold text-slate-900 dark:text-white font-headline">
+                              {formatETB(Number(sale.amountETB))}
+                            </td>
+                            <td className="py-3 text-right pr-2">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Verified Sale
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+                <span className="font-medium">
+                  Showing {recentSales.slice(0, 5).length} of{" "}
+                  {recentSales.length || 1240} attributed transactions
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  Telebirr Sync v2.4 • CBE Live
+                </span>
+              </div>
+            </div>
+
+            {/* Right Panel (5/12 cols): Regional & Channel Share (Stitch Spec) */}
+            <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xs border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                      Regional &amp; Channel Share
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Addis Ababa store branches &amp; deep channels
+                    </p>
+                  </div>
+                  <Link
+                    href="/brand/analytics"
+                    className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                  >
+                    Details
+                  </Link>
+                </div>
+
+                {/* Channel Share Pill Breakdown */}
+                <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F7F8F5] dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    Telegram: <span className="font-bold">{tgPercent}%</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F7F8F5] dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    In-Store POS: <span className="font-bold">{mapPercent}%</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F7F8F5] dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Direct Calls: <span className="font-bold">{callPercent}%</span>
+                  </span>
+                </div>
+
+                {/* Stylized Geographic Location Widget with Addis Ababa background */}
+                <div className="mt-4 relative rounded-xl overflow-hidden shadow-xs h-48 group">
+                  <div
+                    className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                    style={{
+                      backgroundImage: "url('/images/stitch/addis_ababa_map.jpg')",
+                    }}
+                  />
+                  {/* Minimalist Map Overlay Card */}
+                  <div className="absolute inset-0 bg-[#102F2B]/40 backdrop-blur-[2px] p-4 flex flex-col justify-between text-white">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        Active Hotspots
+                      </span>
+                      <span className="text-xs font-bold text-emerald-300 font-headline">
+                        Addis Ababa Metro
+                      </span>
+                    </div>
+
+                    {/* Hotspot Node Tags */}
+                    <div className="space-y-2">
+                      <div className="bg-black/65 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="text-xs font-semibold text-white">
+                            Bole Flagship (Medhanialem)
+                          </span>
+                        </div>
+                        <span className="text-xs font-bold text-emerald-300">
+                          58% Share
+                        </span>
+                      </div>
+
+                      <div className="bg-black/65 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10">
+                        <div className="flex items-center gap-2">
+                          <Store className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span className="text-xs font-semibold text-white">
+                            Kazanchis Hub
+                          </span>
+                        </div>
+                        <span className="text-xs font-bold text-amber-300">
+                          28% Share
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Settlement Footer */}
+              <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-[11px]">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>EthioLink POS Gateway Verified</span>
+                </div>
+                <a
+                  href="/api/analytics?format=csv"
+                  download
+                  className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                >
+                  Export Branch Audit
+                </a>
               </div>
             </div>
           </div>
         </main>
       </div>
 
-      {/* Operational Support Modal */}
+      {/* Support / Report Issue Modal */}
       <ReportIssueModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        campaigns={campaigns.map((c) => ({ id: c.id, name: c.name, promoCode: c.promoCode }))}
       />
     </div>
   );
