@@ -11,6 +11,7 @@ import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  Plus,
   PlusCircle,
   Download,
   Calendar as CalendarIcon,
@@ -834,6 +835,16 @@ export function BrandDashboardView({
                 >
                   {activeCampaignsCount} Active Campaigns
                 </Badge>
+                <Button
+                  asChild
+                  size="sm"
+                  className="h-7 px-2.5 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1"
+                >
+                  <Link href="/brand/campaigns/new">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>New Campaign</span>
+                  </Link>
+                </Button>
               </div>
             </div>
 
@@ -976,6 +987,59 @@ export function BrandDashboardView({
                     </div>
                   );
                 })}
+
+                {/* Balanced "Launch New Campaign" Action Companion Slot */}
+                {filteredCampaigns.length % 2 !== 0 && (
+                  <div className="bg-slate-50/50 dark:bg-[#101C18]/40 hover:bg-emerald-50/20 dark:hover:bg-[#142620]/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-[#26372F] hover:border-emerald-500/60 dark:hover:border-[#78B99D]/60 p-5 transition-all flex flex-col justify-between space-y-4 group">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-100/70 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#287362] group-hover:text-white dark:group-hover:bg-[#78B99D] dark:group-hover:text-[#0D2119] transition-all shadow-2xs">
+                          <Plus className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F1] tracking-tight group-hover:text-emerald-700 dark:group-hover:text-[#78B99D] transition-colors">
+                            Launch New Campaign
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5 leading-relaxed">
+                            Deploy another attribution campaign with custom promo codes, instant POS QR displays, and creator splits.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Feature Pills */}
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#78B99D]" />
+                          Instant POS QR Display
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#229ED9]" />
+                          Telegram Deep-Links
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F0B85C]" />
+                          Creator Commission Splits
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-dashed border-slate-200 dark:border-[#26372F] flex items-center justify-between">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="h-8 px-3 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                      >
+                        <Link href="/brand/campaigns/new">
+                          <PlusCircle className="w-3.5 h-3.5" />
+                          <span>Create Campaign</span>
+                        </Link>
+                      </Button>
+                      <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
+                        Fast Setup &lt; 60s
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1083,15 +1147,10 @@ export function BrandDashboardView({
                               </div>
                             </td>
                             <td className="py-3 px-3 whitespace-nowrap">
-                              <div className="flex flex-col">
-                                <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
-                                  <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
-                                  Bole Flagship
-                                </span>
-                                <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] pl-5 font-mono">
-                                  In-Store POS
-                                </span>
-                              </div>
+                              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs">
+                                <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                                Bole Flagship POS
+                              </span>
                             </td>
                             <td className="py-3 px-3 whitespace-nowrap">
                               <div className="flex flex-col text-xs leading-tight">
