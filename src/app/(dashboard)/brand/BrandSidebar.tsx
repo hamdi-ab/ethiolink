@@ -62,8 +62,8 @@ export function BrandSidebar({
         }`}
       >
         {/* Top: Brand Header & Merchant Switcher */}
-        <div className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="p-3.5 space-y-3">
+          <div className="flex items-center justify-between px-1 pt-0.5">
             <Link href="/brand" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-md shadow-emerald-950/40 group-hover:scale-105 transition-transform">
                 <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
@@ -106,24 +106,27 @@ export function BrandSidebar({
             <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
           </div>
 
-          {/* Search Shortcut Input */}
+          {/* Search Shortcut Bar (Aligned with unified 14px gutters & dedicated ⌘K badge) */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/50 dark:text-[#9BAAA1]" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/60 dark:text-[#9BAAA1] pointer-events-none" />
             <input
               type="text"
               readOnly
-              placeholder="Search campaigns... ⌘K"
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#163E3A]/60 dark:bg-[#142621]/60 border border-[#205B50]/40 dark:border-[#28493D] text-slate-200 dark:text-[#F1F5F1] placeholder:text-emerald-200/40 dark:placeholder:text-[#9BAAA1]/60 focus:outline-none cursor-pointer hover:border-emerald-500/50 transition-colors select-none"
+              placeholder="Search campaigns..."
+              className="w-full pl-9 pr-12 h-9 text-xs rounded-xl bg-[#163E3A]/60 dark:bg-[#142621]/60 border border-[#205B50]/40 dark:border-[#28493D] text-slate-200 dark:text-[#F1F5F1] placeholder:text-emerald-200/50 dark:placeholder:text-[#9BAAA1]/70 focus:outline-none cursor-pointer hover:bg-[#163E3A] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 transition-all select-none"
               onClick={() => {
                 const el = document.getElementById("campaign-search-input");
                 if (el) el.focus();
               }}
             />
+            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md bg-[#102F2B] dark:bg-[#0B1512] border border-[#205B50]/60 dark:border-[#28493D] text-emerald-300 dark:text-[#83D1A5] select-none pointer-events-none shadow-2xs">
+              ⌘K
+            </kbd>
           </div>
         </div>
 
         {/* Middle Navigation Menus */}
-        <div className="flex-1 overflow-y-auto px-3 py-1 space-y-5 sidebar-scroll">
+        <div className="flex-1 overflow-y-auto px-3.5 py-1 space-y-5 sidebar-scroll">
           {/* Main Menu */}
           <div className="space-y-1">
             <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50 dark:text-[#9BAAA1]">
@@ -273,7 +276,7 @@ export function BrandSidebar({
         </div>
 
         {/* Bottom: Payment Gateway Status & Merchant Profile */}
-        <div className="p-3 border-t border-[#163E3A] dark:border-[#1E332B] bg-[#0c2522]/80 dark:bg-[#08100E] space-y-3">
+        <div className="p-3.5 border-t border-[#163E3A] dark:border-[#1E332B] bg-[#0c2522]/80 dark:bg-[#08100E] space-y-3">
           {/* Telebirr & CBE Birr Live Integration Card (Stitch Spec) */}
           <div className="bg-[#163E3A]/90 dark:bg-[#142621]/90 rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/30 dark:border-[#28493D]">
             <div className="flex items-center gap-2">
