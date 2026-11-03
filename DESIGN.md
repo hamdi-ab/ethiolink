@@ -381,6 +381,9 @@ Use tables, filters, detail drawers, and explicit confirmation for destructive a
 
 ---
 
+---
+
+
 ## 8. Component rules
 
 ### Buttons
@@ -587,45 +590,151 @@ Example: “Sale recorded. Campaign totals have been updated.”
 
 ---
 
-## 15. Suggested design tokens
 
-Use these as the initial source of truth for implementation. Adapt syntax to the chosen stack.
+## 15. Dark mode — complementary theme
+
+Dark mode is a first-class companion to the light theme, not a color-inverted afterthought. It should preserve EthioLink's warm, grounded identity while making long dashboard sessions comfortable. The dark theme uses deep green-charcoal surfaces rather than pure black, softened text rather than harsh white, and a brighter evergreen for primary actions.
+
+### 16.1 Theme principles
+
+1. **Same identity, different lighting.** Keep the evergreen/amber identity, typography, spacing, component shapes, and information hierarchy consistent across themes.
+2. **Use layered surfaces.** Separate the app background, content surfaces, and elevated surfaces with subtle changes in tone. Do not rely on shadows alone.
+3. **Avoid pure black and pure white.** Use green-tinted charcoal backgrounds and slightly softened near-white text.
+4. **Protect data legibility.** Tables, chart labels, KPI values, status badges, and helper text must remain readable in both themes.
+5. **Use bright brand color selectively.** The dark theme's primary green should be lighter than the light theme's button green so it remains legible against dark surfaces.
+6. **Do not change meaning between themes.** Success, warning, danger, and information retain the same meaning and recognizable hue family.
+7. **Do not make every surface a card.** Surface layering should be quiet; preserve the existing preference for whitespace, grouping, and restrained borders.
+
+### 16.2 Dark theme semantic tokens
+
+These are proposed starting values. Validate actual text/background combinations against WCAG AA before shipping.
+
+| Token | Light theme | Dark theme | Usage |
+|---|---|---|---|
+| `color-bg` | `#F7F8F5` | `#0D1714` | App/page background |
+| `color-surface` | `#FFFFFF` | `#14211D` | Cards, dialogs, main panels |
+| `color-surface-subtle` | `#F7F8F5` | `#101C18` | Quiet inset areas |
+| `color-surface-muted` | `#F0F2EF` | `#1A2A24` | Hover areas, table headers, secondary panels |
+| `color-surface-raised` | `#FFFFFF` | `#1D3029` | Menus, popovers, raised panels |
+| `color-text` | `#202824` | `#F1F5F1` | Main text |
+| `color-text-secondary` | `#53605A` | `#C0CCC4` | Supporting text |
+| `color-text-muted` | `#69756F` | `#9BAAA1` | Metadata and quiet labels |
+| `color-border` | `#D7DED9` | `#304239` | Standard borders |
+| `color-border-subtle` | `#E7EBE7` | `#26372F` | Dividers and subtle boundaries |
+| `color-primary` | `#287362` | `#78B99D` | Primary buttons, active controls, key series |
+| `color-primary-hover` | `#205B50` | `#91C9AE` | Primary hover state |
+| `color-primary-pressed` | `#17443D` | `#5FA487` | Pressed state |
+| `color-primary-on` | `#FFFFFF` | `#0D2119` | Text/icon on primary action |
+| `color-accent` | `#E6A23C` | `#F0B85C` | Highlights and selected data points |
+| `color-accent-surface` | `#FAEED8` | `#382B19` | Accent-tinted surface |
+| `color-focus` | `#287362` | `#91C9AE` | Focus ring |
+
+### 16.3 Dark semantic status colors
+
+Use tinted backgrounds with readable foreground colors. Keep status text and icons visible; do not rely on a small colored dot alone.
+
+| Status | Light foreground / background | Dark foreground / background |
+|---|---|---|
+| Success | `#28734F` / `#E3F2E9` | `#83D1A5` / `#193629` |
+| Warning | `#9A6417` / `#FBF0D9` | `#F0C36F` / `#3A2D18` |
+| Danger | `#B8473D` / `#F9E6E3` | `#F18B80` / `#3D211F` |
+| Info | `#356B91` / `#E6F0F7` | `#8FC4E8` / `#1B3040` |
+
+### 16.4 Component behavior in dark mode
+
+**Navigation**
+- The sidebar and mobile navigation use the same dark surface family as the app, with a subtle border separating them from content.
+- Active navigation uses a restrained green-tinted surface and a clear text/icon state. Avoid a large saturated green block.
+- Keep hover and selected states distinct; keyboard focus must remain visible.
+
+**Cards and panels**
+- Standard cards use `color-surface`; inset chart controls or grouped details may use `color-surface-subtle`.
+- Use `color-border-subtle` for quiet separation and `color-border` for interactive boundaries.
+- Avoid strong drop shadows on dark surfaces. Use a small elevation change in surface tone for popovers and menus.
+
+**Buttons**
+- Primary buttons use `color-primary` with `color-primary-on` text.
+- Secondary buttons use a transparent or surface fill with a visible border.
+- Tertiary actions remain text buttons with clear hover and focus states.
+- Destructive actions use the danger semantic pair; do not use red for ordinary secondary actions.
+
+**Inputs**
+- Input backgrounds should be distinguishable from the surrounding surface.
+- Borders must remain visible without making every field look heavy.
+- Placeholder text is lower emphasis than entered text but must remain readable.
+- Error, disabled, focus, and read-only states must be visually distinct.
+
+**Tables**
+- Use subtle row dividers, not bright grid lines.
+- Table headers may use `color-surface-muted`.
+- Hovered rows receive a restrained surface tint.
+- Keep numeric columns aligned and tabular; do not dim important metrics to create visual softness.
+
+**Badges**
+- Use the dark status foreground/background pairs above.
+- Keep badge text concise and always present.
+- Do not use the same bright color for both a badge background and its text.
+
+**Charts**
+- Use the brighter dark-theme primary green for the main series and amber for a secondary highlight.
+- Supporting series should use clearly distinguishable, color-blind-aware hues; avoid multiple similar greens.
+- Grid lines and axes should be low-contrast but still visible.
+- Tooltips use the raised surface, a clear border, and high-contrast text.
+- Never encode a series only by color: include labels, legends, markers, or line styles.
+- Keep chart colors consistent across visits, intent actions, sales recorded, and revenue recorded. Do not let a theme change alter metric meaning.
+
+**Public campaign landing pages**
+- The customer-facing campaign page may follow the visitor's system preference, but its offer and contact actions must remain high-contrast.
+- Do not force the dashboard's saved theme preference onto a public visitor.
+- Keep the landing page lightweight and avoid adding a theme control if it distracts from the campaign action.
+
+### 16.5 Theme selection and persistence
+
+- Offer **Light**, **Dark**, and **System** choices in account settings or the profile/preferences menu.
+- Use **System** as the default for a first-time visitor unless product requirements later establish a different default.
+- When set to System, follow the operating system/browser preference and update when that preference changes.
+- Persist an explicit Light or Dark selection across sessions for that signed-in user. For signed-out public pages, use the visitor's system preference.
+- Apply the theme before the main interface paints where the application architecture allows, to avoid a bright flash when opening in dark mode.
+- Do not put a prominent theme toggle in the main navigation. A small, discoverable control in the profile/preferences area is sufficient.
+- Ensure charts, maps, third-party widgets, dialogs, toasts, date pickers, and empty/loading/error states use the active theme too.
+
+### 16.6 Dark mode quality checklist
+
+- [ ] Main text and essential controls meet WCAG AA contrast against their actual surfaces.
+- [ ] Muted labels remain readable; they are not simply made faint to look elegant.
+- [ ] Borders distinguish controls and surfaces without creating a grid-heavy interface.
+- [ ] Focus rings are visible on every interactive component.
+- [ ] Hover, active, selected, disabled, error, and success states are all defined.
+- [ ] Charts and tooltips remain understandable and consistent with the light theme.
+- [ ] No component is left with a hard-coded light background or dark text.
+- [ ] The theme preference survives navigation and reloads.
+- [ ] System preference works when the user selects System.
+- [ ] Public campaign pages remain readable and action-focused in either theme.
+
+## 16. Suggested design tokens
+
+Use semantic tokens in components. Components should reference `--color-bg`, `--color-surface`, `--color-text`, and similar role-based variables rather than hard-coding palette values. This is what makes the two themes complementary and maintainable.
+
+The values below are initial proposals. Keep the raw brand palette available for brand assets and data visualization, but use semantic tokens for interface surfaces and text.
 
 ```css
+/* Shared, theme-independent tokens */
 :root {
-  /* Brand */
-  --color-brand-950: #102F2B;
-  --color-brand-900: #17443D;
-  --color-brand-800: #205B50;
-  --color-brand-700: #287362;
-  --color-brand-100: #DCEDE6;
-  --color-brand-50: #F0F6F2;
+  color-scheme: light dark;
 
-  /* Accent */
-  --color-accent-500: #E6A23C;
-  --color-accent-100: #FAEED8;
-  --color-coral-500: #D96F5D;
-  --color-coral-100: #F8E7E2;
+  /* Brand palette */
+  --palette-brand-950: #102F2B;
+  --palette-brand-900: #17443D;
+  --palette-brand-800: #205B50;
+  --palette-brand-700: #287362;
+  --palette-brand-100: #DCEDE6;
+  --palette-brand-50: #F0F6F2;
 
-  /* Neutrals */
-  --color-text: #202824;
-  --color-text-secondary: #53605A;
-  --color-text-muted: #69756F;
-  --color-border: #D7DED9;
-  --color-border-subtle: #E7EBE7;
-  --color-surface: #FFFFFF;
-  --color-surface-subtle: #F7F8F5;
-  --color-surface-muted: #F0F2EF;
-
-  /* Semantic */
-  --color-success: #28734F;
-  --color-success-bg: #E3F2E9;
-  --color-warning: #9A6417;
-  --color-warning-bg: #FBF0D9;
-  --color-danger: #B8473D;
-  --color-danger-bg: #F9E6E3;
-  --color-info: #356B91;
-  --color-info-bg: #E6F0F7;
+  /* Accent palette */
+  --palette-accent-500: #E6A23C;
+  --palette-accent-100: #FAEED8;
+  --palette-coral-500: #D96F5D;
+  --palette-coral-100: #F8E7E2;
 
   /* Typography */
   --font-heading: "Manrope", "Inter", sans-serif;
@@ -651,11 +760,126 @@ Use these as the initial source of truth for implementation. Adapt syntax to the
   --space-12: 48px;
   --space-16: 64px;
 }
+
+/* Light theme */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg: #F7F8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F7F8F5;
+  --color-surface-muted: #F0F2EF;
+  --color-surface-raised: #FFFFFF;
+
+  --color-text: #202824;
+  --color-text-secondary: #53605A;
+  --color-text-muted: #69756F;
+
+  --color-border: #D7DED9;
+  --color-border-subtle: #E7EBE7;
+
+  --color-primary: #287362;
+  --color-primary-hover: #205B50;
+  --color-primary-pressed: #17443D;
+  --color-primary-on: #FFFFFF;
+
+  --color-accent: #E6A23C;
+  --color-accent-surface: #FAEED8;
+  --color-focus: #287362;
+
+  --color-success: #28734F;
+  --color-success-bg: #E3F2E9;
+  --color-warning: #9A6417;
+  --color-warning-bg: #FBF0D9;
+  --color-danger: #B8473D;
+  --color-danger-bg: #F9E6E3;
+  --color-info: #356B91;
+  --color-info-bg: #E6F0F7;
+
+  --shadow-sm: 0 1px 2px rgba(16, 47, 43, .06);
+  --shadow-md: 0 8px 24px rgba(16, 47, 43, .08);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #0D1714;
+  --color-surface: #14211D;
+  --color-surface-subtle: #101C18;
+  --color-surface-muted: #1A2A24;
+  --color-surface-raised: #1D3029;
+
+  --color-text: #F1F5F1;
+  --color-text-secondary: #C0CCC4;
+  --color-text-muted: #9BAAA1;
+
+  --color-border: #304239;
+  --color-border-subtle: #26372F;
+
+  --color-primary: #78B99D;
+  --color-primary-hover: #91C9AE;
+  --color-primary-pressed: #5FA487;
+  --color-primary-on: #0D2119;
+
+  --color-accent: #F0B85C;
+  --color-accent-surface: #382B19;
+  --color-focus: #91C9AE;
+
+  --color-success: #83D1A5;
+  --color-success-bg: #193629;
+  --color-warning: #F0C36F;
+  --color-warning-bg: #3A2D18;
+  --color-danger: #F18B80;
+  --color-danger-bg: #3D211F;
+  --color-info: #8FC4E8;
+  --color-info-bg: #1B3040;
+
+  /* Shadows are deliberately restrained in dark mode. */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .18);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, .24);
+}
+
+/* Example component usage */
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.button-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-on);
+}
+
+.button-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
 ```
+
+Implementation notes:
+- Use a theme attribute such as `data-theme="light"` or `data-theme="dark"` on the document root.
+- If using System mode, resolve the operating-system preference and apply the matching theme; do not create a third set of colors.
+- Avoid hard-coded `#FFFFFF`, `#000000`, or palette colors inside individual components. Use semantic variables.
+- For charts, define separate light/dark chart tokens and keep the same metric-to-color mapping in both themes.
+- Test contrast using the final rendered foreground/background pairs, not by judging hex values independently.
 
 ---
 
-## 16. Design acceptance checklist
+## 17. Design acceptance checklist
 
 Before a screen is considered ready, verify:
 
@@ -672,7 +896,7 @@ Before a screen is considered ready, verify:
 
 ---
 
-## 17. What this document does not decide
+## 18. What this document does not decide
 
 These are deliberate product/design questions to validate rather than silently assume:
 
@@ -682,12 +906,12 @@ These are deliberate product/design questions to validate rather than silently a
 - Exact campaign lifecycle/status rules.
 - Whether campaign offers need a dedicated field in the MVP data model.
 - Whether reports need export/PDF in the first release.
-- Dark mode support.
+- Exact theme preference UI placement and whether the first-run default should be System or Light. The proposed behavior is System by default with Light/Dark overrides.
 - Final chart definitions once event tracking and attribution rules are implemented.
 
 ---
 
-## 18. Source basis and design assumptions
+## 19. Source basis and design assumptions
 
 This design direction is grounded in the EthioLink discussions and source documents:
 

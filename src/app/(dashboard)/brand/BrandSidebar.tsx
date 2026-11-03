@@ -55,9 +55,9 @@ export function BrandSidebar({
         />
       )}
 
-      {/* Sidebar Container (Stitch Evergreen Theme: #102F2B) */}
+      {/* Sidebar Container (Stitch Evergreen Theme: #102F2B / Dark: #0B1512) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#102F2B] text-white border-r border-[#163E3A] flex flex-col justify-between transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#102F2B] dark:bg-[#0B1512] text-white border-r border-[#163E3A] dark:border-[#1E332B] flex flex-col justify-between transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           isMobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
@@ -65,14 +65,14 @@ export function BrandSidebar({
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <Link href="/brand" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-base shadow-md shadow-emerald-950/40 group-hover:scale-105 transition-transform">
-                <Layers className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-md shadow-emerald-950/40 group-hover:scale-105 transition-transform">
+                <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
               </div>
               <div className="flex flex-col">
                 <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
-                  Ethio<span className="text-emerald-400">Link</span>
+                  Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
                 </span>
-                <span className="text-[10px] font-semibold text-emerald-300 uppercase tracking-wider mt-0.5">
+                <span className="text-[10px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
                   Attribution Engine
                 </span>
               </div>
@@ -81,7 +81,7 @@ export function BrandSidebar({
             {/* Mobile Close Button */}
             <button
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#163E3A] transition-colors"
+              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#163E3A] dark:hover:bg-[#142621] transition-colors"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
@@ -89,31 +89,31 @@ export function BrandSidebar({
           </div>
 
           {/* Stitch Merchant Account Switcher Card */}
-          <div className="bg-[#163E3A] rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/40 transition-colors hover:bg-[#1C4E49] cursor-pointer">
+          <div className="bg-[#163E3A] dark:bg-[#142621] rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/40 dark:border-[#28493D] transition-colors hover:bg-[#1C4E49] dark:hover:bg-[#1B322C] cursor-pointer">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
                 <Store className="w-4 h-4" />
               </div>
               <div className="truncate">
                 <p className="text-xs font-semibold text-white truncate leading-tight">
                   {brandName}
                 </p>
-                <p className="text-[10px] text-emerald-200/70 truncate">
+                <p className="text-[10px] text-emerald-200/70 dark:text-[#9BAAA1] truncate">
                   {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
                 </p>
               </div>
             </div>
-            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 shrink-0" />
+            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
           </div>
 
           {/* Search Shortcut Input */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/50" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-200/50 dark:text-[#9BAAA1]" />
             <input
               type="text"
               readOnly
               placeholder="Search campaigns... ⌘K"
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#163E3A]/60 border border-[#205B50]/40 text-slate-200 placeholder:text-emerald-200/40 focus:outline-none cursor-pointer hover:border-emerald-500/50 transition-colors select-none"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[#163E3A]/60 dark:bg-[#142621]/60 border border-[#205B50]/40 dark:border-[#28493D] text-slate-200 dark:text-[#F1F5F1] placeholder:text-emerald-200/40 dark:placeholder:text-[#9BAAA1]/60 focus:outline-none cursor-pointer hover:border-emerald-500/50 transition-colors select-none"
               onClick={() => {
                 const el = document.getElementById("campaign-search-input");
                 if (el) el.focus();
@@ -126,7 +126,7 @@ export function BrandSidebar({
         <div className="flex-1 overflow-y-auto px-3 py-1 space-y-5 sidebar-scroll">
           {/* Main Menu */}
           <div className="space-y-1">
-            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50 dark:text-[#9BAAA1]">
               Cockpit Navigation
             </span>
 
@@ -135,20 +135,20 @@ export function BrandSidebar({
                 href="/brand"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isOverview
-                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
-                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
+                    ? "bg-[#1C4E49] dark:bg-[#1B322C] text-white shadow-xs font-bold"
+                    : "text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <LayoutGrid
                     className={`w-4 h-4 ${
-                      isOverview ? "text-emerald-400" : "text-emerald-200/60"
+                      isOverview ? "text-emerald-400 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"
                     }`}
                   />
                   <span>Overview</span>
                 </div>
                 {campaignCount > 0 && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[#102F2B] border border-[#205B50] text-emerald-200">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[#102F2B] dark:bg-[#0B1512] border border-[#205B50] dark:border-[#28493D] text-emerald-200 dark:text-[#78B99D]">
                     {campaignCount}
                   </span>
                 )}
@@ -158,20 +158,20 @@ export function BrandSidebar({
                 href="/brand/sales"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isSales
-                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
-                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
+                    ? "bg-[#1C4E49] dark:bg-[#1B322C] text-white shadow-xs font-bold"
+                    : "text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Store
                     className={`w-4 h-4 ${
-                      isSales ? "text-emerald-400" : "text-emerald-200/60"
+                      isSales ? "text-emerald-400 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"
                     }`}
                   />
                   <span>Sales &amp; Attribution</span>
                 </div>
-                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-300 bg-emerald-900/60 px-1.5 py-0.5 rounded-full border border-emerald-700/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/60 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-700/40 dark:border-[#28493D]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
                   POS
                 </span>
               </Link>
@@ -180,14 +180,14 @@ export function BrandSidebar({
                 href="/brand/analytics"
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isAnalytics
-                    ? "bg-[#1C4E49] text-white shadow-xs font-bold"
-                    : "text-slate-300 hover:bg-[#163E3A] hover:text-white"
+                    ? "bg-[#1C4E49] dark:bg-[#1B322C] text-white shadow-xs font-bold"
+                    : "text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <TrendingUp
                     className={`w-4 h-4 ${
-                      isAnalytics ? "text-emerald-400" : "text-emerald-200/60"
+                      isAnalytics ? "text-emerald-400 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"
                     }`}
                   />
                   <span>Reports &amp; Funnel</span>
@@ -196,10 +196,10 @@ export function BrandSidebar({
 
               <Link
                 href="/creator"
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <Users className="w-4 h-4 text-emerald-200/60" />
+                  <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
                   <span>Creators Directory</span>
                 </div>
               </Link>
@@ -208,40 +208,40 @@ export function BrandSidebar({
 
           {/* Campaign Sectors & Channels */}
           <div className="space-y-1">
-            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50 dark:text-[#9BAAA1]">
               Attribution Channels
             </span>
 
             <div className="space-y-0.5 pt-1">
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A]/60 dark:hover:bg-[#142621]/60 transition-colors">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
                   <span>In-Store POS (Bole)</span>
                 </div>
-                <span className="text-[10px] text-emerald-200/60 font-mono">31%</span>
+                <span className="text-[10px] text-emerald-200/60 dark:text-[#9BAAA1] font-mono">31%</span>
               </div>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A]/60 dark:hover:bg-[#142621]/60 transition-colors">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#229ED9]" />
                   <span>Telegram Bots</span>
                 </div>
-                <span className="text-[10px] text-emerald-200/60 font-mono">58%</span>
+                <span className="text-[10px] text-emerald-200/60 dark:text-[#9BAAA1] font-mono">58%</span>
               </div>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-[#163E3A]/60 transition-colors">
+              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A]/60 dark:hover:bg-[#142621]/60 transition-colors">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="w-2 h-2 rounded-full bg-amber-400 dark:bg-[#F0B85C]" />
                   <span>Direct Phone Orders</span>
                 </div>
-                <span className="text-[10px] text-emerald-200/60 font-mono">11%</span>
+                <span className="text-[10px] text-emerald-200/60 dark:text-[#9BAAA1] font-mono">11%</span>
               </div>
             </div>
           </div>
 
           {/* Support & Audit */}
           <div className="space-y-1">
-            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-200/50 dark:text-[#9BAAA1]">
               Governance &amp; Support
             </span>
 
@@ -250,10 +250,10 @@ export function BrandSidebar({
                 <button
                   type="button"
                   onClick={onOpenReportModal}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all cursor-pointer text-left"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white transition-all cursor-pointer text-left"
                 >
                   <div className="flex items-center gap-2.5">
-                    <LifeBuoy className="w-4 h-4 text-amber-400" />
+                    <LifeBuoy className="w-4 h-4 text-amber-400 dark:text-[#F0B85C]" />
                     <span>Report Issue</span>
                   </div>
                 </button>
@@ -261,10 +261,10 @@ export function BrandSidebar({
 
               <Link
                 href="/privacy"
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#163E3A] hover:text-white transition-all"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 dark:text-[#C0CCC4] hover:bg-[#163E3A] dark:hover:bg-[#142621] hover:text-white transition-all"
               >
                 <div className="flex items-center gap-2.5">
-                  <Shield className="w-4 h-4 text-emerald-200/60" />
+                  <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
                   <span>Privacy &amp; Data Audit</span>
                 </div>
               </Link>
@@ -273,33 +273,33 @@ export function BrandSidebar({
         </div>
 
         {/* Bottom: Payment Gateway Status & Merchant Profile */}
-        <div className="p-3 border-t border-[#163E3A] bg-[#0c2522]/80 space-y-3">
+        <div className="p-3 border-t border-[#163E3A] dark:border-[#1E332B] bg-[#0c2522]/80 dark:bg-[#08100E] space-y-3">
           {/* Telebirr & CBE Birr Live Integration Card (Stitch Spec) */}
-          <div className="bg-[#163E3A]/90 rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/30">
+          <div className="bg-[#163E3A]/90 dark:bg-[#142621]/90 rounded-xl p-2.5 flex items-center justify-between border border-[#205B50]/30 dark:border-[#28493D]">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
               <div className="flex flex-col">
                 <span className="text-[11px] font-semibold text-white leading-tight">
                   Telebirr &amp; CBE Birr
                 </span>
-                <span className="text-[9px] text-emerald-200/70">Gateway Sync v2.4</span>
+                <span className="text-[9px] text-emerald-200/70 dark:text-[#9BAAA1]">Gateway Sync v2.4</span>
               </div>
             </div>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-600/30">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-950/80 dark:bg-[#193629] px-2 py-0.5 rounded border border-emerald-600/30 dark:border-[#28493D]">
               Active
             </span>
           </div>
 
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                 {brandName.charAt(0)}
               </div>
               <div className="min-w-0">
                 <span className="font-semibold text-xs text-white block truncate leading-tight">
                   {ownerName}
                 </span>
-                <span className="text-[10px] text-emerald-200/60 block truncate">
+                <span className="text-[10px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate">
                   {role === "OWNER" ? "Brand Merchant" : role}
                 </span>
               </div>
@@ -311,7 +311,7 @@ export function BrandSidebar({
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold text-slate-300 hover:text-rose-300 hover:bg-rose-950/30 border border-[#205B50]/40 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold text-slate-300 dark:text-[#C0CCC4] hover:text-rose-300 hover:bg-rose-950/30 border border-[#205B50]/40 dark:border-[#28493D] transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>

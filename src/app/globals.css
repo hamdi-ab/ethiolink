@@ -40,28 +40,28 @@
 
 .dark {
   color-scheme: dark;
-  --background: #090d16;
-  --foreground: #f8fafc;
-  --surface: #0f172a;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #10b981;
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-  --primary: #10b981;
-  --primary-foreground: #090d16;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
-  --destructive: #f43f5e;
-  --destructive-foreground: #ffffff;
-  --scrollbar-thumb: #334155;
-  --scrollbar-thumb-hover: #475569;
+  --background: #0D1714;
+  --foreground: #F1F5F1;
+  --surface: #14211D;
+  --border: #304239;
+  --input: #26372F;
+  --ring: #91C9AE;
+  --card: #14211D;
+  --card-foreground: #F1F5F1;
+  --popover: #1D3029;
+  --popover-foreground: #F1F5F1;
+  --primary: #78B99D;
+  --primary-foreground: #0D2119;
+  --secondary: #1A2A24;
+  --secondary-foreground: #F1F5F1;
+  --muted: #1A2A24;
+  --muted-foreground: #9BAAA1;
+  --accent: #382B19;
+  --accent-foreground: #F0B85C;
+  --destructive: #F18B80;
+  --destructive-foreground: #3D211F;
+  --scrollbar-thumb: #26372F;
+  --scrollbar-thumb-hover: #304239;
   --scrollbar-track: transparent;
 }
 
