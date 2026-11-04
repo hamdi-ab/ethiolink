@@ -1170,13 +1170,13 @@ export function BrandDashboardView({
                             key={sale.id}
                             className="hover:bg-slate-50/70 dark:hover:bg-[#1A2A24]/60 transition-colors group"
                           >
-                            <td className="py-3 px-3.5 whitespace-nowrap">
+                            <td className="py-3 px-3.5 whitespace-nowrap align-top">
                               <span className="inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold bg-slate-100 dark:bg-[#1B2924] text-slate-700 dark:text-[#C0CCC4] border border-slate-200/80 dark:border-[#28493D] shadow-2xs group-hover:border-emerald-500/40 transition-colors">
                                 #{sale.id.slice(-5).toUpperCase()}
                               </span>
                             </td>
-                            <td className="py-3 px-3">
-                              <div className="flex items-center gap-2.5">
+                            <td className="py-3 px-3 align-top">
+                              <div className="flex items-start gap-2.5">
                                 <Image
                                   src={avatarImg}
                                   alt="Creator avatar"
@@ -1189,45 +1189,49 @@ export function BrandDashboardView({
                                   <p className="font-semibold text-slate-900 dark:text-[#F1F5F1] leading-tight truncate max-w-[190px] text-xs">
                                     {sale.campaign.name}
                                   </p>
-                                  <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                  <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
                                     <Tag className="w-2.5 h-2.5 text-slate-400 dark:text-[#9BAAA1]" />
                                     {sale.campaign.promoCode}
                                   </span>
                                 </div>
                               </div>
                             </td>
-                            <td className="py-3 px-3 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs">
+                            <td className="py-3 px-3 whitespace-nowrap align-top">
+                              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
                                 <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
                                 Bole Flagship POS
                               </span>
                             </td>
-                            <td className="py-3 px-3 whitespace-nowrap">
+                            <td className="py-3 px-3 whitespace-nowrap align-top">
                               <div className="flex flex-col text-xs leading-tight">
                                 <span className="font-medium text-slate-700 dark:text-[#C0CCC4]">
                                   {dateFormatted}
                                 </span>
-                                <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
                                   {timeFormatted}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3 px-3 text-right whitespace-nowrap">
-                              <span className="font-bold text-xs text-slate-900 dark:text-[#F1F5F1] font-mono tracking-tight">
-                                {Number(sale.amountETB).toLocaleString("en-US", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })}
-                              </span>
-                              <span className="text-[10px] font-medium text-slate-400 dark:text-[#9BAAA1] ml-1 uppercase">
-                                ETB
-                              </span>
+                            <td className="py-3 px-3 text-right whitespace-nowrap align-top">
+                              <div className="text-right leading-tight">
+                                <span className="font-bold text-xs text-slate-900 dark:text-[#F1F5F1] font-mono tracking-tight">
+                                  {Number(sale.amountETB).toLocaleString("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                </span>
+                                <span className="text-[11px] font-medium text-slate-400 dark:text-[#9BAAA1] ml-1 uppercase">
+                                  ETB
+                                </span>
+                              </div>
                             </td>
-                            <td className="py-3 px-3.5 text-right whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-emerald-200/80 dark:border-[#264D3A] shadow-2xs">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5] animate-pulse" />
-                                Verified Sale
-                              </span>
+                            <td className="py-3 px-3.5 text-right whitespace-nowrap align-top">
+                              <div className="text-right">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-emerald-200/80 dark:border-[#264D3A] shadow-2xs">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5] animate-pulse" />
+                                  Verified Sale
+                                </span>
+                              </div>
                             </td>
                           </tr>
                         );
