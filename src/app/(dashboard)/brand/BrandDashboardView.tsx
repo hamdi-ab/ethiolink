@@ -1095,153 +1095,155 @@ export function BrandDashboardView({
           </div>
 
           {/* 7. Bottom Section: Side-by-Side Panels (Sales Table + Regional Share - Stitch Spec) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             {/* Left Panel (7/12 cols): Recent Recorded Sales Activity Table */}
-            <div className="lg:col-span-7 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F]">
-              <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1] leading-tight">
-                      Recent Recorded Sales Activity
-                    </h2>
-                    <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A]">
-                      Live Feed
-                    </span>
+            <div className="lg:col-span-7 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
+              <div>
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1] leading-tight">
+                        Recent Recorded Sales Activity
+                      </h2>
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A]">
+                        Live Feed
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5">
+                      Merchant-entered sales with creator attribution tags
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5">
-                    Merchant-entered sales with creator attribution tags
-                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      asChild
+                      size="sm"
+                      className="h-8 px-3 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer"
+                    >
+                      <Link href="/brand/sales">
+                        <Receipt className="w-3.5 h-3.5 mr-1.5" />
+                        <span>Log Manual Sale</span>
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    asChild
-                    size="sm"
-                    className="h-8 px-3 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer"
-                  >
-                    <Link href="/brand/sales">
-                      <Receipt className="w-3.5 h-3.5 mr-1.5" />
-                      <span>Log Manual Sale</span>
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Polished Table Container */}
-              <div className="overflow-x-auto border border-slate-200/80 dark:border-[#26372F] rounded-xl shadow-2xs">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#F8F9F7] dark:bg-[#101C18] border-b border-slate-200/80 dark:border-[#26372F]">
-                    <tr className="text-[11px] font-bold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
-                      <th className="py-2.5 px-3.5 text-left font-bold align-top whitespace-nowrap">Receipt ID</th>
-                      <th className="py-2.5 px-3 text-left font-bold align-top">Creator / Campaign</th>
-                      <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Channel / Branch</th>
-                      <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Logged Date</th>
-                      <th className="py-2.5 px-3 text-right font-bold align-top whitespace-nowrap">Amount</th>
-                      <th className="py-2.5 px-3.5 text-right font-bold align-top whitespace-nowrap">Attribution</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] bg-white dark:bg-[#14211D]">
-                    {recentSales.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={6}
-                          className="py-8 text-center text-xs text-slate-400 dark:text-[#9BAAA1]"
-                        >
-                          No sales recorded yet. Cashiers log tickets via the POS terminal.
-                        </td>
+                {/* Polished Table Container */}
+                <div className="overflow-x-auto border border-slate-200/80 dark:border-[#26372F] rounded-xl shadow-2xs">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#F8F9F7] dark:bg-[#101C18] border-b border-slate-200/80 dark:border-[#26372F]">
+                      <tr className="text-[11px] font-bold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
+                        <th className="py-2.5 px-3.5 text-left font-bold align-top whitespace-nowrap">Receipt ID</th>
+                        <th className="py-2.5 px-3 text-left font-bold align-top">Creator / Campaign</th>
+                        <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Channel / Branch</th>
+                        <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Logged Date</th>
+                        <th className="py-2.5 px-3 text-right font-bold align-top whitespace-nowrap">Amount</th>
+                        <th className="py-2.5 px-3.5 text-right font-bold align-top whitespace-nowrap">Attribution</th>
                       </tr>
-                    ) : (
-                      recentSales.slice(0, 5).map((sale, idx) => {
-                        const avatarImg =
-                          creatorImages[idx % creatorImages.length];
-                        const dateObj = new Date(sale.createdAt);
-                        const dateFormatted = dateObj.toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        });
-                        const timeFormatted = dateObj.toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        });
-
-                        return (
-                          <tr
-                            key={sale.id}
-                            className="hover:bg-slate-50/70 dark:hover:bg-[#1A2A24]/60 transition-colors group"
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] bg-white dark:bg-[#14211D]">
+                      {recentSales.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="py-8 text-center text-xs text-slate-400 dark:text-[#9BAAA1]"
                           >
-                            <td className="py-3 px-3.5 whitespace-nowrap align-top">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold bg-slate-100 dark:bg-[#1B2924] text-slate-700 dark:text-[#C0CCC4] border border-slate-200/80 dark:border-[#28493D] shadow-2xs group-hover:border-emerald-500/40 transition-colors">
-                                #{sale.id.slice(-5).toUpperCase()}
-                              </span>
-                            </td>
-                            <td className="py-3 px-3 align-top">
-                              <div className="flex items-start gap-2.5">
-                                <Image
-                                  src={avatarImg}
-                                  alt="Creator avatar"
-                                  width={28}
-                                  height={28}
-                                  unoptimized
-                                  className="w-7 h-7 rounded-full object-cover shrink-0 ring-1 ring-slate-200/80 dark:ring-[#304239]"
-                                />
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-slate-900 dark:text-[#F1F5F1] leading-tight truncate max-w-[190px] text-xs">
-                                    {sale.campaign.name}
-                                  </p>
-                                  <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
-                                    <Tag className="w-2.5 h-2.5 text-slate-400 dark:text-[#9BAAA1]" />
-                                    {sale.campaign.promoCode}
+                            No sales recorded yet. Cashiers log tickets via the POS terminal.
+                          </td>
+                        </tr>
+                      ) : (
+                        recentSales.slice(0, 5).map((sale, idx) => {
+                          const avatarImg =
+                            creatorImages[idx % creatorImages.length];
+                          const dateObj = new Date(sale.createdAt);
+                          const dateFormatted = dateObj.toLocaleDateString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          });
+                          const timeFormatted = dateObj.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          });
+
+                          return (
+                            <tr
+                              key={sale.id}
+                              className="hover:bg-slate-50/70 dark:hover:bg-[#1A2A24]/60 transition-colors group"
+                            >
+                              <td className="py-3 px-3.5 whitespace-nowrap align-top">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md font-mono text-[11px] font-semibold bg-slate-100 dark:bg-[#1B2924] text-slate-700 dark:text-[#C0CCC4] border border-slate-200/80 dark:border-[#28493D] shadow-2xs group-hover:border-emerald-500/40 transition-colors">
+                                  #{sale.id.slice(-5).toUpperCase()}
+                                </span>
+                              </td>
+                              <td className="py-3 px-3 align-top">
+                                <div className="flex items-start gap-2.5">
+                                  <Image
+                                    src={avatarImg}
+                                    alt="Creator avatar"
+                                    width={28}
+                                    height={28}
+                                    unoptimized
+                                    className="w-7 h-7 rounded-full object-cover shrink-0 ring-1 ring-slate-200/80 dark:ring-[#304239]"
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-slate-900 dark:text-[#F1F5F1] leading-tight truncate max-w-[190px] text-xs">
+                                      {sale.campaign.name}
+                                    </p>
+                                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                      <Tag className="w-2.5 h-2.5 text-slate-400 dark:text-[#9BAAA1]" />
+                                      {sale.campaign.promoCode}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3 px-3 whitespace-nowrap align-top">
+                                <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
+                                  <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                                  Bole Flagship POS
+                                </span>
+                              </td>
+                              <td className="py-3 px-3 whitespace-nowrap align-top">
+                                <div className="flex flex-col text-xs leading-tight">
+                                  <span className="font-medium text-slate-700 dark:text-[#C0CCC4]">
+                                    {dateFormatted}
+                                  </span>
+                                  <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                    {timeFormatted}
                                   </span>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-3 whitespace-nowrap align-top">
-                              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
-                                <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
-                                Bole Flagship POS
-                              </span>
-                            </td>
-                            <td className="py-3 px-3 whitespace-nowrap align-top">
-                              <div className="flex flex-col text-xs leading-tight">
-                                <span className="font-medium text-slate-700 dark:text-[#C0CCC4]">
-                                  {dateFormatted}
-                                </span>
-                                <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
-                                  {timeFormatted}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-3 text-right whitespace-nowrap align-top">
-                              <div className="text-right leading-tight">
-                                <span className="font-bold text-xs text-slate-900 dark:text-[#F1F5F1] font-mono tracking-tight">
-                                  {Number(sale.amountETB).toLocaleString("en-US", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                                </span>
-                                <span className="text-[11px] font-medium text-slate-400 dark:text-[#9BAAA1] ml-1 uppercase">
-                                  ETB
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-3.5 text-right whitespace-nowrap align-top">
-                              <div className="text-right">
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-emerald-200/80 dark:border-[#264D3A] shadow-2xs">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5] animate-pulse" />
-                                  Verified Sale
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                              </td>
+                              <td className="py-3 px-3 text-right whitespace-nowrap align-top">
+                                <div className="text-right leading-tight">
+                                  <span className="font-bold text-xs text-slate-900 dark:text-[#F1F5F1] font-mono tracking-tight">
+                                    {Number(sale.amountETB).toLocaleString("en-US", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    })}
+                                  </span>
+                                  <span className="text-[11px] font-medium text-slate-400 dark:text-[#9BAAA1] ml-1 uppercase">
+                                    ETB
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-3 px-3.5 text-right whitespace-nowrap align-top">
+                                <div className="text-right">
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-emerald-200/80 dark:border-[#264D3A] shadow-2xs">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#83D1A5] animate-pulse" />
+                                    Verified Sale
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div className="mt-4 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-[#9BAAA1]">
+              <div className="mt-4 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#26372F]">
                 <span className="font-medium text-[11px]">
                   Showing {recentSales.slice(0, 5).length} of{" "}
                   {recentSales.length || 1240} attributed transactions
@@ -1255,7 +1257,7 @@ export function BrandDashboardView({
                     <ExternalLink className="w-3 h-3" />
                   </Link>
                   <span className="text-slate-300 dark:text-slate-700">|</span>
-                  <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
+                  <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono">
                     Telebirr Sync v2.4 • CBE Live
                   </span>
                 </div>
@@ -1263,14 +1265,14 @@ export function BrandDashboardView({
             </div>
 
             {/* Right Panel (5/12 cols): Regional & Channel Share (Stitch Spec) */}
-            <div className="lg:col-span-5 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between space-y-4">
-              <div>
-                <div className="flex items-center justify-between">
+            <div className="lg:col-span-5 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
+              <div className="flex-1 flex flex-col">
+                <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
+                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1] leading-tight">
                       Regional &amp; Channel Share
                     </h2>
-                    <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                    <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5">
                       Addis Ababa store branches &amp; deep channels
                     </p>
                   </div>
@@ -1282,8 +1284,15 @@ export function BrandDashboardView({
                   </Link>
                 </div>
 
+                {/* Proportional Share Bar (Coding Standard FR-023) */}
+                <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-[#101C18] overflow-hidden flex mt-3.5">
+                  <div style={{ width: `${tgPercent}%` }} className="bg-blue-500 h-full" title={`Telegram ${tgPercent}%`} />
+                  <div style={{ width: `${mapPercent}%` }} className="bg-emerald-500 dark:bg-[#78B99D] h-full" title={`In-Store POS ${mapPercent}%`} />
+                  <div style={{ width: `${callPercent}%` }} className="bg-amber-500 dark:bg-[#F0B85C] h-full" title={`Direct Calls ${callPercent}%`} />
+                </div>
+
                 {/* Channel Share Pill Breakdown */}
-                <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
+                <div className="flex flex-wrap items-center gap-2 mt-2.5 text-xs">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-transparent dark:border-[#26372F] font-medium text-slate-800 dark:text-[#C0CCC4]">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
                     Telegram: <span className="font-bold">{tgPercent}%</span>
@@ -1298,8 +1307,8 @@ export function BrandDashboardView({
                   </span>
                 </div>
 
-                {/* Stylized Geographic Location Widget with Addis Ababa background */}
-                <div className="mt-4 relative rounded-xl overflow-hidden shadow-xs h-48 group">
+                {/* Stylized Geographic Location Widget with Addis Ababa background (flex-1 so it expands to fill card height) */}
+                <div className="mt-3.5 relative rounded-xl overflow-hidden shadow-xs flex-1 min-h-[200px] group">
                   <div
                     className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                     style={{
@@ -1309,7 +1318,7 @@ export function BrandDashboardView({
                   {/* Minimalist Map Overlay Card */}
                   <div className="absolute inset-0 bg-[#102F2B]/40 dark:bg-[#0D1714]/65 backdrop-blur-[2px] p-4 flex flex-col justify-between text-white">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 bg-black/60 dark:bg-[#08100E]/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase border border-white/10 dark:border-[#304239]">
+                      <span className="inline-flex items-center gap-1.5 bg-black/60 dark:bg-[#08100E]/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase border border-white/10 dark:border-[#304239]">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
                         Active Hotspots
                       </span>
@@ -1348,8 +1357,8 @@ export function BrandDashboardView({
                 </div>
               </div>
 
-              {/* Settlement Footer */}
-              <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
+              {/* Settlement Footer (matching Left Panel Footer border and margin) */}
+              <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
                 <div className="flex items-center gap-1.5 text-slate-500 dark:text-[#9BAAA1] text-[11px]">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                   <span>EthioLink POS Gateway Verified</span>
