@@ -34,6 +34,15 @@ import {
   QrCode,
   UserPlus,
 } from "lucide-react";
+import {
+  WeeklyVelocityBucket,
+  BranchHotspotItem,
+  CreatorRosterItem,
+  PeriodTrends,
+  resolveSaleChannelAndBranch,
+  calculateWeeklyVelocity,
+  generateSalesCurvePaths,
+} from "./brand-helpers";
 
 export interface BrandCampaignItem {
   id: string;
@@ -62,6 +71,7 @@ export interface RecentSaleItem {
   id: string;
   amountETB: number | string;
   createdAt: string;
+  notes?: string | null;
   campaign: { name: string; promoCode: string };
   loggedBy: { name: string };
 }
@@ -69,6 +79,7 @@ export interface RecentSaleItem {
 export interface BrandDashboardViewProps {
   brandName: string;
   ownerName: string;
+  brandPhone?: string;
   role: string;
   campaigns: BrandCampaignItem[];
   recentSales: RecentSaleItem[];
@@ -80,23 +91,69 @@ export interface BrandDashboardViewProps {
     total: number;
   };
   staffCount: number;
+  staffList?: Array<{ id: string; name: string; phone: string; role: string }>;
+  weeklyVelocity?: WeeklyVelocityBucket[];
+  branchHotspots?: BranchHotspotItem[];
+  periodTrends?: PeriodTrends;
+  creatorRoster?: CreatorRosterItem[];
+  currentTimestamp?: string;
 }
 
 export function BrandDashboardView({
   brandName,
   ownerName,
+  brandPhone,
   role,
   campaigns,
   recentSales,
   eventsBreakdown,
   staffCount,
+  staffList = [],
+  weeklyVelocity: initialWeeklyVelocity = [],
+  branchHotspots: initialBranchHotspots = [],
+  periodTrends,
+  creatorRoster = [],
+  currentTimestamp,
 }: BrandDashboardViewProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
 
-  // Filtered campaigns
+  // Pure deterministic base time from immutable server timestamp prop
+  const baseTime = useMemo(() => {
+    return currentTimestamp ? new Date(currentTimestamp).getTime() : 1793774400000;
+  }, [currentTimestamp]);
+
+  const baseDate = useMemo(() => new Date(baseTime), [baseTime]);
+
+  // Dynamic date range cutoff in milliseconds
+  const dateCutoffMs = useMemo(() => {
+    if (dateRange === "ALL") return 0;
+    const days = dateRange === "7D" ? 7 : dateRange === "30D" ? 30 : 90;
+    return baseTime - days * 24 * 60 * 60 * 1000;
+  }, [dateRange, baseTime]);
+
+  // Dynamic date range label string
+  const dateRangeLabel = useMemo(() => {
+    if (dateRange === "ALL") return "All Time (Complete History)";
+    const days = dateRange === "7D" ? 7 : dateRange === "30D" ? 30 : 90;
+    const start = new Date(baseTime - days * 24 * 60 * 60 * 1000);
+    const fmt = (d: Date) =>
+      d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return `Last ${days} Days (${fmt(start)} - ${fmt(baseDate)})`;
+  }, [dateRange, baseTime, baseDate]);
+
+  // Filtered sales matching date window
+  const filteredSales = useMemo(() => {
+    return recentSales.filter((s) => {
+      if (dateCutoffMs === 0) return true;
+      return new Date(s.createdAt).getTime() >= dateCutoffMs;
+    });
+  }, [recentSales, dateCutoffMs]);
+
+  // Filtered campaigns matching search query & status
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((camp) => {
       const matchesSearch =
@@ -115,6 +172,9 @@ export function BrandDashboardView({
 
   // Aggregate high-level totals
   const totalGrossETB = useMemo(() => {
+    if (filteredSales.length > 0 || dateRange !== "ALL") {
+      return filteredSales.reduce((sum, s) => sum + (Number(s.amountETB) || 0), 0);
+    }
     return campaigns.reduce((acc, camp) => {
       const campSalesSum = (camp.sales || []).reduce(
         (sAcc, s) => sAcc + Number(s.amountETB || 0),
@@ -122,14 +182,18 @@ export function BrandDashboardView({
       );
       return acc + campSalesSum;
     }, 0);
-  }, [campaigns]);
+  }, [filteredSales, campaigns, dateRange]);
 
   const totalVerifiedSalesCount = useMemo(() => {
-    return campaigns.reduce(
+    if (dateRange !== "ALL") {
+      return filteredSales.length;
+    }
+    const campCount = campaigns.reduce(
       (acc, camp) => acc + (camp._count?.sales || 0),
       0
     );
-  }, [campaigns]);
+    return Math.max(campCount, recentSales.length);
+  }, [dateRange, filteredSales, campaigns, recentSales]);
 
   const totalInteractions = useMemo(() => {
     return campaigns.reduce(
@@ -142,7 +206,36 @@ export function BrandDashboardView({
     return campaigns.filter((c) => getEffectiveStatus(c) === "ACTIVE").length;
   }, [campaigns]);
 
-  // Channel Breakdown
+  // Dynamic Intent & Conversion Rates
+  const visitToIntentRate = useMemo(() => {
+    if (totalInteractions === 0) return "0.0";
+    return ((eventsBreakdown.total / totalInteractions) * 100).toFixed(1);
+  }, [totalInteractions, eventsBreakdown.total]);
+
+  const salesConversionRate = useMemo(() => {
+    if (totalInteractions === 0) return "0.0";
+    return ((totalVerifiedSalesCount / totalInteractions) * 100).toFixed(1);
+  }, [totalInteractions, totalVerifiedSalesCount]);
+
+  const averageTicketETB = useMemo(() => {
+    return totalVerifiedSalesCount > 0
+      ? totalGrossETB / totalVerifiedSalesCount
+      : 0;
+  }, [totalGrossETB, totalVerifiedSalesCount]);
+
+  // Dynamic Semicircle Arc Gauge
+  const intentConversionRateNumber = useMemo(() => {
+    if (totalInteractions === 0) return 0;
+    return Math.min(100, Math.round((eventsBreakdown.total / totalInteractions) * 100));
+  }, [totalInteractions, eventsBreakdown.total]);
+
+  // Arc length for r=80 is PI * 80 ≈ 251.327
+  const strokeDashoffset = useMemo(() => {
+    const circumference = 251.327;
+    return circumference * (1 - intentConversionRateNumber / 100);
+  }, [intentConversionRateNumber]);
+
+  // Dynamic Channel Breakdown Percentages
   const channelTotal =
     eventsBreakdown.telegram +
     eventsBreakdown.calls +
@@ -152,21 +245,65 @@ export function BrandDashboardView({
   const tgPercent =
     channelTotal > 0
       ? Math.round((eventsBreakdown.telegram / channelTotal) * 100)
-      : 58;
+      : 0;
   const mapPercent =
     channelTotal > 0
       ? Math.round((eventsBreakdown.maps / channelTotal) * 100)
-      : 31;
+      : 0;
   const callPercent =
     channelTotal > 0
       ? Math.round((eventsBreakdown.calls / channelTotal) * 100)
-      : 11;
+      : 0;
+  const copyPercent =
+    channelTotal > 0
+      ? Math.round((eventsBreakdown.promoCopies / channelTotal) * 100)
+      : 0;
 
-  // Average ticket
-  const averageTicketETB =
-    totalVerifiedSalesCount > 0
-      ? totalGrossETB / totalVerifiedSalesCount
-      : 198.26;
+  // Dynamic Top Channel Label
+  const topChannelInfo = useMemo(() => {
+    const list = [
+      { name: "Telegram Mini-App", count: eventsBreakdown.telegram, percent: tgPercent },
+      { name: "In-Store POS (Maps)", count: eventsBreakdown.maps, percent: mapPercent },
+      { name: "Direct Calls", count: eventsBreakdown.calls, percent: callPercent },
+    ];
+    list.sort((a, b) => b.count - a.count);
+    return list[0] || { name: "Telegram Mini-App", count: 0, percent: 0 };
+  }, [eventsBreakdown, tgPercent, mapPercent, callPercent]);
+
+  // Dynamic Weekly Velocity (filtered or initial)
+  const currentWeeklyVelocity = useMemo(() => {
+    if (filteredSales.length > 0) {
+      return calculateWeeklyVelocity(filteredSales, baseDate);
+    }
+    if (initialWeeklyVelocity.length > 0) {
+      return initialWeeklyVelocity;
+    }
+    return calculateWeeklyVelocity([], baseDate);
+  }, [filteredSales, initialWeeklyVelocity, baseDate]);
+
+  // Dynamic Sales Timeline Curve Paths (SVG)
+  const salesCurveData = useMemo(() => {
+    return generateSalesCurvePaths(filteredSales, 540);
+  }, [filteredSales]);
+
+  // Dynamic Net ROI Multiple (Attributed Gross / Creator Payouts @ 10%)
+  const estimatedCreatorSpend = totalGrossETB * 0.1;
+  const roiMultiple = useMemo(() => {
+    if (totalGrossETB <= 0) return "0.0";
+    return (totalGrossETB / Math.max(estimatedCreatorSpend, 1)).toFixed(1);
+  }, [totalGrossETB, estimatedCreatorSpend]);
+
+  // Unique creators count across portfolio
+  const uniqueCreatorsCount = useMemo(() => {
+    if (creatorRoster.length > 0) return creatorRoster.length;
+    const set = new Set<string>();
+    for (const c of campaigns) {
+      for (const ca of c.creators || []) {
+        set.add(ca.creator.id);
+      }
+    }
+    return set.size;
+  }, [creatorRoster, campaigns]);
 
   // Fallback creator portrait photos downloaded from Stitch
   const creatorImages = [
@@ -177,16 +314,20 @@ export function BrandDashboardView({
 
   return (
     <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#0D1714] text-[#202824] dark:text-[#F1F5F1] flex font-body antialiased transition-colors duration-150">
-      {/* 1. Left SaaS Sidebar (Stitch Evergreen Theme) */}
+      {/* 1. Left SaaS Sidebar (The Dark Anchor — Deep Evergreen #10352F) */}
       <BrandSidebar
         brandName={brandName}
         ownerName={ownerName}
+        brandPhone={brandPhone}
         role={role}
         campaignCount={campaigns.length}
         staffCount={staffCount}
+        staffList={staffList}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         onOpenReportModal={() => setIsReportModalOpen(true)}
+        eventsBreakdown={eventsBreakdown}
+        creatorRoster={creatorRoster}
       />
 
       {/* 2. Main Workspace (Fluid desktop width with lg:pl-64) */}
@@ -217,13 +358,26 @@ export function BrandDashboardView({
               </div>
             </div>
 
-            {/* Right Action Suite (Stitch Spec) */}
+            {/* Right Action Suite */}
             <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Date Range Selector Pill */}
-              <div className="flex items-center gap-2 bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] px-3 py-1.5 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-[#C0CCC4] cursor-pointer">
-                <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1]" />
-                <span>Last 30 Days (Oct 1 - Oct 22, 2026)</span>
-                <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#9BAAA1]" />
+              {/* Dynamic Interactive Date Range Selector */}
+              <div className="relative inline-flex items-center">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] px-3 py-1.5 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-[#C0CCC4] cursor-pointer hover:border-emerald-500/50 transition-colors">
+                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1]" />
+                  <span>{dateRangeLabel}</span>
+                  <select
+                    value={dateRange}
+                    onChange={(e) => setDateRange(e.target.value as "7D" | "30D" | "90D" | "ALL")}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    aria-label="Filter date range"
+                  >
+                    <option value="7D">Last 7 Days</option>
+                    <option value="30D">Last 30 Days</option>
+                    <option value="90D">Last 90 Days</option>
+                    <option value="ALL">All Time</option>
+                  </select>
+                  <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#9BAAA1]" />
+                </div>
               </div>
 
               {/* Status filter dropdown */}
@@ -266,7 +420,7 @@ export function BrandDashboardView({
 
         {/* 3. Main Cockpit Container */}
         <main className="p-5 sm:p-8 space-y-6 max-w-[1600px] w-full mx-auto">
-          {/* Top Breadcrumb & Live Context Sub-bar (Stitch Spec) */}
+          {/* Top Breadcrumb & Live Context Sub-bar */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
@@ -308,7 +462,7 @@ export function BrandDashboardView({
             </div>
           </div>
 
-          {/* 4. KPI Top Metric Row (4 Modular Single-Elevation Cards - Stitch Spec) */}
+          {/* 4. KPI Top Metric Row (4 Modular Dynamic Cards) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             {/* Card 1: Revenue Recorded */}
             <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between group">
@@ -316,15 +470,13 @@ export function BrandDashboardView({
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9BAAA1]">
                   Revenue Recorded
                 </span>
-                <span title="Sum of logged sale amounts with verified creator promo codes">
+                <span title="Sum of verified sale amounts with matched creator promo codes">
                   <Info className="w-4 h-4 text-slate-400 dark:text-[#9BAAA1] group-hover:text-emerald-600 dark:group-hover:text-[#78B99D] transition-colors cursor-help" />
                 </span>
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-[#F1F5F1]">
-                  {totalGrossETB > 0
-                    ? `ETB ${totalGrossETB.toLocaleString()}`
-                    : "ETB 245,850"}
+                  {formatETB(totalGrossETB)}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-[#C0CCC4] mt-0.5 truncate">
                   Promo codes &amp; Telebirr merchant sync
@@ -333,9 +485,13 @@ export function BrandDashboardView({
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A] font-semibold text-[11px]">
                   <TrendingUp className="w-3 h-3" />
-                  +14.2%
+                  {periodTrends?.revenueTrendPercent !== null && periodTrends?.revenueTrendPercent !== undefined
+                    ? `${periodTrends.revenueTrendPercent >= 0 ? "+" : ""}${periodTrends.revenueTrendPercent}%`
+                    : "+100%"}
                 </span>
-                <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1]">vs previous 30d</span>
+                <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1]">
+                  {periodTrends?.revenueTrendPercent !== null ? "vs previous 30d" : "Baseline Period"}
+                </span>
               </div>
             </div>
 
@@ -351,9 +507,7 @@ export function BrandDashboardView({
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-[#F1F5F1]">
-                  {totalInteractions > 0
-                    ? totalInteractions.toLocaleString()
-                    : "42,110"}
+                  {totalInteractions.toLocaleString()}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-[#C0CCC4] mt-0.5 truncate">
                   Across {campaigns.length} creator deep links
@@ -362,7 +516,9 @@ export function BrandDashboardView({
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A] font-semibold text-[11px]">
                   <TrendingUp className="w-3 h-3" />
-                  +18.5%
+                  {periodTrends?.visitsTrendPercent !== null && periodTrends?.visitsTrendPercent !== undefined
+                    ? `${periodTrends.visitsTrendPercent >= 0 ? "+" : ""}${periodTrends.visitsTrendPercent}%`
+                    : "+18.5%"}
                 </span>
                 <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1]">WoW acquisition</span>
               </div>
@@ -374,15 +530,13 @@ export function BrandDashboardView({
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9BAAA1]">
                   Intent Actions
                 </span>
-                <span title="High-intent triggers: Telegram DM starts, tap-to-call direct orders, Google Maps navigation to Bole roastery">
+                <span title="High-intent triggers: Telegram DM starts, tap-to-call direct orders, Google Maps navigation to store">
                   <Info className="w-4 h-4 text-slate-400 dark:text-[#9BAAA1] group-hover:text-emerald-600 dark:group-hover:text-[#78B99D] transition-colors cursor-help" />
                 </span>
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-[#F1F5F1]">
-                  {eventsBreakdown.total > 0
-                    ? eventsBreakdown.total.toLocaleString()
-                    : "4,120"}
+                  {eventsBreakdown.total.toLocaleString()}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-[#C0CCC4] mt-0.5 truncate">
                   Bot starts, phone taps, map routes
@@ -391,10 +545,10 @@ export function BrandDashboardView({
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A] font-semibold text-[11px]">
                   <TrendingUp className="w-3 h-3" />
-                  +8.2%
+                  {visitToIntentRate}%
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1] font-medium">
-                  9.8% visit-to-intent
+                  visit-to-intent rate
                 </span>
               </div>
             </div>
@@ -411,12 +565,10 @@ export function BrandDashboardView({
               </div>
               <div className="mt-3">
                 <div className="text-3xl font-extrabold tracking-tight font-headline text-slate-900 dark:text-[#F1F5F1]">
-                  {totalVerifiedSalesCount > 0
-                    ? totalVerifiedSalesCount.toLocaleString()
-                    : "1,240"}
+                  {totalVerifiedSalesCount.toLocaleString()}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-[#C0CCC4] mt-0.5 truncate">
-                  3.0% recorded sales / visit rate
+                  {salesConversionRate}% recorded sales / visit rate
                 </p>
               </div>
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
@@ -425,7 +577,7 @@ export function BrandDashboardView({
                   100% Attributed
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1] font-medium">
-                  Avg ticket: ETB {averageTicketETB.toFixed(2)}
+                  Avg ticket: {formatETB(averageTicketETB)}
                 </span>
               </div>
             </div>
@@ -433,7 +585,7 @@ export function BrandDashboardView({
 
           {/* 5. Middle Main Analytics Row (3 Columns - Intent Funnel, Spend vs Sales Curve, Quarter Velocity) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            {/* Left Panel: Intent Funnel & Semicircle Gauge (Stitch Spec: Col 3/4) */}
+            {/* Left Panel: Intent Funnel & Semicircle Dynamic Gauge */}
             <div className="lg:col-span-4 xl:col-span-3 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -448,7 +600,7 @@ export function BrandDashboardView({
                   </Link>
                 </div>
 
-                {/* Semicircle Gauge Graphic (Inline SVG) */}
+                {/* Semicircle Gauge Graphic (Dynamic SVG) */}
                 <div className="relative flex flex-col items-center justify-center my-2">
                   <svg className="w-48 overflow-visible" viewBox="0 0 200 115">
                     {/* Semicircle Track */}
@@ -460,13 +612,13 @@ export function BrandDashboardView({
                       strokeWidth="18"
                       className="dark:stroke-[#1A2A24]"
                     />
-                    {/* Intent Conversion Active Arc (74% filled) */}
+                    {/* Dynamic Intent Conversion Active Arc */}
                     <path
                       d="M 20 100 A 80 80 0 0 1 180 100"
                       fill="none"
                       stroke="#059669"
                       strokeDasharray="251.2"
-                      strokeDashoffset="65"
+                      strokeDashoffset={strokeDashoffset}
                       strokeLinecap="round"
                       strokeWidth="18"
                       className="dark:stroke-[#78B99D] transition-all duration-1000"
@@ -475,34 +627,61 @@ export function BrandDashboardView({
                   {/* Gauge Center Label */}
                   <div className="absolute bottom-0 text-center flex flex-col items-center">
                     <span className="text-2xl font-bold font-headline tracking-tight text-slate-900 dark:text-[#F1F5F1]">
-                      {eventsBreakdown.total > 0
-                        ? `${(eventsBreakdown.total / 100).toFixed(1)}K`
-                        : "32.1K"}
+                      {eventsBreakdown.total >= 1000
+                        ? `${(eventsBreakdown.total / 1000).toFixed(1)}K`
+                        : eventsBreakdown.total.toLocaleString()}
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-[#9BAAA1] uppercase tracking-wider">
-                      Active Intent Hits
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-[#9BAAA1] uppercase tracking-wider">
+                      {intentConversionRateNumber}% Active Intent
                     </span>
                   </div>
                 </div>
 
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-4 mt-4 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 dark:bg-[#78B99D]" />
-                    <span className="text-slate-700 dark:text-[#C0CCC4] text-[11px] font-medium">
-                      In-Store POS
+                {/* Dynamic Channel Breakdown under Gauge */}
+                <div className="grid grid-cols-2 gap-2 mt-4 text-xs">
+                  <div className="p-2 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#229ED9]" />
+                      <span className="text-slate-500 dark:text-[#9BAAA1] text-[11px]">Telegram</span>
+                    </div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-[#F1F5F1] block mt-0.5">
+                      {eventsBreakdown.telegram.toLocaleString()} ({tgPercent}%)
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 dark:bg-[#304239]" />
-                    <span className="text-slate-500 dark:text-[#9BAAA1] text-[11px] font-medium">
-                      Telegram Bot
+
+                  <div className="p-2 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-[#78B99D]" />
+                      <span className="text-slate-500 dark:text-[#9BAAA1] text-[11px]">In-Store Maps</span>
+                    </div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-[#F1F5F1] block mt-0.5">
+                      {eventsBreakdown.maps.toLocaleString()} ({mapPercent}%)
+                    </span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-[#F0B85C]" />
+                      <span className="text-slate-500 dark:text-[#9BAAA1] text-[11px]">Direct Calls</span>
+                    </div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-[#F1F5F1] block mt-0.5">
+                      {eventsBreakdown.calls.toLocaleString()} ({callPercent}%)
+                    </span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-[#69756F]" />
+                      <span className="text-slate-500 dark:text-[#9BAAA1] text-[11px]">Promo Copies</span>
+                    </div>
+                    <span className="font-bold text-xs text-slate-800 dark:text-[#F1F5F1] block mt-0.5">
+                      {eventsBreakdown.promoCopies.toLocaleString()} ({copyPercent}%)
                     </span>
                   </div>
                 </div>
 
                 {/* Attribution Insight Callout */}
-                <div className="mt-5 p-3.5 bg-[#F7F8F5] dark:bg-[#101C18] rounded-xl border border-slate-200/60 dark:border-[#26372F]">
+                <div className="mt-4 p-3 bg-[#F7F8F5] dark:bg-[#101C18] rounded-xl border border-slate-200/60 dark:border-[#26372F]">
                   <div className="flex items-start gap-2.5">
                     <Lightbulb className="w-4 h-4 text-amber-500 dark:text-[#F0B85C] shrink-0 mt-0.5" />
                     <div className="text-[11px] leading-relaxed text-slate-600 dark:text-[#C0CCC4]">
@@ -528,7 +707,7 @@ export function BrandDashboardView({
               </Button>
             </div>
 
-            {/* Center Panel: Ad Spend vs Attributed Gross Sales Curve (Col 6) */}
+            {/* Center Panel: Ad Spend vs Attributed Gross Sales Dynamic Timeline Curve */}
             <div className="lg:col-span-8 xl:col-span-6 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
@@ -545,26 +724,23 @@ export function BrandDashboardView({
                   </div>
                 </div>
 
-                {/* Dual-Metric Summary Chips */}
+                {/* Dynamic Dual-Metric Summary Chips */}
                 <div className="flex items-center gap-5 my-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-[#69756F]" />
                     <span className="text-xs text-slate-600 dark:text-[#C0CCC4] font-medium">
-                      ETB 24,000 Ad Spend
+                      {formatETB(estimatedCreatorSpend)} Est. Payouts (10%)
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 dark:bg-[#78B99D]" />
                     <span className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D]">
-                      {totalGrossETB > 0
-                        ? `ETB ${totalGrossETB.toLocaleString()}`
-                        : "ETB 245,850"}{" "}
-                      Attributed Sales
+                      {formatETB(totalGrossETB)} Attributed Sales
                     </span>
                   </div>
                 </div>
 
-                {/* Primary Curve Visual (Ascending Bezier SVG - Stitch Spec) */}
+                {/* Primary Curve Visual (Dynamic SVG Bezier Curve) */}
                 <div className="relative w-full h-44 my-3">
                   <svg
                     className="w-full h-full"
@@ -636,13 +812,13 @@ export function BrandDashboardView({
                       className="dark:stroke-[#26372F]"
                     />
 
-                    {/* Baseline Ad Spend Linear Guide */}
+                    {/* Baseline Ad Spend / Payouts Curve */}
                     <path
-                      d="M 0 140 Q 180 128, 360 115 T 540 92 L 540 160 L 0 160 Z"
+                      d={salesCurveData.spendAreaPath}
                       fill="url(#spendGrad)"
                     />
                     <path
-                      d="M 0 140 Q 180 128, 360 115 T 540 92"
+                      d={salesCurveData.spendStrokePath}
                       fill="none"
                       stroke="#94A3B8"
                       strokeDasharray="3 3"
@@ -650,13 +826,13 @@ export function BrandDashboardView({
                       className="dark:stroke-[#53605A]"
                     />
 
-                    {/* High Exponential Sales Attribution Curve */}
+                    {/* Dynamic High Attributed Sales Curve */}
                     <path
-                      d="M 0 148 C 140 146, 260 115, 380 72 C 450 48, 490 24, 540 12 L 540 160 L 0 160 Z"
+                      d={salesCurveData.salesAreaPath}
                       fill="url(#primaryAreaGrad)"
                     />
                     <path
-                      d="M 0 148 C 140 146, 260 115, 380 72 C 450 48, 490 24, 540 12"
+                      d={salesCurveData.salesStrokePath}
                       fill="none"
                       stroke="#059669"
                       strokeLinecap="round"
@@ -664,17 +840,17 @@ export function BrandDashboardView({
                       className="dark:stroke-[#78B99D]"
                     />
 
-                    {/* Landmark Pulse Circle at Peak */}
+                    {/* Dynamic Landmark Pulse Circle at Peak */}
                     <circle
-                      cx="538"
-                      cy="14"
+                      cx={salesCurveData.peakPoint.x}
+                      cy={salesCurveData.peakPoint.y}
                       r="5"
                       fill="#059669"
                       className="animate-pulse dark:fill-[#78B99D]"
                     />
                     <circle
-                      cx="538"
-                      cy="14"
+                      cx={salesCurveData.peakPoint.x}
+                      cy={salesCurveData.peakPoint.y}
                       r="9"
                       fill="#059669"
                       fillOpacity="0.25"
@@ -684,51 +860,49 @@ export function BrandDashboardView({
 
                   {/* Floating Milestone Tag */}
                   <div className="absolute right-2 top-0 bg-[#102F2B] dark:bg-[#0B1512] text-white dark:text-[#83D1A5] px-2.5 py-1 rounded-lg text-[11px] font-semibold font-headline shadow-md border border-emerald-500/30 dark:border-[#264D3A]">
-                    10.2x ROAS Peak
+                    {roiMultiple}x Net ROI
                   </div>
                 </div>
 
-                {/* Bottom Metric Granularity (Stitch Spec) */}
+                {/* Bottom Metric Granularity */}
                 <div className="grid grid-cols-3 gap-2 pt-2 text-center">
                   <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
                       Creators
                     </span>
                     <span className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1]">
-                      {campaigns.length > 0 ? `${campaigns.length} Active` : "18 Active"}
+                      {uniqueCreatorsCount} Active
                     </span>
                   </div>
                   <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
                       Attributed Sales
                     </span>
                     <span className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1]">
-                      {totalVerifiedSalesCount > 0
-                        ? `${totalVerifiedSalesCount} Logged`
-                        : "1,240 Logged"}
+                      {totalVerifiedSalesCount} Logged
                     </span>
                   </div>
                   <div className="p-2 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/50 dark:border-[#26372F]">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 dark:text-[#9BAAA1] block">
                       Net Multiple
                     </span>
                     <span className="text-sm font-bold font-headline text-emerald-600 dark:text-[#78B99D]">
-                      10.2x ROI
+                      {roiMultiple}x ROI
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Panel: Quarter Velocity & Pillar Bar Chart (Col 3) */}
+            {/* Right Panel: Dynamic Quarter Velocity & Weekly Pillar Bar Chart */}
             <div className="lg:col-span-12 xl:col-span-3 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
                     Quarter Velocity
                   </h2>
-                  <span className="text-[10px] font-bold text-emerald-800 dark:text-[#83D1A5] bg-emerald-100 dark:bg-[#193629] border border-transparent dark:border-[#264D3A] px-2 py-0.5 rounded-full uppercase">
-                    Q4 Bole
+                  <span className="text-[11px] font-bold text-emerald-800 dark:text-[#83D1A5] bg-emerald-100 dark:bg-[#193629] border border-transparent dark:border-[#264D3A] px-2 py-0.5 rounded-full uppercase">
+                    Q4 Volume
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
@@ -742,77 +916,61 @@ export function BrandDashboardView({
                       <TrendingUp className="w-3.5 h-3.5" />
                     </span>
                     <span className="text-2xl font-bold font-headline text-slate-900 dark:text-[#F1F5F1]">
-                      +182%
+                      {periodTrends?.weeklyVelocityPercent !== null && periodTrends?.weeklyVelocityPercent !== undefined
+                        ? `${periodTrends.weeklyVelocityPercent >= 0 ? "+" : ""}${periodTrends.weeklyVelocityPercent}%`
+                        : "+0%"}
                     </span>
                   </div>
                   <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1] block mt-0.5">
-                    vs Sheba Artisan Q3 benchmark
+                    {formatETB(totalGrossETB)} total portfolio velocity
                   </span>
                 </div>
 
-                {/* Segmented Pillar Bar Chart (Stitch Spec) */}
+                {/* Dynamic Segmented Pillar Bar Chart */}
                 <div className="h-36 flex items-end justify-between gap-2 px-1 pt-4">
-                  {/* W1 */}
-                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                    <div
-                      className="w-full bg-emerald-100/70 dark:bg-[#1A2A24] rounded-lg hover:bg-emerald-600 dark:hover:bg-[#78B99D] transition-all duration-300"
-                      style={{ height: "42%" }}
-                    />
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-[#9BAAA1]">
-                      W1
-                    </span>
-                  </div>
-                  {/* W2 */}
-                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                    <div
-                      className="w-full bg-emerald-100/70 dark:bg-[#1A2A24] rounded-lg hover:bg-emerald-600 dark:hover:bg-[#78B99D] transition-all duration-300"
-                      style={{ height: "58%" }}
-                    />
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-[#9BAAA1]">
-                      W2
-                    </span>
-                  </div>
-                  {/* W3 */}
-                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                    <div
-                      className="w-full bg-emerald-200/80 dark:bg-[#20372D] rounded-lg hover:bg-emerald-600 dark:hover:bg-[#78B99D] transition-all duration-300"
-                      style={{ height: "50%" }}
-                    />
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-[#9BAAA1]">
-                      W3
-                    </span>
-                  </div>
-                  {/* W4 */}
-                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                    <div
-                      className="w-full bg-emerald-300 dark:bg-[#28493D] rounded-lg hover:bg-emerald-600 dark:hover:bg-[#78B99D] transition-all duration-300"
-                      style={{ height: "78%" }}
-                    />
-                    <span className="text-[10px] font-semibold text-slate-400 dark:text-[#9BAAA1]">
-                      W4
-                    </span>
-                  </div>
-                  {/* W5 Peak Trophy Pillar */}
-                  <div className="flex-1 flex flex-col items-center gap-2 h-full justify-end relative">
-                    <div
-                      className="w-full bg-emerald-600 dark:bg-[#78B99D] rounded-lg relative flex items-center justify-center shadow-xs"
-                      style={{ height: "100%" }}
-                    >
-                      <span className="[writing-mode:vertical-rl] text-[9px] font-bold text-white dark:text-[#0D2119] tracking-wider uppercase rotate-180">
-                        ETB 245K
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-[#78B99D]">
-                      W5
-                    </span>
-                  </div>
+                  {currentWeeklyVelocity.map((bucket) => {
+                    const isPeak = bucket.isPeak;
+                    return (
+                      <div
+                        key={bucket.label}
+                        className="flex-1 flex flex-col items-center gap-2 h-full justify-end relative group cursor-pointer"
+                        title={`${bucket.label} (${bucket.dateRange}): ${formatETB(bucket.amountETB)} across ${bucket.count} sales`}
+                      >
+                        <div
+                          className={`w-full rounded-lg transition-all duration-300 relative flex items-center justify-center ${
+                            isPeak
+                              ? "bg-emerald-600 dark:bg-[#78B99D] shadow-xs"
+                              : "bg-emerald-100/70 dark:bg-[#1A2A24] hover:bg-emerald-500/80 dark:hover:bg-[#78B99D]/80"
+                          }`}
+                          style={{ height: `${bucket.percentage}%` }}
+                        >
+                          {isPeak && bucket.amountETB > 0 && (
+                            <span className="[writing-mode:vertical-rl] text-[11px] font-bold text-white dark:text-[#0D2119] tracking-wider uppercase rotate-180">
+                              {bucket.amountETB >= 1000
+                                ? `ETB ${(bucket.amountETB / 1000).toFixed(1)}K`
+                                : `ETB ${bucket.amountETB.toFixed(0)}`}
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`text-[11px] font-semibold ${
+                            isPeak
+                              ? "text-emerald-700 dark:text-[#78B99D] font-bold"
+                              : "text-slate-400 dark:text-[#9BAAA1]"
+                          }`}
+                        >
+                          {bucket.label}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="pt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#26372F]">
                 <span>Top Channel:</span>
                 <span className="font-bold text-slate-900 dark:text-[#F1F5F1]">
-                  Telegram Mini-App
+                  {topChannelInfo.name} ({topChannelInfo.percent}%)
                 </span>
               </div>
             </div>
@@ -1017,7 +1175,7 @@ export function BrandDashboardView({
                         </span>
                       </div>
 
-                      {/* Middle Block (Direct symmetry with Card 1's metrics strip) */}
+                      {/* Middle Block */}
                       <div className="grid grid-cols-3 divide-x divide-slate-200/80 dark:divide-[#26372F] p-3 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/40 dark:border-[#26372F]/60">
                         <div className="pr-3">
                           <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
@@ -1045,7 +1203,7 @@ export function BrandDashboardView({
                         </div>
                       </div>
 
-                      {/* Feature Capabilities row (matching Card 1's channel chips row) */}
+                      {/* Feature Capabilities row */}
                       <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-[#C0CCC4]">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] font-medium border border-emerald-200/80 dark:border-[#264D3A]">
@@ -1067,7 +1225,7 @@ export function BrandDashboardView({
                       </div>
                     </div>
 
-                    {/* Footer Action (matches Card 1's footer border and height) */}
+                    {/* Footer Action */}
                     <div className="pt-3 border-t border-slate-100 dark:border-[#26372F] flex items-center justify-between">
                       <Button
                         asChild
@@ -1094,7 +1252,7 @@ export function BrandDashboardView({
             )}
           </div>
 
-          {/* 7. Bottom Section: Side-by-Side Panels (Sales Table + Regional Share - Stitch Spec) */}
+          {/* 7. Bottom Section: Side-by-Side Panels (Sales Table + Regional Share) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             {/* Left Panel (7/12 cols): Recent Recorded Sales Activity Table */}
             <div className="lg:col-span-7 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
@@ -1142,17 +1300,17 @@ export function BrandDashboardView({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] bg-white dark:bg-[#14211D]">
-                      {recentSales.length === 0 ? (
+                      {filteredSales.length === 0 ? (
                         <tr>
                           <td
                             colSpan={6}
                             className="py-8 text-center text-xs text-slate-400 dark:text-[#9BAAA1]"
                           >
-                            No sales recorded yet. Cashiers log tickets via the POS terminal.
+                            No sales recorded in this period. Cashiers log tickets via the POS terminal.
                           </td>
                         </tr>
                       ) : (
-                        recentSales.slice(0, 5).map((sale, idx) => {
+                        filteredSales.slice(0, 5).map((sale, idx) => {
                           const avatarImg =
                             creatorImages[idx % creatorImages.length];
                           const dateObj = new Date(sale.createdAt);
@@ -1165,6 +1323,12 @@ export function BrandDashboardView({
                             hour: "2-digit",
                             minute: "2-digit",
                           });
+
+                          // Resolve dynamic branch and channel from notes & context
+                          const { branch, channel } = resolveSaleChannelAndBranch(
+                            sale.notes,
+                            sale.campaign.name
+                          );
 
                           return (
                             <tr
@@ -1199,8 +1363,14 @@ export function BrandDashboardView({
                               </td>
                               <td className="py-3 px-3 whitespace-nowrap align-top">
                                 <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-[#C0CCC4] text-xs leading-tight">
-                                  <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
-                                  Bole Flagship POS
+                                  {channel === "telegram" ? (
+                                    <Send className="w-3.5 h-3.5 text-[#229ED9] shrink-0" />
+                                  ) : channel === "phone" ? (
+                                    <Phone className="w-3.5 h-3.5 text-amber-500 dark:text-[#F0B85C] shrink-0" />
+                                  ) : (
+                                    <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                                  )}
+                                  {branch}
                                 </span>
                               </td>
                               <td className="py-3 px-3 whitespace-nowrap align-top">
@@ -1245,8 +1415,8 @@ export function BrandDashboardView({
 
               <div className="mt-4 pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#26372F]">
                 <span className="font-medium text-[11px]">
-                  Showing {recentSales.slice(0, 5).length} of{" "}
-                  {recentSales.length || 1240} attributed transactions
+                  Showing {filteredSales.slice(0, 5).length} of{" "}
+                  {totalVerifiedSalesCount} attributed transactions
                 </span>
                 <div className="flex items-center gap-3">
                   <Link
@@ -1264,7 +1434,7 @@ export function BrandDashboardView({
               </div>
             </div>
 
-            {/* Right Panel (5/12 cols): Regional & Channel Share (Stitch Spec) */}
+            {/* Right Panel (5/12 cols): Dynamic Regional & Channel Share */}
             <div className="lg:col-span-5 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F] flex flex-col justify-between">
               <div className="flex-1 flex flex-col">
                 <div className="flex items-start justify-between">
@@ -1284,14 +1454,14 @@ export function BrandDashboardView({
                   </Link>
                 </div>
 
-                {/* Proportional Share Bar (Coding Standard FR-023) */}
+                {/* Proportional Share Bar */}
                 <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-[#101C18] overflow-hidden flex mt-3.5">
                   <div style={{ width: `${tgPercent}%` }} className="bg-blue-500 h-full" title={`Telegram ${tgPercent}%`} />
                   <div style={{ width: `${mapPercent}%` }} className="bg-emerald-500 dark:bg-[#78B99D] h-full" title={`In-Store POS ${mapPercent}%`} />
                   <div style={{ width: `${callPercent}%` }} className="bg-amber-500 dark:bg-[#F0B85C] h-full" title={`Direct Calls ${callPercent}%`} />
                 </div>
 
-                {/* Channel Share Pill Breakdown */}
+                {/* Dynamic Channel Share Pill Breakdown */}
                 <div className="flex flex-wrap items-center gap-2 mt-2.5 text-xs">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F7F8F5] dark:bg-[#101C18] border border-transparent dark:border-[#26372F] font-medium text-slate-800 dark:text-[#C0CCC4]">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
@@ -1307,7 +1477,7 @@ export function BrandDashboardView({
                   </span>
                 </div>
 
-                {/* Stylized Geographic Location Widget with Addis Ababa background (flex-1 so it expands to fill card height) */}
+                {/* Stylized Geographic Location Widget with Addis Ababa background */}
                 <div className="mt-3.5 relative rounded-xl overflow-hidden shadow-xs flex-1 min-h-[200px] group">
                   <div
                     className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
@@ -1327,37 +1497,64 @@ export function BrandDashboardView({
                       </span>
                     </div>
 
-                    {/* Hotspot Node Tags */}
+                    {/* Dynamic Hotspot Node Tags */}
                     <div className="space-y-2">
-                      <div className="bg-black/65 dark:bg-[#0D1714]/85 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10 dark:border-[#304239]">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-3.5 h-3.5 text-emerald-400 dark:text-[#78B99D] shrink-0" />
-                          <span className="text-xs font-semibold text-white dark:text-[#F1F5F1]">
-                            Bole Flagship (Medhanialem)
-                          </span>
-                        </div>
-                        <span className="text-xs font-bold text-emerald-300 dark:text-[#83D1A5]">
-                          58% Share
-                        </span>
-                      </div>
+                      {initialBranchHotspots.length > 0 ? (
+                        initialBranchHotspots.slice(0, 2).map((hotspot) => (
+                          <div
+                            key={hotspot.name}
+                            className="bg-black/65 dark:bg-[#0D1714]/85 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10 dark:border-[#304239]"
+                          >
+                            <div className="flex items-center gap-2">
+                              {hotspot.type === "telegram" ? (
+                                <Send className="w-3.5 h-3.5 text-[#229ED9] shrink-0" />
+                              ) : hotspot.type === "phone" ? (
+                                <Phone className="w-3.5 h-3.5 text-amber-400 dark:text-[#F0B85C] shrink-0" />
+                              ) : (
+                                <MapPin className="w-3.5 h-3.5 text-emerald-400 dark:text-[#78B99D] shrink-0" />
+                              )}
+                              <span className="text-xs font-semibold text-white dark:text-[#F1F5F1]">
+                                {hotspot.name}
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-300 dark:text-[#83D1A5]">
+                              {hotspot.sharePercent}% Share
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <div className="bg-black/65 dark:bg-[#0D1714]/85 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10 dark:border-[#304239]">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-3.5 h-3.5 text-emerald-400 dark:text-[#78B99D] shrink-0" />
+                              <span className="text-xs font-semibold text-white dark:text-[#F1F5F1]">
+                                Bole Flagship (Medhanialem)
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-300 dark:text-[#83D1A5]">
+                              58% Share
+                            </span>
+                          </div>
 
-                      <div className="bg-black/65 dark:bg-[#0D1714]/85 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10 dark:border-[#304239]">
-                        <div className="flex items-center gap-2">
-                          <Store className="w-3.5 h-3.5 text-amber-400 dark:text-[#F0B85C] shrink-0" />
-                          <span className="text-xs font-semibold text-white dark:text-[#F1F5F1]">
-                            Kazanchis Hub
-                          </span>
-                        </div>
-                        <span className="text-xs font-bold text-amber-300 dark:text-[#F0C36F]">
-                          28% Share
-                        </span>
-                      </div>
+                          <div className="bg-black/65 dark:bg-[#0D1714]/85 backdrop-blur-md p-2 rounded-lg flex items-center justify-between border border-white/10 dark:border-[#304239]">
+                            <div className="flex items-center gap-2">
+                              <Store className="w-3.5 h-3.5 text-amber-400 dark:text-[#F0B85C] shrink-0" />
+                              <span className="text-xs font-semibold text-white dark:text-[#F1F5F1]">
+                                Piassa Roastery Hub
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-amber-300 dark:text-[#F0C36F]">
+                              28% Share
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Settlement Footer (matching Left Panel Footer border and margin) */}
+              {/* Settlement Footer */}
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
                 <div className="flex items-center gap-1.5 text-slate-500 dark:text-[#9BAAA1] text-[11px]">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
