@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { formatETB } from "@/lib/sales";
 import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import { BrandSidebar } from "./BrandSidebar";
@@ -115,11 +117,23 @@ export function BrandDashboardView({
   creatorRoster = [],
   currentTimestamp,
 }: BrandDashboardViewProps) {
+  const router = useRouter();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
+
+  const handleRefreshFeeds = () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    router.refresh();
+    toast.success("Synchronizing live sales & telemetry feeds...");
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 700);
+  };
 
   // Pure deterministic base time from immutable server timestamp prop
   const baseTime = useMemo(() => {
@@ -453,11 +467,16 @@ export function BrandDashboardView({
 
               <button
                 type="button"
-                onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#14211D] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] border border-[#D7DED9]/80 dark:border-[#304239] text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] transition-colors shadow-2xs cursor-pointer"
+                onClick={handleRefreshFeeds}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#14211D] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] border border-[#D7DED9]/80 dark:border-[#304239] text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
               >
-                <RotateCw className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
-                <span>Refresh Feeds</span>
+                <RotateCw
+                  className={`w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] ${
+                    isRefreshing ? "animate-spin" : ""
+                  }`}
+                />
+                <span>{isRefreshing ? "Syncing..." : "Refresh Feeds"}</span>
               </button>
             </div>
           </div>
