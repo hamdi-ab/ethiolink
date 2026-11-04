@@ -31,6 +31,8 @@ import {
   Receipt,
   RotateCw,
   ShieldCheck,
+  QrCode,
+  UserPlus,
 } from "lucide-react";
 
 export interface BrandCampaignItem {
@@ -883,21 +885,21 @@ export function BrandDashboardView({
                       key={campaign.id}
                       className="bg-white dark:bg-[#14211D] rounded-2xl border border-[#D7DED9]/80 dark:border-[#26372F] p-5 shadow-xs hover:border-slate-300 dark:hover:border-[#304239] transition-all flex flex-col justify-between space-y-4"
                     >
-                      <div className="space-y-3">
+                      <div className="space-y-3.5">
                         {/* Header: Title, Promo Badge & Lifecycle */}
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F1] truncate">
+                              <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F1] tracking-tight truncate">
                                 {campaign.name}
                               </h3>
                               <span
-                                className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${badgeCfg.badgeClass}`}
+                                className={`text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full border ${badgeCfg.badgeClass}`}
                               >
                                 {badgeCfg.label}
                               </span>
                             </div>
-                            <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5 line-clamp-1">
+                            <p className="text-xs text-slate-600 dark:text-[#9BAAA1] mt-0.5 line-clamp-1">
                               {campaign.description || "Omnichannel attribution link"}
                             </p>
                           </div>
@@ -908,55 +910,57 @@ export function BrandDashboardView({
                         </div>
 
                         {/* Metrics Strip */}
-                        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-transparent dark:border-[#26372F] text-xs">
-                          <div>
-                            <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] block font-medium">
+                        <div className="grid grid-cols-3 divide-x divide-slate-200/80 dark:divide-[#26372F] p-3 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/40 dark:border-[#26372F]/60">
+                          <div className="pr-3">
+                            <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
                               Attributed Revenue
                             </span>
-                            <span className="font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
+                            <span className="font-bold text-sm text-slate-900 dark:text-[#F1F5F1] font-headline mt-0.5 block tracking-tight">
                               {formatETB(totalCampaignSales)}
                             </span>
                           </div>
-                          <div>
-                            <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] block font-medium">
+                          <div className="px-3">
+                            <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
                               Verified Sales
                             </span>
-                            <span className="font-bold text-slate-900 dark:text-[#F1F5F1]">
+                            <span className="font-bold text-sm text-slate-900 dark:text-[#F1F5F1] mt-0.5 block tracking-tight">
                               {campaign._count?.sales || 0}
                             </span>
                           </div>
-                          <div>
-                            <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] block font-medium">
+                          <div className="pl-3">
+                            <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
                               Interactions
                             </span>
-                            <span className="font-bold text-slate-900 dark:text-[#F1F5F1]">
+                            <span className="font-bold text-sm text-slate-900 dark:text-[#F1F5F1] mt-0.5 block tracking-tight">
                               {campaign._count?.events || 0}
                             </span>
                           </div>
                         </div>
 
                         {/* Channels active chips */}
-                        <div className="flex items-center gap-2 flex-wrap text-[11px] text-slate-500 dark:text-[#C0CCC4]">
-                          {campaign.telegramUrl && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#229ED9]/10 text-[#229ED9] font-medium">
-                              <Send className="w-3 h-3" />
-                              Telegram
-                            </span>
-                          )}
-                          {campaign.phoneNumber && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-[#F0B85C] font-medium">
-                              <Phone className="w-3 h-3" />
-                              Phone
-                            </span>
-                          )}
-                          {campaign.mapUrl && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#78B99D] font-medium">
-                              <MapPin className="w-3 h-3" />
-                              Maps
-                            </span>
-                          )}
+                        <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-[#C0CCC4]">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {campaign.telegramUrl && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#229ED9]/10 text-[#229ED9] font-medium border border-[#229ED9]/20">
+                                <Send className="w-3 h-3" />
+                                Telegram
+                              </span>
+                            )}
+                            {campaign.phoneNumber && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-[#F0B85C] font-medium border border-amber-500/20">
+                                <Phone className="w-3 h-3" />
+                                Phone
+                              </span>
+                            )}
+                            {campaign.mapUrl && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-[#78B99D] font-medium border border-emerald-500/20">
+                                <MapPin className="w-3 h-3" />
+                                Maps
+                              </span>
+                            )}
+                          </div>
                           {campaign.startDate && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 dark:text-[#9BAAA1] ml-auto font-mono">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono shrink-0">
                               <Calendar className="w-3 h-3" />
                               {new Date(campaign.startDate).toLocaleDateString()}
                             </span>
@@ -991,52 +995,98 @@ export function BrandDashboardView({
                 {/* Balanced "Launch New Campaign" Action Companion Slot */}
                 {filteredCampaigns.length % 2 !== 0 && (
                   <div className="bg-slate-50/50 dark:bg-[#101C18]/40 hover:bg-emerald-50/20 dark:hover:bg-[#142620]/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-[#26372F] hover:border-emerald-500/60 dark:hover:border-[#78B99D]/60 p-5 transition-all flex flex-col justify-between space-y-4 group">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-100/70 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-[#287362] group-hover:text-white dark:group-hover:bg-[#78B99D] dark:group-hover:text-[#0D2119] transition-all shadow-2xs">
-                          <Plus className="w-4 h-4" />
-                        </div>
+                    <div className="space-y-3.5">
+                      {/* Header: Title, Badge & Placeholder Code */}
+                      <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F1] tracking-tight group-hover:text-emerald-700 dark:group-hover:text-[#78B99D] transition-colors">
-                            Launch New Campaign
-                          </h3>
-                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5 leading-relaxed">
-                            Deploy another attribution campaign with custom promo codes, instant POS QR displays, and creator splits.
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F1] tracking-tight group-hover:text-emerald-700 dark:group-hover:text-[#78B99D] transition-colors truncate">
+                              Launch New Campaign
+                            </h3>
+                            <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full border bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] border-emerald-200 dark:border-[#264D3A]">
+                              Quick Setup
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-[#9BAAA1] mt-0.5 line-clamp-1">
+                            Deploy an omnichannel attribution link with custom promo codes and verified retail tracking
                           </p>
+                        </div>
+
+                        <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100/80 dark:bg-[#1A2A24] text-slate-400 dark:text-[#7C8F85] border border-dashed border-slate-300 dark:border-[#2B4036] shrink-0">
+                          + PROMO CODE
+                        </span>
+                      </div>
+
+                      {/* Middle Block (Direct symmetry with Card 1's metrics strip) */}
+                      <div className="grid grid-cols-3 divide-x divide-slate-200/80 dark:divide-[#26372F] p-3 rounded-xl bg-[#F7F8F5] dark:bg-[#101C18] border border-slate-200/40 dark:border-[#26372F]/60">
+                        <div className="pr-3">
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
+                            Channel Routing
+                          </span>
+                          <span className="font-bold text-xs text-slate-800 dark:text-[#E2E8E4] mt-1 block tracking-tight">
+                            Telegram &amp; Calls
+                          </span>
+                        </div>
+                        <div className="px-3">
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
+                            POS Retail QR
+                          </span>
+                          <span className="font-bold text-xs text-slate-800 dark:text-[#E2E8E4] mt-1 block tracking-tight">
+                            Print Display
+                          </span>
+                        </div>
+                        <div className="pl-3">
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-[#9BAAA1] block">
+                            Creator Splits
+                          </span>
+                          <span className="font-bold text-xs text-slate-800 dark:text-[#E2E8E4] mt-1 block tracking-tight">
+                            Signed Invites
+                          </span>
                         </div>
                       </div>
 
-                      {/* Feature Pills */}
-                      <div className="flex flex-wrap items-center gap-2 pt-1">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#78B99D]" />
-                          Instant POS QR Display
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#229ED9]" />
-                          Telegram Deep-Links
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#26372F] text-[11px] font-medium text-slate-700 dark:text-[#C0CCC4]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-[#F0B85C]" />
-                          Creator Commission Splits
+                      {/* Feature Capabilities row (matching Card 1's channel chips row) */}
+                      <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-[#C0CCC4]">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-[#193629] text-emerald-700 dark:text-[#83D1A5] font-medium border border-emerald-200/80 dark:border-[#264D3A]">
+                            <QrCode className="w-3 h-3" />
+                            POS QR
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#229ED9]/10 text-[#229ED9] font-medium border border-[#229ED9]/20">
+                            <Send className="w-3 h-3" />
+                            Telebirr &amp; CBE
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-[#F0B85C] font-medium border border-amber-500/20">
+                            <UserPlus className="w-3 h-3" />
+                            Magic Invite
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono shrink-0">
+                          Takes &lt; 60s
                         </span>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-dashed border-slate-200 dark:border-[#26372F] flex items-center justify-between">
+                    {/* Footer Action (matches Card 1's footer border and height) */}
+                    <div className="pt-3 border-t border-slate-100 dark:border-[#26372F] flex items-center justify-between">
                       <Button
                         asChild
                         size="sm"
-                        className="h-8 px-3 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                        className="h-8 px-3.5 rounded-xl bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                       >
                         <Link href="/brand/campaigns/new">
-                          <PlusCircle className="w-3.5 h-3.5" />
+                          <Plus className="w-3.5 h-3.5" />
                           <span>Create Campaign</span>
                         </Link>
                       </Button>
-                      <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
-                        Fast Setup &lt; 60s
-                      </span>
+
+                      <Link
+                        href="/brand/campaigns/new"
+                        className="text-[11px] font-medium text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>Open Studio</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
                     </div>
                   </div>
                 )}
