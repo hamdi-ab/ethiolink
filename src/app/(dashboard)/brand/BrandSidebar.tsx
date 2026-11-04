@@ -48,7 +48,7 @@ export interface BrandSidebarProps {
   creatorRoster?: CreatorRosterItem[];
 }
 
-export function BrandSidebar({
+export const BrandSidebar = React.memo(function BrandSidebar({
   brandName,
   ownerName,
   brandPhone,
@@ -755,4 +755,6 @@ export function BrandSidebar({
       )}
     </>
   );
-}
+});
+
+BrandSidebar.displayName = "BrandSidebar";

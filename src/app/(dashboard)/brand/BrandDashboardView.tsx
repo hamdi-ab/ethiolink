@@ -117,22 +117,59 @@ export function BrandDashboardView({
   creatorRoster = [],
   currentTimestamp,
 }: BrandDashboardViewProps) {
-  const router = useRouter();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [localSales, setLocalSales] = useState<RecentSaleItem[]>(recentSales);
+  const [localCampaigns, setLocalCampaigns] = useState<BrandCampaignItem[]>(campaigns);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
 
-  const handleRefreshFeeds = () => {
+  // Keep local state in sync when server props revalidate
+  React.useEffect(() => {
+    setLocalSales(recentSales);
+  }, [recentSales]);
+
+  React.useEffect(() => {
+    setLocalCampaigns(campaigns);
+  }, [campaigns]);
+
+  // Client-side targeted refresh: updates only the dashboard body in place
+  const handleRefreshFeeds = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
-    router.refresh();
-    toast.success("Synchronizing live sales & telemetry feeds...");
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 700);
+    try {
+      const [salesRes, campRes] = await Promise.all([
+        fetch("/api/sales").then((r) => (r.ok ? r.json() : null)),
+        fetch("/api/campaigns").then((r) => (r.ok ? r.json() : null)),
+      ]);
+
+      if (salesRes?.sales && Array.isArray(salesRes.sales)) {
+        setLocalSales(
+          salesRes.sales.map((s: { id: string; amountETB: number | string; createdAt: string; notes?: string | null; campaign: { name: string; promoCode: string }; loggedBy: { name: string } }) => ({
+            id: s.id,
+            amountETB: Number(s.amountETB),
+            createdAt: s.createdAt,
+            notes: s.notes,
+            campaign: s.campaign,
+            loggedBy: s.loggedBy,
+          }))
+        );
+      }
+
+      if (campRes?.campaigns && Array.isArray(campRes.campaigns)) {
+        setLocalCampaigns(campRes.campaigns);
+      }
+
+      toast.success("Cockpit feeds updated");
+    } catch {
+      toast.error("Failed to sync feeds");
+    } finally {
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 500);
+    }
   };
 
   // Pure deterministic base time from immutable server timestamp prop
@@ -161,15 +198,15 @@ export function BrandDashboardView({
 
   // Filtered sales matching date window
   const filteredSales = useMemo(() => {
-    return recentSales.filter((s) => {
+    return localSales.filter((s) => {
       if (dateCutoffMs === 0) return true;
       return new Date(s.createdAt).getTime() >= dateCutoffMs;
     });
-  }, [recentSales, dateCutoffMs]);
+  }, [localSales, dateCutoffMs]);
 
   // Filtered campaigns matching search query & status
   const filteredCampaigns = useMemo(() => {
-    return campaigns.filter((camp) => {
+    return localCampaigns.filter((camp) => {
       const matchesSearch =
         camp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         camp.promoCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -182,43 +219,43 @@ export function BrandDashboardView({
 
       return matchesSearch && matchesStatus;
     });
-  }, [campaigns, searchQuery, statusFilter]);
+  }, [localCampaigns, searchQuery, statusFilter]);
 
   // Aggregate high-level totals
   const totalGrossETB = useMemo(() => {
     if (filteredSales.length > 0 || dateRange !== "ALL") {
       return filteredSales.reduce((sum, s) => sum + (Number(s.amountETB) || 0), 0);
     }
-    return campaigns.reduce((acc, camp) => {
+    return localCampaigns.reduce((acc, camp) => {
       const campSalesSum = (camp.sales || []).reduce(
         (sAcc, s) => sAcc + Number(s.amountETB || 0),
         0
       );
       return acc + campSalesSum;
     }, 0);
-  }, [filteredSales, campaigns, dateRange]);
+  }, [filteredSales, localCampaigns, dateRange]);
 
   const totalVerifiedSalesCount = useMemo(() => {
     if (dateRange !== "ALL") {
       return filteredSales.length;
     }
-    const campCount = campaigns.reduce(
+    const campCount = localCampaigns.reduce(
       (acc, camp) => acc + (camp._count?.sales || 0),
       0
     );
-    return Math.max(campCount, recentSales.length);
-  }, [dateRange, filteredSales, campaigns, recentSales]);
+    return Math.max(campCount, localSales.length);
+  }, [dateRange, filteredSales, localCampaigns, localSales]);
 
   const totalInteractions = useMemo(() => {
-    return campaigns.reduce(
+    return localCampaigns.reduce(
       (acc, camp) => acc + (camp._count?.events || 0),
       0
     );
-  }, [campaigns]);
+  }, [localCampaigns]);
 
   const activeCampaignsCount = useMemo(() => {
-    return campaigns.filter((c) => getEffectiveStatus(c) === "ACTIVE").length;
-  }, [campaigns]);
+    return localCampaigns.filter((c) => getEffectiveStatus(c) === "ACTIVE").length;
+  }, [localCampaigns]);
 
   // Dynamic Intent & Conversion Rates
   const visitToIntentRate = useMemo(() => {
@@ -311,13 +348,13 @@ export function BrandDashboardView({
   const uniqueCreatorsCount = useMemo(() => {
     if (creatorRoster.length > 0) return creatorRoster.length;
     const set = new Set<string>();
-    for (const c of campaigns) {
+    for (const c of localCampaigns) {
       for (const ca of c.creators || []) {
         set.add(ca.creator.id);
       }
     }
     return set.size;
-  }, [creatorRoster, campaigns]);
+  }, [creatorRoster, localCampaigns]);
 
   // Fallback creator portrait photos downloaded from Stitch
   const creatorImages = [
@@ -334,7 +371,7 @@ export function BrandDashboardView({
         ownerName={ownerName}
         brandPhone={brandPhone}
         role={role}
-        campaignCount={campaigns.length}
+        campaignCount={localCampaigns.length}
         staffCount={staffCount}
         staffList={staffList}
         isMobileOpen={isMobileSidebarOpen}
@@ -529,7 +566,7 @@ export function BrandDashboardView({
                   {totalInteractions.toLocaleString()}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-[#C0CCC4] mt-0.5 truncate">
-                  Across {campaigns.length} creator deep links
+                  Across {localCampaigns.length} creator deep links
                 </p>
               </div>
               <div className="mt-4 pt-3 flex items-center justify-between text-xs border-t border-slate-100 dark:border-[#26372F]">
@@ -739,7 +776,7 @@ export function BrandDashboardView({
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-[#C0CCC4] bg-[#F0F2EF] dark:bg-[#1A2A24] px-2.5 py-1 rounded-lg">
-                    <span>{campaigns.length} Campaigns</span>
+                    <span>{localCampaigns.length} Campaigns</span>
                   </div>
                 </div>
 
