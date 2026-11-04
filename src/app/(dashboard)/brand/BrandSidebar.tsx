@@ -245,9 +245,9 @@ export function BrandSidebar({
         </div>
 
         {/* Bottom: Payment Gateway Status, Merchant Switcher & Profile (Matchly Pattern) */}
-        <div className="p-3.5 border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] space-y-2.5 transition-colors">
+        <div className="p-3 border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] space-y-2.5 transition-colors">
           {/* Matchly Merchant Account Switcher Card */}
-          <div className="bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-colors hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs">
+          <div className="bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-colors hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
                 <Store className="w-4 h-4" />
@@ -256,7 +256,7 @@ export function BrandSidebar({
                 <p className="text-xs font-semibold text-white truncate leading-tight">
                   {brandName}
                 </p>
-                <p className="text-[10px] text-emerald-200/70 dark:text-[#9BAAA1] truncate">
+                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
                   {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
                 </p>
               </div>
@@ -264,44 +264,53 @@ export function BrandSidebar({
             <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
           </div>
 
-          {/* Telebirr & CBE Birr Live Integration Card (Stitch Spec) */}
-          <div className="bg-[#16443D]/90 dark:bg-[#11211C]/90 rounded-xl p-2 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] shadow-2xs">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-              <div className="flex flex-col">
-                <span className="text-[10px] font-semibold text-white leading-tight">
+          {/* Telebirr & CBE Birr Live Integration Card (Matching Card 1 Rhythm) */}
+          <div className="bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] shadow-2xs h-12">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+              </div>
+              <div className="truncate">
+                <p className="text-xs font-semibold text-white truncate leading-tight">
                   Telebirr &amp; CBE Birr
-                </span>
-                <span className="text-[9px] text-emerald-200/70 dark:text-[#9BAAA1]">Gateway Sync v2.4</span>
+                </p>
+                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                  Gateway Sync v2.4
+                </p>
               </div>
             </div>
-            <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-1.5 py-0.5 rounded border border-emerald-500/40 dark:border-[#28493D]">
+            <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
               Active
             </span>
           </div>
 
-          <div className="flex items-center justify-between pt-0.5">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+          {/* User Profile & Theme Toggle Row */}
+          <div className="flex items-center justify-between px-1 h-10">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                 {brandName.charAt(0)}
               </div>
               <div className="min-w-0">
                 <span className="font-semibold text-xs text-white block truncate leading-tight">
                   {ownerName}
                 </span>
-                <span className="text-[10px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate">
+                <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
                   {role === "OWNER" ? "Brand Merchant" : role}
                 </span>
               </div>
             </div>
 
-            <ThemeToggle size="sm" />
+            <ThemeToggle
+              size="sm"
+              className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
+            />
           </div>
 
+          {/* Sign Out Action Button */}
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
+              className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
