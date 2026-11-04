@@ -1098,13 +1098,13 @@ export function BrandDashboardView({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             {/* Left Panel (7/12 cols): Recent Recorded Sales Activity Table */}
             <div className="lg:col-span-7 bg-white dark:bg-[#14211D] rounded-2xl p-6 shadow-xs border border-[#D7DED9]/80 dark:border-[#26372F]">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
+                    <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1] leading-tight">
                       Recent Recorded Sales Activity
                     </h2>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A]">
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A]">
                       Live Feed
                     </span>
                   </div>
@@ -1131,13 +1131,13 @@ export function BrandDashboardView({
               <div className="overflow-x-auto border border-slate-200/80 dark:border-[#26372F] rounded-xl shadow-2xs">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#F8F9F7] dark:bg-[#101C18] border-b border-slate-200/80 dark:border-[#26372F]">
-                    <tr className="text-[10px] font-bold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
-                      <th className="py-2.5 px-3.5 text-left font-bold">Receipt ID</th>
-                      <th className="py-2.5 px-3 text-left font-bold">Creator / Campaign</th>
-                      <th className="py-2.5 px-3 text-left font-bold">Channel / Branch</th>
-                      <th className="py-2.5 px-3 text-left font-bold">Logged Date</th>
-                      <th className="py-2.5 px-3 text-right font-bold">Amount</th>
-                      <th className="py-2.5 px-3.5 text-right font-bold">Attribution</th>
+                    <tr className="text-[11px] font-bold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
+                      <th className="py-2.5 px-3.5 text-left font-bold align-top whitespace-nowrap">Receipt ID</th>
+                      <th className="py-2.5 px-3 text-left font-bold align-top">Creator / Campaign</th>
+                      <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Channel / Branch</th>
+                      <th className="py-2.5 px-3 text-left font-bold align-top whitespace-nowrap">Logged Date</th>
+                      <th className="py-2.5 px-3 text-right font-bold align-top whitespace-nowrap">Amount</th>
+                      <th className="py-2.5 px-3.5 text-right font-bold align-top whitespace-nowrap">Attribution</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] bg-white dark:bg-[#14211D]">
