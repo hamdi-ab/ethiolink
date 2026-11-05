@@ -22,7 +22,26 @@ import {
   Info,
   Scale,
   Table as TableIcon,
+  ChevronDown,
+  Check,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+const SORT_FIELD_OPTIONS: { field: CampaignComparisonSortField; label: string }[] = [
+  { field: "revenue", label: "Gross Revenue (ETB)" },
+  { field: "conversionRate", label: "Conversion Rate (CVR %)" },
+  { field: "clickThroughRate", label: "Click-Through Rate (CTR %)" },
+  { field: "salesCount", label: "Total Redemptions" },
+  { field: "pageViews", label: "Page Views" },
+  { field: "aov", label: "Average Order Value (AOV)" },
+];
 
 interface CampaignComparisonMatrixProps {
   campaigns: CampaignAnalyticsResponse[];
@@ -160,18 +179,47 @@ export function CampaignComparisonMatrix({
             {viewMode === "table" && (
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500 dark:text-[#9BAAA1] font-medium hidden sm:inline">Sort:</span>
-                <select
-                  value={sortField}
-                  onChange={(e) => setSortField(e.target.value as CampaignComparisonSortField)}
-                  className="bg-slate-50 dark:bg-[#101C18] border border-slate-200 dark:border-[#304239] rounded-lg px-2.5 py-1.5 font-semibold text-slate-700 dark:text-[#C0CCC4] focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-[#78B99D] cursor-pointer"
-                >
-                  <option value="revenue">Gross Revenue (ETB)</option>
-                  <option value="conversionRate">Conversion Rate (CVR %)</option>
-                  <option value="clickThroughRate">Click-Through Rate (CTR %)</option>
-                  <option value="salesCount">Total Redemptions</option>
-                  <option value="pageViews">Page Views</option>
-                  <option value="aov">Average Order Value (AOV)</option>
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="h-8 flex items-center gap-2 bg-white dark:bg-[#101C18] border border-[#D7DED9]/80 dark:border-[#304239] px-2.5 py-1.5 rounded-lg shadow-2xs text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 focus:outline-none focus:ring-1 focus:ring-emerald-600/40 dark:focus:ring-[#78B99D]/40 transition-all cursor-pointer"
+                    >
+                      <span>
+                        {SORT_FIELD_OPTIONS.find((opt) => opt.field === sortField)?.label ?? "Sort Metric"}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1] shrink-0" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                  >
+                    <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1]">
+                      Sort Metric
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                    {SORT_FIELD_OPTIONS.map((opt) => {
+                      const isSelected = sortField === opt.field;
+                      return (
+                        <DropdownMenuItem
+                          key={opt.field}
+                          onClick={() => setSortField(opt.field)}
+                          className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                            isSelected
+                              ? "bg-emerald-50 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] font-semibold"
+                              : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 <button
                   onClick={() => setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))}
@@ -521,34 +569,108 @@ export function CampaignComparisonMatrix({
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-emerald-700 dark:text-[#78B99D]">Campaign A:</span>
-                <select
-                  value={compareIdA}
-                  onChange={(e) => setCompareIdA(e.target.value)}
-                  className="bg-slate-50 dark:bg-[#101C18] border border-slate-200 dark:border-[#304239] rounded-lg px-2.5 py-1 font-semibold text-slate-800 dark:text-[#F1F5F1] cursor-pointer"
-                >
-                  {campaigns.map((c) => (
-                    <option key={c.campaignId} value={c.campaignId}>
-                      {c.campaignName} ({c.promoCode})
-                    </option>
-                  ))}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="h-8 flex items-center gap-2 bg-white dark:bg-[#101C18] border border-[#D7DED9]/80 dark:border-[#304239] px-2.5 py-1 rounded-lg shadow-2xs font-semibold text-slate-800 dark:text-[#F1F5F1] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] focus:outline-none focus:ring-1 focus:ring-emerald-600/40 cursor-pointer transition-all"
+                    >
+                      <span className="max-w-[160px] truncate">
+                        {campaigns.find((c) => c.campaignId === compareIdA)?.campaignName || "Select Campaign A"}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1] shrink-0" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-64 max-h-72 overflow-y-auto p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                  >
+                    <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-[#78B99D]">
+                      Campaign A Selection
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                    {campaigns.map((c) => {
+                      const isSelected = compareIdA === c.campaignId;
+                      return (
+                        <DropdownMenuItem
+                          key={c.campaignId}
+                          onClick={() => setCompareIdA(c.campaignId)}
+                          className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                            isSelected
+                              ? "bg-emerald-50 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] font-semibold"
+                              : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                          }`}
+                        >
+                          <div className="truncate pr-2">
+                            <div className="font-semibold text-slate-900 dark:text-[#F1F5F1] truncate">
+                              {c.campaignName}
+                            </div>
+                            <div className="text-[10px] text-emerald-700 dark:text-[#78B99D] font-mono">
+                              {c.promoCode}
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               <span className="text-slate-400 dark:text-[#9BAAA1] font-bold px-1">VS</span>
 
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-indigo-700 dark:text-[#93C5FD]">Campaign B:</span>
-                <select
-                  value={compareIdB}
-                  onChange={(e) => setCompareIdB(e.target.value)}
-                  className="bg-slate-50 dark:bg-[#101C18] border border-slate-200 dark:border-[#304239] rounded-lg px-2.5 py-1 font-semibold text-slate-800 dark:text-[#F1F5F1] cursor-pointer"
-                >
-                  {campaigns.map((c) => (
-                    <option key={c.campaignId} value={c.campaignId}>
-                      {c.campaignName} ({c.promoCode})
-                    </option>
-                  ))}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="h-8 flex items-center gap-2 bg-white dark:bg-[#101C18] border border-[#D7DED9]/80 dark:border-[#304239] px-2.5 py-1 rounded-lg shadow-2xs font-semibold text-slate-800 dark:text-[#F1F5F1] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] focus:outline-none focus:ring-1 focus:ring-indigo-600/40 cursor-pointer transition-all"
+                    >
+                      <span className="max-w-[160px] truncate">
+                        {campaigns.find((c) => c.campaignId === compareIdB)?.campaignName || "Select Campaign B"}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1] shrink-0" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-64 max-h-72 overflow-y-auto p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                  >
+                    <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-[#93C5FD]">
+                      Campaign B Selection
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                    {campaigns.map((c) => {
+                      const isSelected = compareIdB === c.campaignId;
+                      return (
+                        <DropdownMenuItem
+                          key={c.campaignId}
+                          onClick={() => setCompareIdB(c.campaignId)}
+                          className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                            isSelected
+                              ? "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-[#93C5FD] font-semibold"
+                              : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                          }`}
+                        >
+                          <div className="truncate pr-2">
+                            <div className="font-semibold text-slate-900 dark:text-[#F1F5F1] truncate">
+                              {c.campaignName}
+                            </div>
+                            <div className="text-[10px] text-indigo-600 dark:text-[#93C5FD] font-mono">
+                              {c.promoCode}
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-[#93C5FD] shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>

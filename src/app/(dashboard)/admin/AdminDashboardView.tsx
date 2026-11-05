@@ -39,7 +39,17 @@ import {
   Clock,
   Filter,
   X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export interface SaleAuditItem {
   id: string;
@@ -1649,34 +1659,114 @@ export function AdminDashboardView({
 
                   {/* Filter Selectors */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-                      <Filter className="w-3.5 h-3.5 text-slate-400" />
-                      <select
-                        value={issueStatusFilter}
-                        onChange={(e) => setIssueStatusFilter(e.target.value)}
-                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          className="h-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          <Filter className="w-3.5 h-3.5 text-slate-400" />
+                          <span>
+                            {issueStatusFilter === "ALL"
+                              ? `All Statuses (${issuesList.length})`
+                              : issueStatusFilter === "OPEN"
+                              ? "Open"
+                              : issueStatusFilter === "IN_REVIEW"
+                              ? "In Review"
+                              : issueStatusFilter === "RESOLVED"
+                              ? "Resolved"
+                              : "Dismissed"}
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-48 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-xl z-50 text-xs"
                       >
-                        <option value="ALL">All Statuses ({issuesList.length})</option>
-                        <option value="OPEN">Open</option>
-                        <option value="IN_REVIEW">In Review</option>
-                        <option value="RESOLVED">Resolved</option>
-                        <option value="DISMISSED">Dismissed</option>
-                      </select>
-                    </div>
+                        <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Issue Status
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                        {[
+                          { value: "ALL", label: `All Statuses (${issuesList.length})` },
+                          { value: "OPEN", label: "Open" },
+                          { value: "IN_REVIEW", label: "In Review" },
+                          { value: "RESOLVED", label: "Resolved" },
+                          { value: "DISMISSED", label: "Dismissed" },
+                        ].map((opt) => {
+                          const isSelected = issueStatusFilter === opt.value;
+                          return (
+                            <DropdownMenuItem
+                              key={opt.value}
+                              onClick={() => setIssueStatusFilter(opt.value)}
+                              className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                                isSelected
+                                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold"
+                                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
 
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-                      <select
-                        value={issuePriorityFilter}
-                        onChange={(e) => setIssuePriorityFilter(e.target.value)}
-                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          className="h-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          <span>
+                            {issuePriorityFilter === "ALL"
+                              ? "All Priorities"
+                              : issuePriorityFilter === "URGENT"
+                              ? "Urgent"
+                              : issuePriorityFilter === "HIGH"
+                              ? "High"
+                              : issuePriorityFilter === "MEDIUM"
+                              ? "Medium"
+                              : "Low"}
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-44 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-xl z-50 text-xs"
                       >
-                        <option value="ALL">All Priorities</option>
-                        <option value="URGENT">Urgent</option>
-                        <option value="HIGH">High</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="LOW">Low</option>
-                      </select>
-                    </div>
+                        <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Priority Level
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                        {[
+                          { value: "ALL", label: "All Priorities" },
+                          { value: "URGENT", label: "Urgent" },
+                          { value: "HIGH", label: "High" },
+                          { value: "MEDIUM", label: "Medium" },
+                          { value: "LOW", label: "Low" },
+                        ].map((opt) => {
+                          const isSelected = issuePriorityFilter === opt.value;
+                          return (
+                            <DropdownMenuItem
+                              key={opt.value}
+                              onClick={() => setIssuePriorityFilter(opt.value)}
+                              className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                                isSelected
+                                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold"
+                                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
 
