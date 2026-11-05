@@ -52,6 +52,7 @@ export interface BrandSidebarProps {
   onTabChange?: (tab: "overview" | "sales" | "analytics" | "privacy") => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  onOpenCreateCampaignModal?: () => void;
 }
 
 export const BrandSidebar = React.memo(function BrandSidebar({
@@ -72,6 +73,7 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   onTabChange,
   isCollapsed = false,
   onToggleCollapse,
+  onOpenCreateCampaignModal,
 }: BrandSidebarProps) {
   const pathname = usePathname();
 
@@ -1035,14 +1037,28 @@ export const BrandSidebar = React.memo(function BrandSidebar({
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-[#101C18] border-t border-slate-100 dark:border-[#26372F] flex items-center justify-between">
-              <Link
-                href="/brand/campaigns/new"
-                onClick={() => setIsLocalCreatorsModalOpen(false)}
-                className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline flex items-center gap-1"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Launch Campaign with Creator Splits</span>
-              </Link>
+              {onOpenCreateCampaignModal ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLocalCreatorsModalOpen(false);
+                    onOpenCreateCampaignModal();
+                  }}
+                  className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Launch Campaign with Creator Splits</span>
+                </button>
+              ) : (
+                <Link
+                  href="/brand/campaigns/new"
+                  onClick={() => setIsLocalCreatorsModalOpen(false)}
+                  className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline flex items-center gap-1"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Launch Campaign with Creator Splits</span>
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => setIsLocalCreatorsModalOpen(false)}

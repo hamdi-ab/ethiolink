@@ -47,12 +47,14 @@ interface CampaignComparisonMatrixProps {
   campaigns: CampaignAnalyticsResponse[];
   brandName: string;
   onSelectCampaign?: (campaignId: string) => void;
+  onOpenCreateCampaignModal?: () => void;
 }
 
 export function CampaignComparisonMatrix({
   campaigns,
   brandName,
   onSelectCampaign,
+  onOpenCreateCampaignModal,
 }: CampaignComparisonMatrixProps) {
   const [sortField, setSortField] = useState<CampaignComparisonSortField>("revenue");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -111,12 +113,22 @@ export function CampaignComparisonMatrix({
             No active campaigns found. Create campaigns to unlock cross-campaign cohort benchmarking, efficiency ratios, and omnichannel performance analysis.
           </p>
         </div>
-        <Link
-          href="/brand/campaigns/new"
-          className="inline-flex items-center gap-1.5 bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-        >
-          <span>+ Create First Campaign</span>
-        </Link>
+        {onOpenCreateCampaignModal ? (
+          <button
+            type="button"
+            onClick={onOpenCreateCampaignModal}
+            className="inline-flex items-center gap-1.5 bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+          >
+            <span>+ Create First Campaign</span>
+          </button>
+        ) : (
+          <Link
+            href="/brand/campaigns/new"
+            className="inline-flex items-center gap-1.5 bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          >
+            <span>+ Create First Campaign</span>
+          </Link>
+        )}
       </div>
     );
   }
@@ -337,12 +349,22 @@ export function CampaignComparisonMatrix({
               <Info className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
               Comparative cohort benchmarking activates when 2 or more campaigns are active.
             </span>
-            <Link
-              href="/brand/campaigns/new"
-              className="text-emerald-600 dark:text-[#78B99D] font-bold hover:underline"
-            >
-              + Add another campaign
-            </Link>
+            {onOpenCreateCampaignModal ? (
+              <button
+                type="button"
+                onClick={onOpenCreateCampaignModal}
+                className="text-emerald-600 dark:text-[#78B99D] font-bold hover:underline cursor-pointer"
+              >
+                + Add another campaign
+              </button>
+            ) : (
+              <Link
+                href="/brand/campaigns/new"
+                className="text-emerald-600 dark:text-[#78B99D] font-bold hover:underline"
+              >
+                + Add another campaign
+              </Link>
+            )}
           </div>
         )}
       </div>

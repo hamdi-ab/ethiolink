@@ -47,6 +47,7 @@ export interface AnalyticsViewProps {
   auditEntries?: AuditLogEntry[];
   embedded?: boolean;
   onNavigateTab?: (tab: "overview" | "sales" | "analytics") => void;
+  onOpenCreateCampaignModal?: () => void;
 }
 
 export function AnalyticsView({
@@ -56,6 +57,7 @@ export function AnalyticsView({
   auditEntries = [],
   embedded = false,
   onNavigateTab,
+  onOpenCreateCampaignModal,
 }: AnalyticsViewProps) {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>("all");
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
@@ -606,6 +608,7 @@ export function AnalyticsView({
           campaigns={campaigns}
           brandName={brandName}
           onSelectCampaign={(id) => setSelectedCampaignId(id)}
+          onOpenCreateCampaignModal={onOpenCreateCampaignModal}
         />
     </div>
   );

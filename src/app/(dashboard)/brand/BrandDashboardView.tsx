@@ -14,6 +14,7 @@ import { AnalyticsView } from "./analytics/AnalyticsView";
 import { BrandPrivacyAuditView } from "./BrandPrivacyAuditView";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import { ReportIssueModal } from "@/components/support/ReportIssueModal";
+import { CreateCampaignModal } from "@/components/campaign/CreateCampaignModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -139,6 +140,7 @@ export function BrandDashboardView({
 }: BrandDashboardViewProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isCreateCampaignModalOpen, setIsCreateCampaignModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<BrandDashboardTab>("overview");
   const [localSales, setLocalSales] = useState<RecentSaleItem[]>(recentSales);
@@ -567,6 +569,7 @@ export function BrandDashboardView({
         onTabChange={handleTabChange}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        onOpenCreateCampaignModal={() => setIsCreateCampaignModalOpen(true)}
       />
 
       {/* 2. Main Workspace (Fluid desktop width with lg:pl-64 or lg:pl-20) */}
@@ -720,14 +723,13 @@ export function BrandDashboardView({
               </Button>
 
               <Button
-                asChild
+                type="button"
                 size="sm"
+                onClick={() => setIsCreateCampaignModalOpen(true)}
                 className="h-8.5 px-3.5 text-xs font-semibold rounded-xl bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] shadow-xs shadow-emerald-950/20 active:scale-[0.98] transition-all cursor-pointer font-bold"
               >
-                <Link href="/brand/campaigns/new">
-                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
-                  <span>Create Campaign</span>
-                </Link>
+                <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+                <span>Create Campaign</span>
               </Button>
             </div>
           </div>
@@ -823,6 +825,7 @@ export function BrandDashboardView({
               auditEntries={[]}
               embedded={true}
               onNavigateTab={handleTabChange}
+              onOpenCreateCampaignModal={() => setIsCreateCampaignModalOpen(true)}
             />
           )}
 
@@ -1369,14 +1372,13 @@ export function BrandDashboardView({
                   {activeCampaignsCount} Active Campaigns
                 </Badge>
                 <Button
-                  asChild
+                  type="button"
                   size="sm"
+                  onClick={() => setIsCreateCampaignModalOpen(true)}
                   className="h-7 px-2.5 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1"
                 >
-                  <Link href="/brand/campaigns/new">
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>New Campaign</span>
-                  </Link>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New Campaign</span>
                 </Button>
               </div>
             </div>
@@ -1391,14 +1393,13 @@ export function BrandDashboardView({
                   Try adjusting your search query or status filter, or create a brand-new campaign to get started.
                 </p>
                 <Button
-                  asChild
+                  type="button"
                   size="sm"
-                  className="bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] rounded-xl text-xs font-bold"
+                  onClick={() => setIsCreateCampaignModalOpen(true)}
+                  className="bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] rounded-xl text-xs font-bold cursor-pointer"
                 >
-                  <Link href="/brand/campaigns/new">
-                    <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
-                    <span>Create Campaign</span>
-                  </Link>
+                  <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+                  <span>Create Campaign</span>
                 </Button>
               </div>
             ) : (
@@ -1601,23 +1602,23 @@ export function BrandDashboardView({
                     {/* Footer Action */}
                     <div className="pt-3 border-t border-slate-100 dark:border-[#26372F] flex items-center justify-between">
                       <Button
-                        asChild
+                        type="button"
                         size="sm"
+                        onClick={() => setIsCreateCampaignModalOpen(true)}
                         className="h-8 px-3.5 rounded-xl bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                       >
-                        <Link href="/brand/campaigns/new">
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Create Campaign</span>
-                        </Link>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Create Campaign</span>
                       </Button>
 
-                      <Link
-                        href="/brand/campaigns/new"
-                        className="text-[11px] font-medium text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1"
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateCampaignModalOpen(true)}
+                        className="text-[11px] font-medium text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
                         <span>Open Studio</span>
                         <ExternalLink className="w-3 h-3" />
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -1952,6 +1953,13 @@ export function BrandDashboardView({
       <ReportIssueModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
+      />
+
+      {/* Create Campaign Modal */}
+      <CreateCampaignModal
+        isOpen={isCreateCampaignModalOpen}
+        onClose={() => setIsCreateCampaignModalOpen(false)}
+        onSuccess={() => handleRefreshFeeds()}
       />
     </div>
   );
