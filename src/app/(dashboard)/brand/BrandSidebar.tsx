@@ -22,6 +22,8 @@ import {
   UserPlus,
   Copy,
   Check,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CreatorRosterItem } from "./brand-helpers";
@@ -48,6 +50,8 @@ export interface BrandSidebarProps {
   creatorRoster?: CreatorRosterItem[];
   activeTab?: "overview" | "sales" | "analytics" | "privacy";
   onTabChange?: (tab: "overview" | "sales" | "analytics" | "privacy") => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export const BrandSidebar = React.memo(function BrandSidebar({
@@ -66,6 +70,8 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   creatorRoster = [],
   activeTab,
   onTabChange,
+  isCollapsed = false,
+  onToggleCollapse,
 }: BrandSidebarProps) {
   const pathname = usePathname();
 
@@ -129,45 +135,69 @@ export const BrandSidebar = React.memo(function BrandSidebar({
 
       {/* Sidebar Container: The Dark Anchor — Deep Evergreen (#10352F) in Light / Midnight Pine (#08120F) in Dark */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#10352F] dark:bg-[#08120F] text-white border-r border-[#1B4B42] dark:border-[#1E332B] flex flex-col justify-between transition-colors duration-150 ease-in-out lg:translate-x-0 ${
-          isMobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 bg-[#10352F] dark:bg-[#08120F] text-white border-r border-[#1B4B42] dark:border-[#1E332B] flex flex-col justify-between transition-all duration-300 ease-in-out lg:translate-x-0 ${
+          isCollapsed ? "w-20" : "w-64"
+        } ${isMobileOpen ? "translate-x-0 shadow-2xl w-64" : "-translate-x-full"}`}
       >
         {/* Top: Brand Header */}
         <div className="p-3.5 pb-2">
-          <div className="flex items-center justify-between px-1 pt-0.5">
+          <div className={`flex items-center justify-between px-1 pt-0.5 ${isCollapsed ? "flex-col gap-2" : ""}`}>
             {onTabChange ? (
               <button
                 type="button"
                 onClick={() => handleNavClick("overview")}
-                className="flex items-center gap-2.5 group cursor-pointer text-left focus:outline-none"
+                title={isCollapsed ? "EthioLink Attribution Engine" : undefined}
+                className={`flex items-center gap-2.5 group cursor-pointer text-left focus:outline-none ${
+                  isCollapsed ? "justify-center" : ""
+                }`}
               >
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform shrink-0">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
-                    Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
-                  </span>
-                  <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
-                    Attribution Engine
-                  </span>
-                </div>
+                {!isCollapsed && (
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                      Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
+                      Attribution Engine
+                    </span>
+                  </div>
+                )}
               </button>
             ) : (
-              <Link href="/brand" className="flex items-center gap-2.5 group">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
+              <Link
+                href="/brand"
+                title={isCollapsed ? "EthioLink Attribution Engine" : undefined}
+                className={`flex items-center gap-2.5 group ${isCollapsed ? "justify-center" : ""}`}
+              >
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform shrink-0">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
-                    Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
-                  </span>
-                  <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
-                    Attribution Engine
-                  </span>
-                </div>
+                {!isCollapsed && (
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                      Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
+                      Attribution Engine
+                    </span>
+                  </div>
+                )}
               </Link>
+            )}
+
+            {/* Desktop Collapse Toggle */}
+            {onToggleCollapse && (
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                className="hidden lg:flex p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
+              >
+                {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+              </button>
             )}
 
             {/* Mobile Close Button */}
@@ -182,35 +212,38 @@ export const BrandSidebar = React.memo(function BrandSidebar({
         </div>
 
         {/* Middle Navigation Menus */}
-        <div className="flex-1 overflow-y-auto px-3.5 py-1 space-y-5 sidebar-scroll">
+        <div className={`flex-1 overflow-y-auto ${isCollapsed ? "px-2 py-2" : "px-3.5 py-1"} space-y-5 sidebar-scroll`}>
           {/* Main Menu */}
           <div className="space-y-1">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
-              Cockpit Navigation
-            </span>
+            {!isCollapsed && (
+              <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
+                Cockpit Navigation
+              </span>
+            )}
 
             <nav className="space-y-1 pt-1">
               {onTabChange ? (
                 <button
                   type="button"
                   onClick={() => handleNavClick("overview")}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                  title={isCollapsed ? "Overview" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                     isOverview
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <LayoutGrid
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isOverview
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Overview</span>
+                    {!isCollapsed && <span>Overview</span>}
                   </div>
-                  {campaignCount > 0 && (
+                  {!isCollapsed && campaignCount > 0 && (
                     <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
                       {campaignCount}
                     </span>
@@ -219,23 +252,24 @@ export const BrandSidebar = React.memo(function BrandSidebar({
               ) : (
                 <Link
                   href="/brand"
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  title={isCollapsed ? "Overview" : undefined}
+                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
                     isOverview
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <LayoutGrid
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isOverview
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Overview</span>
+                    {!isCollapsed && <span>Overview</span>}
                   </div>
-                  {campaignCount > 0 && (
+                  {!isCollapsed && campaignCount > 0 && (
                     <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
                       {campaignCount}
                     </span>
@@ -247,50 +281,56 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 <button
                   type="button"
                   onClick={() => handleNavClick("sales")}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                  title={isCollapsed ? "Sales & Attribution (POS)" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                     isSales
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <Store
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isSales
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Sales &amp; Attribution</span>
+                    {!isCollapsed && <span>Sales &amp; Attribution</span>}
                   </div>
-                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                    POS
-                  </span>
+                  {!isCollapsed && (
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                      POS
+                    </span>
+                  )}
                 </button>
               ) : (
                 <Link
                   href="/brand/sales"
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  title={isCollapsed ? "Sales & Attribution (POS)" : undefined}
+                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
                     isSales
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <Store
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isSales
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Sales &amp; Attribution</span>
+                    {!isCollapsed && <span>Sales &amp; Attribution</span>}
                   </div>
-                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                    POS
-                  </span>
+                  {!isCollapsed && (
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                      POS
+                    </span>
+                  )}
                 </Link>
               )}
 
@@ -298,41 +338,43 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 <button
                   type="button"
                   onClick={() => handleNavClick("analytics")}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                  title={isCollapsed ? "Reports & Funnel" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                     isAnalytics
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <TrendingUp
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isAnalytics
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Reports &amp; Funnel</span>
+                    {!isCollapsed && <span>Reports &amp; Funnel</span>}
                   </div>
                 </button>
               ) : (
                 <Link
                   href="/brand/analytics"
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  title={isCollapsed ? "Reports & Funnel" : undefined}
+                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
                     isAnalytics
                       ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                     <TrendingUp
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isAnalytics
                           ? "text-emerald-300 dark:text-[#78B99D]"
                           : "text-emerald-200/60 dark:text-[#9BAAA1]"
                       }`}
                     />
-                    <span>Reports &amp; Funnel</span>
+                    {!isCollapsed && <span>Reports &amp; Funnel</span>}
                   </div>
                 </Link>
               )}
@@ -341,13 +383,14 @@ export const BrandSidebar = React.memo(function BrandSidebar({
               <button
                 type="button"
                 onClick={handleOpenCreators}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left"
+                title={isCollapsed ? "Creators Directory" : undefined}
+                className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
-                  <span>Creators Directory</span>
+                <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                  <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+                  {!isCollapsed && <span>Creators Directory</span>}
                 </div>
-                {creatorRoster.length > 0 && (
+                {!isCollapsed && creatorRoster.length > 0 && (
                   <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
                     {creatorRoster.length}
                   </span>
@@ -357,60 +400,105 @@ export const BrandSidebar = React.memo(function BrandSidebar({
           </div>
 
           {/* Dynamic Campaign Sectors & Channels */}
-          <div className="space-y-1">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
-              Attribution Channels
-            </span>
-
-            <div className="space-y-0.5 pt-1">
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D]/70 dark:hover:bg-[#11211C]/70 transition-colors">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
-                  <span>In-Store POS (Maps)</span>
-                </div>
-                <span className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] font-mono font-bold">
-                  {mapPercent}%
-                </span>
+          {isCollapsed ? (
+            <div
+              className="py-1 flex flex-col items-center gap-2"
+              title={`Attribution Channels: In-Store POS ${mapPercent}%, Telegram ${tgPercent}%, Direct Calls ${callPercent}%`}
+            >
+              <div className="w-6 h-px bg-[#1B4B42] dark:bg-[#1E332B]" />
+              <div className="flex flex-col items-center gap-1.5 py-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" title={`In-Store POS (Maps): ${mapPercent}%`} />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#229ED9]" title={`Telegram Bots: ${tgPercent}%`} />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 dark:bg-[#F0B85C]" title={`Direct Phone Orders: ${callPercent}%`} />
               </div>
+              <div className="w-6 h-px bg-[#1B4B42] dark:bg-[#1E332B]" />
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
+                Attribution Channels
+              </span>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D]/70 dark:hover:bg-[#11211C]/70 transition-colors">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#229ED9]" />
-                  <span>Telegram Bots</span>
+              <div className="space-y-1.5 pt-0.5 px-1">
+                {/* Channel 1: In-Store POS (Maps) */}
+                <div className="p-2 rounded-xl bg-[#0C2722]/60 dark:bg-[#060D0B]/70 border border-[#16443D]/60 dark:border-[#1E332B]/60 space-y-1.5 cursor-default">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#78B99D] shrink-0" />
+                      <span className="text-[#C5DCD6] dark:text-[#C0CCC4] font-medium">In-Store POS (Maps)</span>
+                    </div>
+                    <span className="text-[11px] text-emerald-300 dark:text-[#78B99D] font-mono font-bold">
+                      {mapPercent}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-[#16443D]/50 dark:bg-[#101C18] overflow-hidden">
+                    <div
+                      style={{ width: `${Math.max(mapPercent, 3)}%` }}
+                      className="h-full bg-emerald-400 dark:bg-[#78B99D] rounded-full transition-all duration-500"
+                    />
+                  </div>
                 </div>
-                <span className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] font-mono font-bold">
-                  {tgPercent}%
-                </span>
-              </div>
 
-              <div className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D]/70 dark:hover:bg-[#11211C]/70 transition-colors">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 dark:bg-[#F0B85C]" />
-                  <span>Direct Phone Orders</span>
+                {/* Channel 2: Telegram Bots */}
+                <div className="p-2 rounded-xl bg-[#0C2722]/60 dark:bg-[#060D0B]/70 border border-[#16443D]/60 dark:border-[#1E332B]/60 space-y-1.5 cursor-default">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#229ED9] shrink-0" />
+                      <span className="text-[#C5DCD6] dark:text-[#C0CCC4] font-medium">Telegram Bots</span>
+                    </div>
+                    <span className="text-[11px] text-blue-300 dark:text-[#93C5FD] font-mono font-bold">
+                      {tgPercent}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-[#16443D]/50 dark:bg-[#101C18] overflow-hidden">
+                    <div
+                      style={{ width: `${Math.max(tgPercent, 3)}%` }}
+                      className="h-full bg-[#229ED9] rounded-full transition-all duration-500"
+                    />
+                  </div>
                 </div>
-                <span className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] font-mono font-bold">
-                  {callPercent}%
-                </span>
+
+                {/* Channel 3: Direct Phone Orders */}
+                <div className="p-2 rounded-xl bg-[#0C2722]/60 dark:bg-[#060D0B]/70 border border-[#16443D]/60 dark:border-[#1E332B]/60 space-y-1.5 cursor-default">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 dark:bg-[#F0B85C] shrink-0" />
+                      <span className="text-[#C5DCD6] dark:text-[#C0CCC4] font-medium">Direct Phone Orders</span>
+                    </div>
+                    <span className="text-[11px] text-amber-300 dark:text-[#F0B85C] font-mono font-bold">
+                      {callPercent}%
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-[#16443D]/50 dark:bg-[#101C18] overflow-hidden">
+                    <div
+                      style={{ width: `${Math.max(callPercent, 3)}%` }}
+                      className="h-full bg-amber-400 dark:bg-[#F0B85C] rounded-full transition-all duration-500"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Support & Audit */}
           <div className="space-y-1">
-            <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
-              Governance &amp; Support
-            </span>
+            {!isCollapsed && (
+              <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
+                Governance &amp; Support
+              </span>
+            )}
 
             <nav className="space-y-1 pt-1">
               {onOpenReportModal && (
                 <button
                   type="button"
                   onClick={onOpenReportModal}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left"
+                  title={isCollapsed ? "Report Issue" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <LifeBuoy className="w-4 h-4 text-amber-400 dark:text-[#F0B85C]" />
-                    <span>Report Issue</span>
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                    <LifeBuoy className="w-4 h-4 text-amber-400 dark:text-[#F0B85C] shrink-0" />
+                    {!isCollapsed && <span>Report Issue</span>}
                   </div>
                 </button>
               )}
@@ -419,28 +507,30 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 <button
                   type="button"
                   onClick={() => handleNavClick("privacy")}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                  title={isCollapsed ? "Privacy & Data Audit" : undefined}
+                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                     isPrivacy
                       ? "bg-[#1C554C] dark:bg-[#152B24] text-white shadow-xs"
                       : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Shield className={`w-4 h-4 ${isPrivacy ? "text-emerald-300 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"}`} />
-                    <span>Privacy &amp; Data Audit</span>
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                    <Shield className={`w-4 h-4 shrink-0 ${isPrivacy ? "text-emerald-300 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"}`} />
+                    {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
                   </div>
-                  {isPrivacy && (
+                  {!isCollapsed && isPrivacy && (
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
                   )}
                 </button>
               ) : (
                 <Link
                   href="/privacy"
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all"
+                  title={isCollapsed ? "Privacy & Data Audit" : undefined}
+                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
-                    <span>Privacy &amp; Data Audit</span>
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                    <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+                    {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
                   </div>
                 </Link>
               )}
@@ -449,85 +539,152 @@ export const BrandSidebar = React.memo(function BrandSidebar({
         </div>
 
         {/* Bottom: Payment Gateway Status, Merchant Switcher & Profile */}
-        <div className="p-3 border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] space-y-2.5 transition-colors">
-          {/* Interactive Merchant Account Switcher Card */}
-          <button
-            type="button"
-            onClick={() => setIsMerchantModalOpen(true)}
-            className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
+        <div className={`border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] transition-colors ${
+          isCollapsed ? "p-2 space-y-2 flex flex-col items-center" : "p-3 space-y-2.5"
+        }`}>
+          {isCollapsed ? (
+            <div className="flex flex-col items-center gap-2 py-0.5">
+              {/* Merchant Account Switcher Icon */}
+              <button
+                type="button"
+                onClick={() => setIsMerchantModalOpen(true)}
+                title={`${brandName} (Merchant Profile)`}
+                className="w-9 h-9 rounded-xl bg-[#16443D] dark:bg-[#11211C] border border-[#225C52] dark:border-[#20362E] text-amber-300 dark:text-[#F0B85C] flex items-center justify-center hover:bg-[#1C554C] dark:hover:bg-[#18332A] transition-colors cursor-pointer"
+              >
                 <Store className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-semibold text-white truncate leading-tight">
-                  {brandName}
-                </p>
-                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
-                  {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
-                </p>
-              </div>
-            </div>
-            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-          </button>
+              </button>
 
-          {/* Interactive Telebirr & CBE Birr Live Integration Card */}
-          <button
-            type="button"
-            onClick={() => setIsGatewayModalOpen(true)}
-            className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-semibold text-white truncate leading-tight">
-                  Telebirr &amp; CBE Birr
-                </p>
-                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
-                  Gateway Sync v2.4
-                </p>
-              </div>
-            </div>
-            <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
-              Active
-            </span>
-          </button>
+              {/* Gateway Live Status Icon */}
+              <button
+                type="button"
+                onClick={() => setIsGatewayModalOpen(true)}
+                title="Telebirr & CBE Birr (Active Gateway)"
+                className="w-9 h-9 rounded-xl bg-[#16443D] dark:bg-[#11211C] border border-[#225C52] dark:border-[#20362E] text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center hover:bg-[#1C554C] dark:hover:bg-[#18332A] transition-colors cursor-pointer"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+              </button>
 
-          {/* User Profile & Theme Toggle Row */}
-          <div className="flex items-center justify-between px-1 h-10">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              {/* User Avatar */}
+              <div
+                title={`${ownerName} (${role === "OWNER" ? "Brand Merchant" : role})`}
+                className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shadow-xs cursor-default"
+              >
                 {brandName.charAt(0)}
               </div>
-              <div className="min-w-0">
-                <span className="font-semibold text-xs text-white block truncate leading-tight">
-                  {ownerName}
-                </span>
-                <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
-                  {role === "OWNER" ? "Brand Merchant" : role}
-                </span>
-              </div>
+
+              {/* Theme Toggle */}
+              <ThemeToggle
+                size="sm"
+                className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
+              />
+
+              {/* Sign Out Action Button */}
+              <form action="/api/auth/logout" method="POST">
+                <button
+                  type="submit"
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </form>
+
+              {/* Expand Sidebar Toggle */}
+              {onToggleCollapse && (
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  title="Expand sidebar"
+                  aria-label="Expand sidebar"
+                  className="hidden lg:flex w-9 h-9 rounded-xl items-center justify-center text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
+                >
+                  <PanelLeftOpen className="w-4 h-4" />
+                </button>
+              )}
             </div>
+          ) : (
+            <>
+              {/* Interactive Merchant Account Switcher Card */}
+              <button
+                type="button"
+                onClick={() => setIsMerchantModalOpen(true)}
+                className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
+                    <Store className="w-4 h-4" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-semibold text-white truncate leading-tight">
+                      {brandName}
+                    </p>
+                    <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                      {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
+                    </p>
+                  </div>
+                </div>
+                <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+              </button>
 
-            <ThemeToggle
-              size="sm"
-              className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
-            />
-          </div>
+              {/* Interactive Telebirr & CBE Birr Live Integration Card */}
+              <button
+                type="button"
+                onClick={() => setIsGatewayModalOpen(true)}
+                className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                  </div>
+                  <div className="truncate">
+                    <p className="text-xs font-semibold text-white truncate leading-tight">
+                      Telebirr &amp; CBE Birr
+                    </p>
+                    <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                      Gateway Sync v2.4
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
+                  Active
+                </span>
+              </button>
 
-          {/* Sign Out Action Button */}
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
-            </button>
-          </form>
+              {/* User Profile & Theme Toggle Row */}
+              <div className="flex items-center justify-between px-1 h-10">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    {brandName.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-semibold text-xs text-white block truncate leading-tight">
+                      {ownerName}
+                    </span>
+                    <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
+                      {role === "OWNER" ? "Brand Merchant" : role}
+                    </span>
+                  </div>
+                </div>
+
+                <ThemeToggle
+                  size="sm"
+                  className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
+                />
+              </div>
+
+              {/* Sign Out Action Button */}
+              <form action="/api/auth/logout" method="POST">
+                <button
+                  type="submit"
+                  className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </aside>
 

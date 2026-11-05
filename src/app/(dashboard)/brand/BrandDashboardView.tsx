@@ -146,6 +146,7 @@ export function BrandDashboardView({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Read URL query parameter on initial load (e.g., ?tab=sales or ?tab=analytics)
   React.useEffect(() => {
@@ -564,10 +565,14 @@ export function BrandDashboardView({
         creatorRoster={creatorRoster}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
       />
 
-      {/* 2. Main Workspace (Fluid desktop width with lg:pl-64) */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+      {/* 2. Main Workspace (Fluid desktop width with lg:pl-64 or lg:pl-20) */}
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
+        isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"
+      }`}>
         {/* Top Header / Action Bar (Stitch Spec: h-16 sticky) */}
         <header className="bg-white/90 dark:bg-[#14211D]/90 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F]">
           <div className="px-5 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
