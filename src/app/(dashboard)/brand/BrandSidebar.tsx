@@ -18,6 +18,7 @@ import {
   Send,
   Building,
   Activity,
+  PieChart,
   Zap,
   UserPlus,
   Copy,
@@ -142,18 +143,18 @@ export const BrandSidebar = React.memo(function BrandSidebar({
         } ${isMobileOpen ? "translate-x-0 shadow-2xl w-64" : "-translate-x-full"}`}
       >
         {/* Top: Brand Header */}
-        <div className="p-3.5 pb-2">
-          <div className={`flex items-center justify-between px-1 pt-0.5 ${isCollapsed ? "flex-col gap-2" : ""}`}>
+        <div className={isCollapsed ? "p-3 pb-2 flex flex-col items-center" : "p-3.5 pb-2"}>
+          <div className={`flex items-center justify-between px-1 pt-0.5 ${isCollapsed ? "flex-col gap-2.5 items-center w-full" : "w-full"}`}>
             {onTabChange ? (
               <button
                 type="button"
                 onClick={() => handleNavClick("overview")}
                 title={isCollapsed ? "EthioLink Attribution Engine" : undefined}
-                className={`flex items-center gap-2.5 group cursor-pointer text-left focus:outline-none ${
-                  isCollapsed ? "justify-center" : ""
+                className={`flex items-center gap-2.5 group/brand cursor-pointer text-left focus:outline-none ${
+                  isCollapsed ? "justify-center relative" : ""
                 }`}
               >
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
                 {!isCollapsed && (
@@ -164,6 +165,12 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                     <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
                       Attribution Engine
                     </span>
+                  </div>
+                )}
+                {isCollapsed && (
+                  <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/brand:opacity-100 group-hover/brand:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                    <span className="font-bold">EthioLink</span>
+                    <span className="text-[10px] text-emerald-300 dark:text-[#78B99D] font-mono">v2.4</span>
                   </div>
                 )}
               </button>
@@ -171,9 +178,9 @@ export const BrandSidebar = React.memo(function BrandSidebar({
               <Link
                 href="/brand"
                 title={isCollapsed ? "EthioLink Attribution Engine" : undefined}
-                className={`flex items-center gap-2.5 group ${isCollapsed ? "justify-center" : ""}`}
+                className={`flex items-center gap-2.5 group/brand ${isCollapsed ? "justify-center relative" : ""}`}
               >
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
                 {!isCollapsed && (
@@ -186,20 +193,35 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                     </span>
                   </div>
                 )}
+                {isCollapsed && (
+                  <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/brand:opacity-100 group-hover/brand:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                    <span className="font-bold">EthioLink</span>
+                    <span className="text-[10px] text-emerald-300 dark:text-[#78B99D] font-mono">v2.4</span>
+                  </div>
+                )}
               </Link>
             )}
 
-            {/* Desktop Collapse Toggle */}
+            {/* Desktop Collapse / Expand Toggle */}
             {onToggleCollapse && (
-              <button
-                type="button"
-                onClick={onToggleCollapse}
-                title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="hidden lg:flex p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
-              >
-                {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-              </button>
+              <div className="relative group/expand flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={onToggleCollapse}
+                  title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  className={`hidden lg:flex items-center justify-center rounded-xl text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-all cursor-pointer ${
+                    isCollapsed ? "w-9 h-9" : "p-1.5"
+                  }`}
+                >
+                  {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                </button>
+                {isCollapsed && (
+                  <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1 bg-[#091F1A] dark:bg-[#14211D] text-white text-[11px] font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/expand:opacity-100 group-hover/expand:translate-x-0 transition-all duration-150 z-50">
+                    Expand Sidebar
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Mobile Close Button */}
@@ -211,10 +233,20 @@ export const BrandSidebar = React.memo(function BrandSidebar({
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {isCollapsed && (
+            <div className="w-8 h-px bg-[#1B4B42]/60 dark:bg-[#1E332B]/60 mx-auto mt-2" />
+          )}
         </div>
 
         {/* Middle Navigation Menus */}
-        <div className={`flex-1 overflow-y-auto ${isCollapsed ? "px-2 py-2" : "px-3.5 py-1"} space-y-5 sidebar-scroll`}>
+        <div
+          className={`flex-1 ${
+            isCollapsed
+              ? "px-2 py-1.5 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden space-y-2 flex flex-col items-center"
+              : "px-3.5 py-1 overflow-y-auto space-y-5 sidebar-scroll"
+          }`}
+        >
           {/* Main Menu */}
           <div className="space-y-1">
             {!isCollapsed && (
@@ -223,197 +255,356 @@ export const BrandSidebar = React.memo(function BrandSidebar({
               </span>
             )}
 
-            <nav className="space-y-1 pt-1">
+            <nav className={`space-y-1 pt-1 ${isCollapsed ? "flex flex-col items-center w-full space-y-1.5" : ""}`}>
               {onTabChange ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavClick("overview")}
-                  title={isCollapsed ? "Overview" : undefined}
-                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
-                    isOverview
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <LayoutGrid
-                      className={`w-4 h-4 shrink-0 ${
-                        isOverview
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Overview</span>}
-                  </div>
-                  {!isCollapsed && campaignCount > 0 && (
-                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
-                      {campaignCount}
-                    </span>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick("overview")}
+                    aria-label="Overview"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
+                      isOverview
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isOverview && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <LayoutGrid
+                        className={`w-4 h-4 shrink-0 ${
+                          isOverview
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Overview</span>}
+                    </div>
+                    {!isCollapsed && campaignCount > 0 && (
+                      <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                        {campaignCount}
+                      </span>
+                    )}
+                  </button>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Overview</span>
+                      {campaignCount > 0 && (
+                        <span className="text-[10px] font-mono font-bold text-emerald-300 dark:text-[#78B99D] bg-[#143B33] dark:bg-[#1C3229] px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          {campaignCount} Active
+                        </span>
+                      )}
+                    </div>
                   )}
-                </button>
+                </div>
               ) : (
-                <Link
-                  href="/brand"
-                  title={isCollapsed ? "Overview" : undefined}
-                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
-                    isOverview
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <LayoutGrid
-                      className={`w-4 h-4 shrink-0 ${
-                        isOverview
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Overview</span>}
-                  </div>
-                  {!isCollapsed && campaignCount > 0 && (
-                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
-                      {campaignCount}
-                    </span>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <Link
+                    href="/brand"
+                    aria-label="Overview"
+                    className={`flex items-center transition-all ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold"
+                    } ${
+                      isOverview
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isOverview && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <LayoutGrid
+                        className={`w-4 h-4 shrink-0 ${
+                          isOverview
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Overview</span>}
+                    </div>
+                    {!isCollapsed && campaignCount > 0 && (
+                      <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                        {campaignCount}
+                      </span>
+                    )}
+                  </Link>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Overview</span>
+                      {campaignCount > 0 && (
+                        <span className="text-[10px] font-mono font-bold text-emerald-300 dark:text-[#78B99D] bg-[#143B33] dark:bg-[#1C3229] px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          {campaignCount} Active
+                        </span>
+                      )}
+                    </div>
                   )}
-                </Link>
+                </div>
               )}
 
               {onTabChange ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavClick("sales")}
-                  title={isCollapsed ? "Sales & Attribution (POS)" : undefined}
-                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
-                    isSales
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <Store
-                      className={`w-4 h-4 shrink-0 ${
-                        isSales
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Sales &amp; Attribution</span>}
-                  </div>
-                  {!isCollapsed && (
-                    <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                      POS
-                    </span>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick("sales")}
+                    aria-label="Sales & Attribution (POS)"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
+                      isSales
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isSales && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Store
+                        className={`w-4 h-4 shrink-0 ${
+                          isSales
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Sales &amp; Attribution</span>}
+                    </div>
+                    {!isCollapsed && (
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                        POS
+                      </span>
+                    )}
+                  </button>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>In-Store POS Register</span>
+                      <span className="text-[10px] font-mono font-bold text-emerald-300 dark:text-[#78B99D] bg-emerald-950 dark:bg-[#193629] px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        Live
+                      </span>
+                    </div>
                   )}
-                </button>
+                </div>
               ) : (
-                <Link
-                  href="/brand/sales"
-                  title={isCollapsed ? "Sales & Attribution (POS)" : undefined}
-                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
-                    isSales
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <Store
-                      className={`w-4 h-4 shrink-0 ${
-                        isSales
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Sales &amp; Attribution</span>}
-                  </div>
-                  {!isCollapsed && (
-                    <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                      POS
-                    </span>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <Link
+                    href="/brand/sales"
+                    aria-label="Sales & Attribution (POS)"
+                    className={`flex items-center transition-all ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold"
+                    } ${
+                      isSales
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isSales && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Store
+                        className={`w-4 h-4 shrink-0 ${
+                          isSales
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Sales &amp; Attribution</span>}
+                    </div>
+                    {!isCollapsed && (
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                        POS
+                      </span>
+                    )}
+                  </Link>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>In-Store POS Register</span>
+                      <span className="text-[10px] font-mono font-bold text-emerald-300 dark:text-[#78B99D] bg-emerald-950 dark:bg-[#193629] px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        Live
+                      </span>
+                    </div>
                   )}
-                </Link>
+                </div>
               )}
 
               {onTabChange ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavClick("analytics")}
-                  title={isCollapsed ? "Reports & Funnel" : undefined}
-                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
-                    isAnalytics
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <TrendingUp
-                      className={`w-4 h-4 shrink-0 ${
-                        isAnalytics
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Reports &amp; Funnel</span>}
-                  </div>
-                </button>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick("analytics")}
+                    aria-label="Reports & Funnel"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
+                      isAnalytics
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isAnalytics && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <TrendingUp
+                        className={`w-4 h-4 shrink-0 ${
+                          isAnalytics
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Reports &amp; Funnel</span>}
+                    </div>
+                  </button>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Reports &amp; Funnel</span>
+                    </div>
+                  )}
+                </div>
               ) : (
-                <Link
-                  href="/brand/analytics"
-                  title={isCollapsed ? "Reports & Funnel" : undefined}
-                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all ${
-                    isAnalytics
-                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <TrendingUp
-                      className={`w-4 h-4 shrink-0 ${
-                        isAnalytics
-                          ? "text-emerald-300 dark:text-[#78B99D]"
-                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                      }`}
-                    />
-                    {!isCollapsed && <span>Reports &amp; Funnel</span>}
-                  </div>
-                </Link>
+                <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                  <Link
+                    href="/brand/analytics"
+                    aria-label="Reports & Funnel"
+                    className={`flex items-center transition-all ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold"
+                    } ${
+                      isAnalytics
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isAnalytics && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <TrendingUp
+                        className={`w-4 h-4 shrink-0 ${
+                          isAnalytics
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Reports &amp; Funnel</span>}
+                    </div>
+                  </Link>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Reports &amp; Funnel</span>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Creators Directory: Opens interactive Creator Roster Modal */}
-              <button
-                type="button"
-                onClick={handleOpenCreators}
-                title={isCollapsed ? "Creators Directory" : undefined}
-                className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left`}
-              >
-                <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                  <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-                  {!isCollapsed && <span>Creators Directory</span>}
-                </div>
-                {!isCollapsed && creatorRoster.length > 0 && (
-                  <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
-                    {creatorRoster.length}
-                  </span>
+              <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
+                <button
+                  type="button"
+                  onClick={handleOpenCreators}
+                  aria-label="Creators Directory"
+                  className={`flex items-center text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer ${
+                    isCollapsed
+                      ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                      : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                  }`}
+                >
+                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                    <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+                    {!isCollapsed && <span>Creators Directory</span>}
+                  </div>
+                  {!isCollapsed && creatorRoster.length > 0 && (
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                      {creatorRoster.length}
+                    </span>
+                  )}
+                </button>
+                {isCollapsed && (
+                  <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                    <span>Creators Directory</span>
+                    {creatorRoster.length > 0 && (
+                      <span className="text-[10px] font-mono font-bold text-emerald-300 dark:text-[#78B99D] bg-[#143B33] dark:bg-[#1C3229] px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        {creatorRoster.length}
+                      </span>
+                    )}
+                  </div>
                 )}
-              </button>
+              </div>
             </nav>
           </div>
 
           {/* Dynamic Campaign Sectors & Channels */}
           {isCollapsed ? (
-            <div
-              className="py-1 flex flex-col items-center gap-2"
-              title={`Attribution Channels: In-Store POS ${mapPercent}%, Telegram ${tgPercent}%, Direct Calls ${callPercent}%`}
-            >
-              <div className="w-6 h-px bg-[#1B4B42] dark:bg-[#1E332B]" />
-              <div className="flex flex-col items-center gap-1.5 py-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" title={`In-Store POS (Maps): ${mapPercent}%`} />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#229ED9]" title={`Telegram Bots: ${tgPercent}%`} />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 dark:bg-[#F0B85C]" title={`Direct Phone Orders: ${callPercent}%`} />
+            <div className="py-0.5 w-full flex flex-col items-center">
+              <div className="w-8 h-px bg-[#1B4B42]/50 dark:bg-[#1E332B]/50 mx-auto my-1.5" />
+              <div className="relative group/chan flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => handleNavClick("analytics")}
+                  aria-label="Attribution Channels breakdown"
+                  className="w-10 h-10 rounded-xl bg-[#0C2722]/80 dark:bg-[#060D0B]/80 hover:bg-[#16443D] dark:hover:bg-[#11211C] border border-[#16443D] dark:border-[#1E332B] flex flex-col items-center justify-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-2xs"
+                >
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#229ED9]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 dark:bg-[#F0B85C]" />
+                  </div>
+                  <PieChart className="w-3.5 h-3.5 text-emerald-200/70 dark:text-[#9BAAA1]" />
+                </button>
+
+                {/* Floating Rich Tooltip */}
+                <div className="pointer-events-none absolute left-full ml-3 p-3 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-xl shadow-2xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/chan:opacity-100 group-hover/chan:translate-x-0 transition-all duration-150 z-50 flex flex-col gap-1.5 min-w-[200px]">
+                  <div className="flex items-center justify-between border-b border-[#1E4D43]/60 dark:border-[#26372F] pb-1.5">
+                    <span className="text-[11px] font-bold text-emerald-300 dark:text-[#78B99D] uppercase tracking-wider">
+                      Attribution Channels
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">100% Total</span>
+                  </div>
+                  <div className="space-y-1.5 text-[11px] pt-0.5">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                        In-Store POS (Maps)
+                      </span>
+                      <span className="font-mono font-bold text-emerald-300">{mapPercent}%</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <span className="w-2 h-2 rounded-full bg-[#229ED9] shrink-0" />
+                        Telegram Bots
+                      </span>
+                      <span className="font-mono font-bold text-blue-300">{tgPercent}%</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                        Direct Phone Orders
+                      </span>
+                      <span className="font-mono font-bold text-amber-300">{callPercent}%</span>
+                    </div>
+                  </div>
+                  <div className="pt-1 border-t border-[#1E4D43]/60 dark:border-[#26372F] text-[10px] text-emerald-300/80 font-normal">
+                    Click to view Funnel Analytics →
+                  </div>
+                </div>
               </div>
-              <div className="w-6 h-px bg-[#1B4B42] dark:bg-[#1E332B]" />
+              <div className="w-8 h-px bg-[#1B4B42]/50 dark:bg-[#1E332B]/50 mx-auto my-1.5" />
             </div>
           ) : (
             <div className="space-y-1.5">
@@ -483,58 +674,94 @@ export const BrandSidebar = React.memo(function BrandSidebar({
           )}
 
           {/* Support & Audit */}
-          <div className="space-y-1">
+          <div className={`space-y-1 ${isCollapsed ? "w-full flex flex-col items-center" : ""}`}>
             {!isCollapsed && (
               <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1]">
                 Governance &amp; Support
               </span>
             )}
 
-            <nav className="space-y-1 pt-1">
+            <nav className={`space-y-1 pt-1 ${isCollapsed ? "flex flex-col items-center w-full space-y-1.5" : ""}`}>
               {onOpenReportModal && (
-                <button
-                  type="button"
-                  onClick={onOpenReportModal}
-                  title={isCollapsed ? "Report Issue" : undefined}
-                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer text-left`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <LifeBuoy className="w-4 h-4 text-amber-400 dark:text-[#F0B85C] shrink-0" />
-                    {!isCollapsed && <span>Report Issue</span>}
-                  </div>
-                </button>
+                <div className={isCollapsed ? "relative group/gov flex items-center justify-center w-full" : "w-full"}>
+                  <button
+                    type="button"
+                    onClick={onOpenReportModal}
+                    aria-label="Report Issue"
+                    className={`flex items-center text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    }`}
+                  >
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <LifeBuoy className="w-4 h-4 text-amber-400 dark:text-[#F0B85C] shrink-0" />
+                      {!isCollapsed && <span>Report Issue</span>}
+                    </div>
+                  </button>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/gov:opacity-100 group-hover/gov:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Report Issue &amp; Support</span>
+                    </div>
+                  )}
+                </div>
               )}
 
               {onTabChange ? (
-                <button
-                  type="button"
-                  onClick={() => handleNavClick("privacy")}
-                  title={isCollapsed ? "Privacy & Data Audit" : undefined}
-                  className={`w-full flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
-                    isPrivacy
-                      ? "bg-[#1C554C] dark:bg-[#152B24] text-white shadow-xs"
-                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <Shield className={`w-4 h-4 shrink-0 ${isPrivacy ? "text-emerald-300 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"}`} />
-                    {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
-                  </div>
-                  {!isCollapsed && isPrivacy && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
+                <div className={isCollapsed ? "relative group/gov flex items-center justify-center w-full" : "w-full"}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick("privacy")}
+                    aria-label="Privacy & Data Audit"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
+                      isPrivacy
+                        ? "bg-[#1C554C] dark:bg-[#152B24] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                    }`}
+                  >
+                    {isCollapsed && isPrivacy && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Shield className={`w-4 h-4 shrink-0 ${isPrivacy ? "text-emerald-300 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"}`} />
+                      {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
+                    </div>
+                    {!isCollapsed && isPrivacy && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
+                    )}
+                  </button>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/gov:opacity-100 group-hover/gov:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Privacy &amp; Retention Audit</span>
+                    </div>
                   )}
-                </button>
+                </div>
               ) : (
-                <Link
-                  href="/privacy"
-                  title={isCollapsed ? "Privacy & Data Audit" : undefined}
-                  className={`flex items-center ${isCollapsed ? "justify-center px-0 py-2.5" : "justify-between px-3 py-2"} rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-                    {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
-                  </div>
-                </Link>
+                <div className={isCollapsed ? "relative group/gov flex items-center justify-center w-full" : "w-full"}>
+                  <Link
+                    href="/privacy"
+                    aria-label="Privacy & Data Audit"
+                    className={`flex items-center text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
+                        : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold"
+                    }`}
+                  >
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+                      {!isCollapsed && <span>Privacy &amp; Data Audit</span>}
+                    </div>
+                  </Link>
+                  {isCollapsed && (
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/gov:opacity-100 group-hover/gov:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
+                      <span>Privacy &amp; Retention Audit</span>
+                    </div>
+                  )}
+                </div>
               )}
             </nav>
           </div>
@@ -542,68 +769,71 @@ export const BrandSidebar = React.memo(function BrandSidebar({
 
         {/* Bottom: Payment Gateway Status, Merchant Switcher & Profile */}
         <div className={`border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] transition-colors ${
-          isCollapsed ? "p-2 space-y-2 flex flex-col items-center" : "p-3 space-y-2.5"
+          isCollapsed ? "p-2.5 flex flex-col items-center gap-2" : "p-3 space-y-2.5"
         }`}>
           {isCollapsed ? (
-            <div className="flex flex-col items-center gap-2 py-0.5">
-              {/* Merchant Account Switcher Icon */}
-              <button
-                type="button"
-                onClick={() => setIsMerchantModalOpen(true)}
-                title={`${brandName} (Merchant Profile)`}
-                className="w-9 h-9 rounded-xl bg-[#16443D] dark:bg-[#11211C] border border-[#225C52] dark:border-[#20362E] text-amber-300 dark:text-[#F0B85C] flex items-center justify-center hover:bg-[#1C554C] dark:hover:bg-[#18332A] transition-colors cursor-pointer"
-              >
-                <Store className="w-4 h-4" />
-              </button>
-
-              {/* Gateway Live Status Icon */}
-              <button
-                type="button"
-                onClick={() => setIsGatewayModalOpen(true)}
-                title="Telebirr & CBE Birr (Active Gateway)"
-                className="w-9 h-9 rounded-xl bg-[#16443D] dark:bg-[#11211C] border border-[#225C52] dark:border-[#20362E] text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center hover:bg-[#1C554C] dark:hover:bg-[#18332A] transition-colors cursor-pointer"
-              >
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-              </button>
-
-              {/* User Avatar */}
-              <div
-                title={`${ownerName} (${role === "OWNER" ? "Brand Merchant" : role})`}
-                className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shadow-xs cursor-default"
-              >
-                {brandName.charAt(0)}
-              </div>
-
-              {/* Theme Toggle */}
-              <ThemeToggle
-                size="sm"
-                className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
-              />
-
-              {/* Sign Out Action Button */}
-              <form action="/api/auth/logout" method="POST">
-                <button
-                  type="submit"
-                  title="Sign Out"
-                  aria-label="Sign Out"
-                  className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </form>
-
-              {/* Expand Sidebar Toggle */}
-              {onToggleCollapse && (
+            <div className="flex flex-col items-center gap-2.5 w-full">
+              {/* Unified Merchant Profile & Live Gateway Avatar */}
+              <div className="relative group/bot flex items-center justify-center">
                 <button
                   type="button"
-                  onClick={onToggleCollapse}
-                  title="Expand sidebar"
-                  aria-label="Expand sidebar"
-                  className="hidden lg:flex w-9 h-9 rounded-xl items-center justify-center text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
+                  onClick={() => setIsMerchantModalOpen(true)}
+                  aria-label={`${brandName} (Merchant Profile & Gateway)`}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1C554C] to-[#0D2B26] dark:from-[#18332A] dark:to-[#0D1714] border border-[#2B7366] dark:border-[#28493D] text-white flex items-center justify-center font-bold text-sm shadow-xs hover:border-emerald-400 hover:scale-105 transition-all cursor-pointer relative"
                 >
-                  <PanelLeftOpen className="w-4 h-4" />
+                  <span>{brandName.charAt(0)}</span>
+                  {/* Active Gateway Live Pulse Ring Indicator */}
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-[#0B2520] dark:border-[#050A08]" />
+                  </span>
                 </button>
-              )}
+
+                {/* Floating Profile Tooltip */}
+                <div className="pointer-events-none absolute left-full ml-3 p-2.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-xl shadow-2xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/bot:opacity-100 group-hover/bot:translate-x-0 transition-all duration-150 z-50 flex flex-col gap-1 min-w-[180px]">
+                  <div className="font-bold text-white flex items-center justify-between">
+                    <span>{brandName}</span>
+                    <span className="text-[10px] text-amber-300 dark:text-[#F0B85C] font-mono px-1 py-0.2 rounded bg-amber-500/10 border border-amber-500/20">Bole</span>
+                  </div>
+                  <div className="text-[11px] text-emerald-300 dark:text-[#83D1A5] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>Telebirr &amp; CBE Live</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-normal border-t border-[#1E4D43]/60 dark:border-[#26372F] pt-1 mt-0.5">
+                    Cashier: <strong className="text-slate-200">{ownerName}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Utility Row: Theme Toggle & Sign Out */}
+              <div className="flex flex-col items-center gap-1.5 w-full">
+                {/* Theme Toggle with Tooltip */}
+                <div className="relative group/bot flex items-center justify-center">
+                  <ThemeToggle
+                    size="sm"
+                    className="!w-9 !h-9 !bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-xl flex items-center justify-center shadow-xs cursor-pointer"
+                  />
+                  <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1 bg-[#091F1A] dark:bg-[#14211D] text-white text-[11px] font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/bot:opacity-100 group-hover/bot:translate-x-0 transition-all duration-150 z-50">
+                    Switch Theme
+                  </div>
+                </div>
+
+                {/* Sign Out Action Button with Tooltip */}
+                <form action="/api/auth/logout" method="POST" className="w-full flex justify-center">
+                  <div className="relative group/bot flex items-center justify-center">
+                    <button
+                      type="submit"
+                      aria-label="Sign Out"
+                      className="w-9 h-9 flex items-center justify-center rounded-xl text-emerald-200/60 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-all cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                    <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1 bg-[#091F1A] dark:bg-[#14211D] text-rose-300 text-[11px] font-semibold rounded-lg shadow-xl border border-rose-900/60 whitespace-nowrap opacity-0 -translate-x-1 group-hover/bot:opacity-100 group-hover/bot:translate-x-0 transition-all duration-150 z-50">
+                      Sign Out
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           ) : (
             <>
