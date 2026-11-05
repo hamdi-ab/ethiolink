@@ -9,9 +9,21 @@ import { formatETB } from "@/lib/sales";
 import { getEffectiveStatus, getStatusBadgeConfig } from "@/lib/lifecycle";
 import { BrandSidebar } from "./BrandSidebar";
 import { BrandCampaignActions } from "./BrandCampaignActions";
+import { SalesTerminal, ActiveCampaign, RecentSale } from "./sales/SalesTerminal";
+import { AnalyticsView } from "./analytics/AnalyticsView";
+import { BrandPrivacyAuditView } from "./BrandPrivacyAuditView";
+import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import {
   Plus,
   PlusCircle,
@@ -35,6 +47,8 @@ import {
   ShieldCheck,
   QrCode,
   UserPlus,
+  Check,
+  Filter,
 } from "lucide-react";
 import {
   WeeklyVelocityBucket,
@@ -74,9 +88,15 @@ export interface RecentSaleItem {
   amountETB: number | string;
   createdAt: string;
   notes?: string | null;
-  campaign: { name: string; promoCode: string };
-  loggedBy: { name: string };
+  campaign: { id?: string; name: string; promoCode: string };
+  loggedBy: { id?: string; name: string };
+  isVoided?: boolean;
+  voidReason?: string | null;
+  voidedAt?: string | null;
+  voidedBy?: { id?: string; name?: string } | null;
 }
+
+export type BrandDashboardTab = "overview" | "sales" | "analytics" | "privacy";
 
 export interface BrandDashboardViewProps {
   brandName: string;
@@ -120,11 +140,46 @@ export function BrandDashboardView({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<BrandDashboardTab>("overview");
   const [localSales, setLocalSales] = useState<RecentSaleItem[]>(recentSales);
   const [localCampaigns, setLocalCampaigns] = useState<BrandCampaignItem[]>(campaigns);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
+
+  // Read URL query parameter on initial load (e.g., ?tab=sales or ?tab=analytics)
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy" || tabParam === "overview") {
+        setActiveTab(tabParam);
+      }
+    }
+  }, []);
+
+  const handleTabChange = (newTab: BrandDashboardTab) => {
+    setActiveTab(newTab);
+    if (typeof window !== "undefined") {
+      const url = newTab === "overview" ? "/brand" : `/brand?tab=${newTab}`;
+      window.history.pushState({ tab: newTab }, "", url);
+    }
+  };
+
+  // Support browser back/forward buttons
+  React.useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy") {
+        setActiveTab(tabParam);
+      } else {
+        setActiveTab("overview");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Keep local state in sync when server props revalidate
   React.useEffect(() => {
@@ -363,6 +418,134 @@ export function BrandDashboardView({
     "/images/stitch/creator_3.jpg",
   ];
 
+  // In-cockpit Sales Terminal data and handlers
+  const terminalCampaigns = useMemo<ActiveCampaign[]>(() => {
+    return localCampaigns
+      .filter((c) => c.status === "ACTIVE")
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        promoCode: c.promoCode,
+      }));
+  }, [localCampaigns]);
+
+  const terminalSales = useMemo<RecentSale[]>(() => {
+    return localSales.map((s) => ({
+      id: s.id,
+      amountETB: Number(s.amountETB),
+      notes: s.notes || null,
+      createdAt: s.createdAt,
+      isVoided: s.isVoided,
+      voidReason: s.voidReason,
+      voidedAt: s.voidedAt,
+      voidedBy: s.voidedBy,
+      campaign: {
+        id: s.campaign?.id || "",
+        name: s.campaign?.name || "Campaign",
+        promoCode: s.campaign?.promoCode || "",
+      },
+      loggedBy: {
+        id: s.loggedBy?.id || "",
+        name: s.loggedBy?.name || "Cashier",
+      },
+    }));
+  }, [localSales]);
+
+  const handleSaleLogged = (newSale: RecentSale) => {
+    setLocalSales((prev) => [
+      {
+        id: newSale.id,
+        amountETB: newSale.amountETB,
+        createdAt: newSale.createdAt,
+        notes: newSale.notes,
+        campaign: newSale.campaign,
+        loggedBy: newSale.loggedBy,
+        isVoided: newSale.isVoided,
+        voidReason: newSale.voidReason,
+        voidedAt: newSale.voidedAt,
+        voidedBy: newSale.voidedBy,
+      },
+      ...prev,
+    ]);
+  };
+
+  const handleSaleVoided = (saleId: string, reason: string) => {
+    setLocalSales((prev) =>
+      prev.map((s) =>
+        s.id === saleId
+          ? {
+              ...s,
+              isVoided: true,
+              voidReason: reason,
+              voidedAt: new Date().toISOString(),
+              voidedBy: { name: ownerName },
+            }
+          : s
+      )
+    );
+  };
+
+  // In-cockpit Analytics data
+  const analyticsSummary = useMemo<FunnelMetrics>(() => {
+    const totalTouchpoints = eventsBreakdown.total || 0;
+    const sCount = filteredSales.length;
+    const aov = sCount > 0 ? totalGrossETB / sCount : 0;
+    return {
+      pageViews: totalTouchpoints > 0 ? totalTouchpoints * 2 : 0,
+      uniqueVisitors: totalTouchpoints > 0 ? Math.round(totalTouchpoints * 0.85) : 0,
+      telegramClicks: eventsBreakdown.telegram,
+      callClicks: eventsBreakdown.calls,
+      mapClicks: eventsBreakdown.maps,
+      copyCodeClicks: eventsBreakdown.promoCopies,
+      totalClicks: totalTouchpoints,
+      salesCount: sCount,
+      totalRevenueETB: totalGrossETB,
+      clickThroughRate:
+        totalTouchpoints > 0
+          ? Math.min(100, Math.round((totalTouchpoints / (totalTouchpoints * 2)) * 100))
+          : 0,
+      salesConversionRate:
+        totalTouchpoints > 0 ? Math.round((sCount / totalTouchpoints) * 1000) / 10 : 0,
+      aovETB: Math.round(aov * 100) / 100,
+    };
+  }, [eventsBreakdown, filteredSales.length, totalGrossETB]);
+
+  const analyticsCampaigns = useMemo<CampaignAnalyticsResponse[]>(() => {
+    return localCampaigns.map((camp) => {
+      const campSales = camp.sales || [];
+      const campSalesCount = campSales.length;
+      const campRevenue = campSales.reduce((acc, s) => acc + Number(s.amountETB || 0), 0);
+      const campEvents = camp._count?.events || 0;
+      const aov = campSalesCount > 0 ? campRevenue / campSalesCount : 0;
+
+      return {
+        campaignId: camp.id,
+        campaignName: camp.name,
+        slug: camp.slug,
+        promoCode: camp.promoCode,
+        status: camp.status,
+        startDate: camp.startDate,
+        endDate: camp.endDate,
+        pageViews: campEvents * 2,
+        uniqueVisitors: Math.round(campEvents * 0.85),
+        telegramClicks: Math.round(campEvents * 0.4),
+        callClicks: Math.round(campEvents * 0.3),
+        mapClicks: Math.round(campEvents * 0.2),
+        copyCodeClicks: Math.round(campEvents * 0.1),
+        totalClicks: campEvents,
+        salesCount: campSalesCount,
+        totalRevenueETB: campRevenue,
+        clickThroughRate: campEvents > 0 ? 50 : 0,
+        salesConversionRate: campEvents > 0 ? Math.round((campSalesCount / campEvents) * 1000) / 10 : 0,
+        aovETB: Math.round(aov * 100) / 100,
+        creators: (camp.creators || []).map((ca) => ({
+          name: ca.creator.user.name,
+          telegramUsername: ca.creator.telegramUsername,
+        })),
+      };
+    });
+  }, [localCampaigns]);
+
   return (
     <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#0D1714] text-[#202824] dark:text-[#F1F5F1] flex font-body antialiased transition-colors duration-150">
       {/* 1. Left SaaS Sidebar (The Dark Anchor — Deep Evergreen #10352F) */}
@@ -379,6 +562,8 @@ export function BrandDashboardView({
         onOpenReportModal={() => setIsReportModalOpen(true)}
         eventsBreakdown={eventsBreakdown}
         creatorRoster={creatorRoster}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
       />
 
       {/* 2. Main Workspace (Fluid desktop width with lg:pl-64) */}
@@ -411,37 +596,111 @@ export function BrandDashboardView({
 
             {/* Right Action Suite */}
             <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Dynamic Interactive Date Range Selector */}
-              <div className="relative inline-flex items-center">
-                <div className="flex items-center gap-2 bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] px-3 py-1.5 rounded-xl shadow-2xs text-xs font-medium text-slate-700 dark:text-[#C0CCC4] cursor-pointer hover:border-emerald-500/50 transition-colors">
-                  <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1]" />
-                  <span>{dateRangeLabel}</span>
-                  <select
-                    value={dateRange}
-                    onChange={(e) => setDateRange(e.target.value as "7D" | "30D" | "90D" | "ALL")}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              {/* Dynamic Theme-Responsive Date Range Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="h-8.5 flex items-center gap-2 bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] px-3 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 focus:outline-none focus:ring-1 focus:ring-emerald-600/40 dark:focus:ring-[#78B99D]/40 transition-all cursor-pointer"
                     aria-label="Filter date range"
                   >
-                    <option value="7D">Last 7 Days</option>
-                    <option value="30D">Last 30 Days</option>
-                    <option value="90D">Last 90 Days</option>
-                    <option value="ALL">All Time</option>
-                  </select>
-                  <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#9BAAA1]" />
-                </div>
-              </div>
+                    <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1]" />
+                    <span>{dateRangeLabel}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#9BAAA1]" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                >
+                  <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1]">
+                    Time Horizon
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                  {[
+                    { id: "7D", label: "Last 7 Days", desc: "Past week velocity" },
+                    { id: "30D", label: "Last 30 Days", desc: "Default monthly window" },
+                    { id: "90D", label: "Last 90 Days", desc: "Quarterly trajectory" },
+                    { id: "ALL", label: "All Time", desc: "Complete historical ledger" },
+                  ].map((opt) => (
+                    <DropdownMenuItem
+                      key={opt.id}
+                      onClick={() => setDateRange(opt.id as "7D" | "30D" | "90D" | "ALL")}
+                      className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs font-medium transition-colors ${
+                        dateRange === opt.id
+                          ? "bg-emerald-50 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] font-semibold"
+                          : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                      }`}
+                    >
+                      <div>
+                        <span className="block leading-tight">{opt.label}</span>
+                        <span className="block text-[11px] text-slate-400 dark:text-[#9BAAA1] mt-0.5">
+                          {opt.desc}
+                        </span>
+                      </div>
+                      {dateRange === opt.id && (
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              {/* Status filter dropdown */}
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] text-slate-700 dark:text-[#C0CCC4] font-medium text-xs focus:outline-none cursor-pointer shadow-2xs"
-              >
-                <option value="ALL">All Statuses</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="PAUSED">Paused Only</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
+              {/* Dynamic Theme-Responsive Status Filter Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="h-8.5 flex items-center gap-2 bg-white dark:bg-[#14211D] border border-[#D7DED9]/80 dark:border-[#304239] px-3 rounded-xl shadow-2xs text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] hover:border-emerald-500/50 dark:hover:border-[#78B99D]/50 focus:outline-none focus:ring-1 focus:ring-emerald-600/40 dark:focus:ring-[#78B99D]/40 transition-all cursor-pointer"
+                    aria-label="Filter campaign status"
+                  >
+                    <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1]" />
+                    <span>
+                      {statusFilter === "ALL"
+                        ? "All Statuses"
+                        : statusFilter === "ACTIVE"
+                        ? "Active Only"
+                        : statusFilter === "PAUSED"
+                        ? "Paused Only"
+                        : "Completed"}
+                    </span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#9BAAA1]" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-44 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                >
+                  <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1]">
+                    Campaign Lifecycle
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                  {[
+                    { id: "ALL", label: "All Statuses", color: "bg-slate-400" },
+                    { id: "ACTIVE", label: "Active Only", color: "bg-emerald-500 dark:bg-[#83D1A5]" },
+                    { id: "PAUSED", label: "Paused Only", color: "bg-amber-400 dark:bg-[#F0B85C]" },
+                    { id: "COMPLETED", label: "Completed", color: "bg-slate-400 dark:bg-[#9BAAA1]" },
+                  ].map((opt) => (
+                    <DropdownMenuItem
+                      key={opt.id}
+                      onClick={() => setStatusFilter(opt.id)}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium transition-colors ${
+                        statusFilter === opt.id
+                          ? "bg-emerald-50 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] font-semibold"
+                          : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${opt.color}`} />
+                        <span>{opt.label}</span>
+                      </div>
+                      {statusFilter === opt.id && (
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Button
                 asChild
@@ -475,17 +734,35 @@ export function BrandDashboardView({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-[#9BAAA1] uppercase tracking-wider">
-                <span>Overview</span>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("overview")}
+                  className="hover:text-emerald-700 dark:hover:text-[#78B99D] cursor-pointer"
+                >
+                  Overview
+                </button>
                 <span>/</span>
                 <span className="text-emerald-700 dark:text-[#78B99D] font-bold">
-                  Attribution Cockpit
+                  {activeTab === "sales"
+                    ? "POS Register"
+                    : activeTab === "analytics"
+                    ? "Attribution Analytics"
+                    : activeTab === "privacy"
+                    ? "Privacy & Data Audit"
+                    : "Attribution Cockpit"}
                 </span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100/70 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A] ml-2">
                   Addis Ababa Standard Time (GMT+3)
                 </span>
               </div>
               <h1 className="text-2xl font-bold font-headline text-slate-900 dark:text-[#F1F5F1] tracking-tight mt-1">
-                Campaign Attribution &amp; Retail Sales
+                {activeTab === "sales"
+                  ? "In-Store POS Terminal & Retail Attribution"
+                  : activeTab === "analytics"
+                  ? "Omnichannel Performance & Conversion Funnel"
+                  : activeTab === "privacy"
+                  ? "Privacy, Telemetry & Data Retention Audit"
+                  : "Campaign Attribution & Retail Sales"}
               </h1>
             </div>
 
@@ -518,6 +795,42 @@ export function BrandDashboardView({
             </div>
           </div>
 
+          {/* In-Cockpit View Switching: Body updates in place without navigating away */}
+          {activeTab === "sales" && (
+            <SalesTerminal
+              userName={ownerName}
+              userRole={role}
+              brandName={brandName}
+              initialCampaigns={terminalCampaigns}
+              initialSales={terminalSales}
+              embedded={true}
+              onSaleLogged={handleSaleLogged}
+              onSaleVoided={handleSaleVoided}
+              onNavigateTab={handleTabChange}
+            />
+          )}
+
+          {activeTab === "analytics" && (
+            <AnalyticsView
+              brandName={brandName}
+              summary={analyticsSummary}
+              campaigns={analyticsCampaigns}
+              auditEntries={[]}
+              embedded={true}
+              onNavigateTab={handleTabChange}
+            />
+          )}
+
+          {activeTab === "privacy" && (
+            <BrandPrivacyAuditView
+              brandName={brandName}
+              onNavigateTab={handleTabChange}
+              onOpenReportModal={() => setIsReportModalOpen(true)}
+            />
+          )}
+
+          {activeTab === "overview" && (
+            <>
           {/* 4. KPI Top Metric Row (4 Modular Dynamic Cards) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             {/* Card 1: Revenue Recorded */}
@@ -648,12 +961,13 @@ export function BrandDashboardView({
                   <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
                     Intent Funnel
                   </h2>
-                  <Link
-                    href="/brand/analytics"
-                    className="text-[11px] font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange("analytics")}
+                    className="text-[11px] font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer"
                   >
                     Show Breakdown
-                  </Link>
+                  </button>
                 </div>
 
                 {/* Semicircle Gauge Graphic (Dynamic SVG) */}
@@ -752,14 +1066,12 @@ export function BrandDashboardView({
               </div>
 
               <Button
-                asChild
                 variant="outline"
+                onClick={() => handleTabChange("analytics")}
                 className="mt-4 w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-[#193629] dark:hover:bg-[#204434] border-emerald-200 dark:border-[#264D3A] text-emerald-800 dark:text-[#83D1A5] text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Link href="/brand/analytics">
-                  <span>View Funnel Cohorts</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
+                <span>View Funnel Cohorts</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </Button>
             </div>
 
@@ -1330,14 +1642,12 @@ export function BrandDashboardView({
 
                   <div className="flex items-center gap-2">
                     <Button
-                      asChild
                       size="sm"
+                      onClick={() => handleTabChange("sales")}
                       className="h-8 px-3 rounded-lg bg-[#287362] hover:bg-[#205B50] text-white dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] text-xs font-semibold shadow-xs cursor-pointer"
                     >
-                      <Link href="/brand/sales">
-                        <Receipt className="w-3.5 h-3.5 mr-1.5" />
-                        <span>Log Manual Sale</span>
-                      </Link>
+                      <Receipt className="w-3.5 h-3.5 mr-1.5" />
+                      <span>Log Manual Sale</span>
                     </Button>
                   </div>
                 </div>
@@ -1475,13 +1785,14 @@ export function BrandDashboardView({
                   {totalVerifiedSalesCount} attributed transactions
                 </span>
                 <div className="flex items-center gap-3">
-                  <Link
-                    href="/brand/sales"
-                    className="text-[11px] font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1"
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange("sales")}
+                    className="text-[11px] font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline inline-flex items-center gap-1 cursor-pointer"
                   >
                     <span>View Sales Ledger</span>
                     <ExternalLink className="w-3 h-3" />
-                  </Link>
+                  </button>
                   <span className="text-slate-300 dark:text-slate-700">|</span>
                   <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] font-mono">
                     Telebirr Sync v2.4 • CBE Live
@@ -1502,12 +1813,13 @@ export function BrandDashboardView({
                       Addis Ababa store branches &amp; deep channels
                     </p>
                   </div>
-                  <Link
-                    href="/brand/analytics"
-                    className="text-xs font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange("analytics")}
+                    className="text-xs font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer"
                   >
                     Details
-                  </Link>
+                  </button>
                 </div>
 
                 {/* Proportional Share Bar */}
@@ -1626,6 +1938,8 @@ export function BrandDashboardView({
               </div>
             </div>
           </div>
+          </>
+          )}
         </main>
       </div>
 

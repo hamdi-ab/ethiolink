@@ -46,6 +46,8 @@ export interface BrandSidebarProps {
     total: number;
   };
   creatorRoster?: CreatorRosterItem[];
+  activeTab?: "overview" | "sales" | "analytics" | "privacy";
+  onTabChange?: (tab: "overview" | "sales" | "analytics" | "privacy") => void;
 }
 
 export const BrandSidebar = React.memo(function BrandSidebar({
@@ -62,6 +64,8 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   onOpenCreatorsModal,
   eventsBreakdown,
   creatorRoster = [],
+  activeTab,
+  onTabChange,
 }: BrandSidebarProps) {
   const pathname = usePathname();
 
@@ -70,9 +74,18 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   const [isLocalCreatorsModalOpen, setIsLocalCreatorsModalOpen] = useState(false);
   const [copiedCreatorId, setCopiedCreatorId] = useState<string | null>(null);
 
-  const isOverview = pathname === "/brand";
-  const isSales = pathname === "/brand/sales";
-  const isAnalytics = pathname === "/brand/analytics";
+  const resolvedTab = activeTab || (pathname === "/brand/sales" ? "sales" : pathname === "/brand/analytics" ? "analytics" : pathname === "/privacy" ? "privacy" : "overview");
+  const isOverview = resolvedTab === "overview";
+  const isSales = resolvedTab === "sales";
+  const isAnalytics = resolvedTab === "analytics";
+  const isPrivacy = resolvedTab === "privacy";
+
+  const handleNavClick = (tab: "overview" | "sales" | "analytics" | "privacy") => {
+    if (onTabChange) {
+      onTabChange(tab);
+      onCloseMobile();
+    }
+  };
 
   // Calculate dynamic channel distribution
   const totalEvents = eventsBreakdown?.total || 0;
@@ -123,24 +136,44 @@ export const BrandSidebar = React.memo(function BrandSidebar({
         {/* Top: Brand Header */}
         <div className="p-3.5 pb-2">
           <div className="flex items-center justify-between px-1 pt-0.5">
-            <Link href="/brand" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
-                <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
-                  Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
-                </span>
-                <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
-                  Attribution Engine
-                </span>
-              </div>
-            </Link>
+            {onTabChange ? (
+              <button
+                type="button"
+                onClick={() => handleNavClick("overview")}
+                className="flex items-center gap-2.5 group cursor-pointer text-left focus:outline-none"
+              >
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
+                  <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                    Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
+                    Attribution Engine
+                  </span>
+                </div>
+              </button>
+            ) : (
+              <Link href="/brand" className="flex items-center gap-2.5 group">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover:scale-105 transition-transform">
+                  <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                    Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5">
+                    Attribution Engine
+                  </span>
+                </div>
+              </Link>
+            )}
 
             {/* Mobile Close Button */}
             <button
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621] transition-colors"
+              className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
@@ -157,74 +190,152 @@ export const BrandSidebar = React.memo(function BrandSidebar({
             </span>
 
             <nav className="space-y-1 pt-1">
-              <Link
-                href="/brand"
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  isOverview
-                    ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                    : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <LayoutGrid
-                    className={`w-4 h-4 ${
-                      isOverview
-                        ? "text-emerald-300 dark:text-[#78B99D]"
-                        : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                    }`}
-                  />
-                  <span>Overview</span>
-                </div>
-                {campaignCount > 0 && (
-                  <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
-                    {campaignCount}
+              {onTabChange ? (
+                <button
+                  type="button"
+                  onClick={() => handleNavClick("overview")}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                    isOverview
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <LayoutGrid
+                      className={`w-4 h-4 ${
+                        isOverview
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Overview</span>
+                  </div>
+                  {campaignCount > 0 && (
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                      {campaignCount}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <Link
+                  href="/brand"
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    isOverview
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <LayoutGrid
+                      className={`w-4 h-4 ${
+                        isOverview
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Overview</span>
+                  </div>
+                  {campaignCount > 0 && (
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                      {campaignCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+
+              {onTabChange ? (
+                <button
+                  type="button"
+                  onClick={() => handleNavClick("sales")}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                    isSales
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Store
+                      className={`w-4 h-4 ${
+                        isSales
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Sales &amp; Attribution</span>
+                  </div>
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                    POS
                   </span>
-                )}
-              </Link>
+                </button>
+              ) : (
+                <Link
+                  href="/brand/sales"
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    isSales
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Store
+                      className={`w-4 h-4 ${
+                        isSales
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Sales &amp; Attribution</span>
+                  </div>
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                    POS
+                  </span>
+                </Link>
+              )}
 
-              <Link
-                href="/brand/sales"
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  isSales
-                    ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                    : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Store
-                    className={`w-4 h-4 ${
-                      isSales
-                        ? "text-emerald-300 dark:text-[#78B99D]"
-                        : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                    }`}
-                  />
-                  <span>Sales &amp; Attribution</span>
-                </div>
-                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/70 dark:bg-[#193629] px-1.5 py-0.5 rounded-full border border-emerald-500/40 dark:border-[#28493D]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                  POS
-                </span>
-              </Link>
-
-              <Link
-                href="/brand/analytics"
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  isAnalytics
-                    ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
-                    : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <TrendingUp
-                    className={`w-4 h-4 ${
-                      isAnalytics
-                        ? "text-emerald-300 dark:text-[#78B99D]"
-                        : "text-emerald-200/60 dark:text-[#9BAAA1]"
-                    }`}
-                  />
-                  <span>Reports &amp; Funnel</span>
-                </div>
-              </Link>
+              {onTabChange ? (
+                <button
+                  type="button"
+                  onClick={() => handleNavClick("analytics")}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                    isAnalytics
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <TrendingUp
+                      className={`w-4 h-4 ${
+                        isAnalytics
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Reports &amp; Funnel</span>
+                  </div>
+                </button>
+              ) : (
+                <Link
+                  href="/brand/analytics"
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    isAnalytics
+                      ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-transparent shadow-xs font-bold"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <TrendingUp
+                      className={`w-4 h-4 ${
+                        isAnalytics
+                          ? "text-emerald-300 dark:text-[#78B99D]"
+                          : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                      }`}
+                    />
+                    <span>Reports &amp; Funnel</span>
+                  </div>
+                </Link>
+              )}
 
               {/* Creators Directory: Opens interactive Creator Roster Modal */}
               <button
@@ -304,15 +415,35 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 </button>
               )}
 
-              <Link
-                href="/privacy"
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
-                  <span>Privacy &amp; Data Audit</span>
-                </div>
-              </Link>
+              {onTabChange ? (
+                <button
+                  type="button"
+                  onClick={() => handleNavClick("privacy")}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
+                    isPrivacy
+                      ? "bg-[#1C554C] dark:bg-[#152B24] text-white shadow-xs"
+                      : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Shield className={`w-4 h-4 ${isPrivacy ? "text-emerald-300 dark:text-[#78B99D]" : "text-emerald-200/60 dark:text-[#9BAAA1]"}`} />
+                    <span>Privacy &amp; Data Audit</span>
+                  </div>
+                  {isPrivacy && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dark:bg-[#78B99D]" />
+                  )}
+                </button>
+              ) : (
+                <Link
+                  href="/privacy"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Shield className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1]" />
+                    <span>Privacy &amp; Data Audit</span>
+                  </div>
+                </Link>
+              )}
             </nav>
           </div>
         </div>
@@ -498,13 +629,26 @@ export const BrandSidebar = React.memo(function BrandSidebar({
             </div>
 
             <div className="p-4 bg-slate-50 dark:bg-[#101C18] border-t border-slate-100 dark:border-[#26372F] flex items-center justify-between gap-3">
-              <Link
-                href="/brand/sales"
-                onClick={() => setIsMerchantModalOpen(false)}
-                className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline"
-              >
-                Go to POS Terminal →
-              </Link>
+              {onTabChange ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMerchantModalOpen(false);
+                    handleNavClick("sales");
+                  }}
+                  className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline cursor-pointer"
+                >
+                  Go to POS Terminal →
+                </button>
+              ) : (
+                <Link
+                  href="/brand/sales"
+                  onClick={() => setIsMerchantModalOpen(false)}
+                  className="text-xs font-semibold text-emerald-700 dark:text-[#78B99D] hover:underline"
+                >
+                  Go to POS Terminal →
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => setIsMerchantModalOpen(false)}
