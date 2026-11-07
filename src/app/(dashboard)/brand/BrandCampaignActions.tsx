@@ -3,9 +3,21 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Share2, QrCode, Play, Pause, Loader2, Pencil, LifeBuoy } from "lucide-react";
+import {
+  ExternalLink,
+  UserPlus,
+  QrCode,
+  Play,
+  Pause,
+  Loader2,
+  Pencil,
+  LifeBuoy,
+} from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { CampaignShareModal } from "@/components/campaign/CampaignShareModal";
 import { EditCampaignModal } from "@/components/campaign/EditCampaignModal";
+import { InviteCampaignModal } from "@/components/campaign/InviteCampaignModal";
 import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 
 export interface BrandCampaignActionsProps {
@@ -30,10 +42,10 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
   const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<string>(campaign.status);
   const [isToggling, setIsToggling] = useState(false);
-  const [toggleError, setToggleError] = useState<string | null>(null);
 
   const isActive = currentStatus === "ACTIVE";
   const isTerminal = currentStatus === "COMPLETED" || currentStatus === "EXPIRED";
@@ -42,7 +54,6 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
     if (isToggling || isTerminal) return;
     const nextStatus = isActive ? "PAUSED" : "ACTIVE";
     setIsToggling(true);
-    setToggleError(null);
 
     try {
       const res = await fetch(`/api/campaigns/${campaign.id}`, {
@@ -58,11 +69,15 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
       }
 
       setCurrentStatus(nextStatus);
+      toast.success(
+        nextStatus === "ACTIVE"
+          ? `Campaign "${campaign.name}" resumed`
+          : `Campaign "${campaign.name}" paused`
+      );
       router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to toggle status";
-      setToggleError(msg);
-      setTimeout(() => setToggleError(null), 4000);
+      toast.error(msg);
     } finally {
       setIsToggling(false);
     }
@@ -70,18 +85,21 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
 
   return (
     <>
-      <div className="flex flex-col items-end gap-1 shrink-0">
-        <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        {/* Left: Primary Operational Actions */}
+        <div className="flex items-center gap-1.5 flex-wrap">
           {/* Pause / Resume Lifecycle Toggle */}
           {!isTerminal && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={handleToggleStatus}
               disabled={isToggling}
-              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 ${
+              className={`font-semibold cursor-pointer shadow-2xs text-xs h-8 px-2.5 rounded-xl transition-colors ${
                 isActive
-                  ? "bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 focus-visible:ring-amber-500"
-                  : "bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 focus-visible:ring-emerald-500"
+                  ? "bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/80"
+                  : "bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/80"
               }`}
               title={isActive ? "Pause Campaign Telemetry & Public Promotion" : "Resume Campaign"}
             >
@@ -93,63 +111,85 @@ export function BrandCampaignActions({ campaign }: BrandCampaignActionsProps) {
                 <Play className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               )}
               <span>{isActive ? "Pause" : "Resume"}</span>
-            </button>
+            </Button>
           )}
 
-          <button
+          {/* POS QR & Share */}
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setIsShareModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800/80 px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-2xs active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="text-xs h-8 px-2.5 font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50/80 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border-emerald-200/80 dark:border-emerald-800/80 rounded-xl cursor-pointer shadow-2xs inline-flex items-center gap-1.5"
             title="Open POS QR Code & Telegram Sharing Suite"
           >
-            <QrCode className="w-3.5 h-3.5" />
+            <QrCode className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>POS QR &amp; Share</span>
-          </button>
+          </Button>
+        </div>
 
-          <Link
-            href={`/c/${campaign.slug}`}
-            target="_blank"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+        {/* Right: Secondary Management Actions */}
+        <div className="flex items-center gap-0.5">
+          {/* Preview Link */}
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-xs h-8 px-2 font-medium text-slate-600 dark:text-[#C0CCC4] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1A2A24] rounded-lg cursor-pointer"
+            title="Preview Public Landing Page"
           >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Preview</span>
-          </Link>
+            <Link href={`/c/${campaign.slug}`} target="_blank">
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1] mr-1" />
+              <span>Preview</span>
+            </Link>
+          </Button>
 
-          <button
+          {/* Edit Button */}
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setIsEditModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="text-xs h-8 px-2 font-medium text-slate-600 dark:text-[#C0CCC4] hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1A2A24] rounded-lg cursor-pointer"
             title="Edit Campaign Details & Destinations"
           >
-            <Pencil className="w-3.5 h-3.5" />
+            <Pencil className="w-3.5 h-3.5 text-slate-400 dark:text-[#9BAAA1] mr-1" />
             <span>Edit</span>
-          </button>
+          </Button>
 
-          <Link
-            href={`/brand/campaigns/new?reinvite=${campaign.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            <span>Invite</span>
-          </Link>
-
-          <button
+          {/* Invite Creator Button */}
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsInviteModalOpen(true)}
+            className="text-xs h-8 px-2 font-medium text-slate-600 dark:text-[#C0CCC4] hover:text-emerald-700 dark:hover:text-[#83D1A5] hover:bg-slate-100 dark:hover:bg-[#1A2A24] rounded-lg cursor-pointer"
+            title="Generate a signed magic invite link for an influencer"
+          >
+            <UserPlus className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] mr-1" />
+            <span>Invite</span>
+          </Button>
+
+          {/* Report Issue Button */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setIsReportModalOpen(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="text-xs h-8 px-2 font-medium text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg cursor-pointer"
             title="Report Campaign Discrepancy or Link Downtime to Ops"
           >
             <LifeBuoy className="w-3.5 h-3.5 text-amber-500" />
-            <span>Report</span>
-          </button>
+            <span className="hidden sm:inline ml-1">Report</span>
+          </Button>
         </div>
-
-        {toggleError && (
-          <span className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
-            {toggleError}
-          </span>
-        )}
       </div>
+
+      <InviteCampaignModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        campaign={{ id: campaign.id, name: campaign.name }}
+      />
 
       <CampaignShareModal
         isOpen={isShareModalOpen}

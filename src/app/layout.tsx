@@ -4,6 +4,8 @@ import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { NetworkStatus } from "@/components/common/NetworkStatus";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-headline",
@@ -44,8 +46,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <ThemeProvider>
+          <TooltipProvider>
           <NetworkStatus />
           {children}
+            <Toaster position="bottom-right" />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
