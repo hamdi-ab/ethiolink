@@ -79,19 +79,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 function CampaignLoadingSkeleton() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 flex flex-col items-center px-4 py-6 sm:py-12 animate-pulse">
+    <main className="min-h-screen bg-[#F7F8F5] dark:bg-[#07120F] flex flex-col items-center px-4 py-6 sm:py-12 animate-pulse">
       <div className="w-full max-w-md flex justify-between items-center mb-6">
-        <div className="w-24 h-6 bg-slate-200 rounded-full" />
-        <div className="w-20 h-6 bg-slate-200 rounded-full" />
+        <div className="w-24 h-6 bg-slate-200 dark:bg-[#142923] rounded-full" />
+        <div className="w-20 h-6 bg-slate-200 dark:bg-[#142923] rounded-full" />
       </div>
-      <div className="w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-200/60 p-6 sm:p-8 flex flex-col items-center">
-        <div className="w-28 h-6 bg-amber-100/70 rounded-full mb-4" />
-        <div className="w-3/4 h-8 bg-slate-200 rounded-xl mb-3" />
-        <div className="w-full h-4 bg-slate-100 rounded mb-2" />
-        <div className="w-2/3 h-4 bg-slate-100 rounded mb-6" />
-        <div className="w-full h-28 bg-emerald-50/70 border border-emerald-100 rounded-2xl mb-6" />
-        <div className="w-full h-12 bg-slate-200 rounded-xl mb-3" />
-        <div className="w-full h-12 bg-slate-200 rounded-xl" />
+      <div className="w-full max-w-md bg-white dark:bg-[#0E1D19] border border-slate-200/80 dark:border-[#1A332C] rounded-3xl shadow-sm p-6 sm:p-8 flex flex-col items-center">
+        <div className="w-28 h-6 bg-amber-100/70 dark:bg-amber-950/40 rounded-full mb-4" />
+        <div className="w-3/4 h-8 bg-slate-200 dark:bg-[#142923] rounded-xl mb-3" />
+        <div className="w-full h-4 bg-slate-100 dark:bg-[#182C26] rounded mb-2" />
+        <div className="w-2/3 h-4 bg-slate-100 dark:bg-[#182C26] rounded mb-6" />
+        <div className="w-full h-28 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100 dark:border-[#1F453A] rounded-2xl mb-6" />
+        <div className="w-full h-12 bg-slate-200 dark:bg-[#142923] rounded-xl mb-3" />
+        <div className="w-full h-12 bg-slate-200 dark:bg-[#142923] rounded-xl" />
       </div>
     </main>
   );
