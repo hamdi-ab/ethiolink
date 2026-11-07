@@ -35,7 +35,7 @@ export interface BrandSidebarProps {
   brandPhone?: string;
   role: string;
   campaignCount: number;
-  staffCount: number;
+  staffCount?: number;
   staffList?: Array<{ id: string; name: string; phone: string; role: string }>;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
@@ -49,8 +49,8 @@ export interface BrandSidebarProps {
     total: number;
   };
   creatorRoster?: CreatorRosterItem[];
-  activeTab?: "overview" | "sales" | "analytics" | "privacy";
-  onTabChange?: (tab: "overview" | "sales" | "analytics" | "privacy") => void;
+  activeTab?: "overview" | "sales" | "analytics" | "privacy" | "creators";
+  onTabChange?: (tab: "overview" | "sales" | "analytics" | "privacy" | "creators") => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onOpenCreateCampaignModal?: () => void;
@@ -62,7 +62,7 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   brandPhone,
   role,
   campaignCount,
-  staffCount,
+  staffCount = 0,
   staffList = [],
   isMobileOpen,
   onCloseMobile,
@@ -83,13 +83,14 @@ export const BrandSidebar = React.memo(function BrandSidebar({
   const [isLocalCreatorsModalOpen, setIsLocalCreatorsModalOpen] = useState(false);
   const [copiedCreatorId, setCopiedCreatorId] = useState<string | null>(null);
 
-  const resolvedTab = activeTab || (pathname === "/brand/sales" ? "sales" : pathname === "/brand/analytics" ? "analytics" : pathname === "/privacy" ? "privacy" : "overview");
+  const resolvedTab = activeTab || (pathname === "/brand/sales" ? "sales" : pathname === "/brand/analytics" ? "analytics" : pathname === "/privacy" ? "privacy" : pathname === "/brand/creators" ? "creators" : "overview");
   const isOverview = resolvedTab === "overview";
   const isSales = resolvedTab === "sales";
   const isAnalytics = resolvedTab === "analytics";
   const isPrivacy = resolvedTab === "privacy";
+  const isCreators = resolvedTab === "creators";
 
-  const handleNavClick = (tab: "overview" | "sales" | "analytics" | "privacy") => {
+  const handleNavClick = (tab: "overview" | "sales" | "analytics" | "privacy" | "creators") => {
     if (onTabChange) {
       onTabChange(tab);
       onCloseMobile();
@@ -513,28 +514,95 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 </div>
               )}
 
-              {/* Creators Directory: Opens interactive Creator Roster Modal */}
+              {/* Creators Directory: Links to /brand/creators or switches tab */}
               <div className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
-                <button
-                  type="button"
-                  onClick={handleOpenCreators}
-                  aria-label="Creators Directory"
-                  className={`flex items-center text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white transition-all cursor-pointer ${
-                    isCollapsed
-                      ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105"
-                      : "w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
-                  }`}
-                >
-                  <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
-                    <Users className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-                    {!isCollapsed && <span>Creators Directory</span>}
-                  </div>
-                  {!isCollapsed && creatorRoster.length > 0 && (
-                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
-                      {creatorRoster.length}
-                    </span>
-                  )}
-                </button>
+                {onTabChange ? (
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick("creators")}
+                    aria-label="Creators Directory"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? `w-10 h-10 rounded-xl justify-center relative hover:scale-105 ${
+                            isCreators
+                              ? "bg-[#184840] dark:bg-[#162922] text-white border border-emerald-500/30 dark:border-[#20362E]"
+                              : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white"
+                          }`
+                        : `w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left ${
+                            isCreators
+                              ? "bg-[#184840] dark:bg-[#162922] text-white font-bold border border-emerald-500/30 dark:border-[#20362E] shadow-2xs"
+                              : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                          }`
+                    }`}
+                  >
+                    {isCollapsed && isCreators && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D]" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Users
+                        className={`w-4 h-4 shrink-0 ${
+                          isCreators
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Creators Directory</span>}
+                    </div>
+                    {!isCollapsed && (
+                      <div className="flex items-center gap-1.5">
+                        {isCreators && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                        {creatorRoster.length > 0 && (
+                          <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                            {creatorRoster.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    href="/brand/creators"
+                    onClick={onCloseMobile}
+                    aria-label="Creators Directory"
+                    className={`flex items-center transition-all cursor-pointer ${
+                      isCollapsed
+                        ? `w-10 h-10 rounded-xl justify-center relative hover:scale-105 ${
+                            isCreators
+                              ? "bg-[#184840] dark:bg-[#162922] text-white border border-emerald-500/30 dark:border-[#20362E]"
+                              : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white"
+                          }`
+                        : `w-full justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left ${
+                            isCreators
+                              ? "bg-[#184840] dark:bg-[#162922] text-white font-bold border border-emerald-500/30 dark:border-[#20362E] shadow-2xs"
+                              : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white"
+                          }`
+                    }`}
+                  >
+                    {isCollapsed && isCreators && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D]" />
+                    )}
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Users
+                        className={`w-4 h-4 shrink-0 ${
+                          isCreators
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>Creators Directory</span>}
+                    </div>
+                    {!isCollapsed && (
+                      <div className="flex items-center gap-1.5">
+                        {isCreators && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                        {creatorRoster.length > 0 && (
+                          <span className="text-[11px] font-mono px-1.5 py-0.5 rounded-md bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]">
+                            {creatorRoster.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </Link>
+                )}
                 {isCollapsed && (
                   <div className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 bg-[#091F1A] dark:bg-[#14211D] text-white text-xs font-semibold rounded-lg shadow-xl border border-[#1E4D43] dark:border-[#2B4237] whitespace-nowrap opacity-0 -translate-x-1 group-hover/nav:opacity-100 group-hover/nav:translate-x-0 transition-all duration-150 z-50 flex items-center gap-1.5">
                     <span>Creators Directory</span>

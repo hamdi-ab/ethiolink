@@ -89,9 +89,9 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
   }, [recentActivity, selectedCampaignFilter]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+    <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#0D1714] text-[#202824] dark:text-[#F1F5F1] font-body antialiased pb-20 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-150">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white/95 dark:bg-[#14211D]/95 backdrop-blur-md border-b border-[#D7DED9]/80 dark:border-[#26372F] sticky top-0 z-30 shadow-2xs">
         <div className="navbar-shell max-w-4xl mx-auto gap-4">
           <div className="flex items-center gap-3">
             <Link
@@ -102,14 +102,14 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-headline font-bold text-base text-slate-900 dark:text-white tracking-tight">
+                <h1 className="font-headline font-bold text-base text-[#202824] dark:text-white tracking-tight">
                   Creator Portal
                 </h1>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800 px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Verified Partner
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
                 {creator.name} {creator.telegramUsername && `(@${creator.telegramUsername})`}
               </p>
             </div>
@@ -118,11 +118,11 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
           <div className="flex items-center gap-3">
             <ThemeToggle />
 
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs">
+            <div className="flex items-center bg-neutral-100 dark:bg-[#1B2B25] p-0.5 rounded-full border border-neutral-200 dark:border-[#26372F] text-xs">
               <button
                 onClick={() => setLang("am")}
                 className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
-                  lang === "am" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600 dark:text-slate-300"
+                  lang === "am" ? "bg-emerald-600 text-white shadow-2xs" : "text-neutral-600 dark:text-neutral-300"
                 }`}
               >
                 አማ
@@ -130,7 +130,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               <button
                 onClick={() => setLang("en")}
                 className={`px-2.5 py-0.5 rounded-full font-semibold transition-all cursor-pointer ${
-                  lang === "en" ? "bg-emerald-600 text-white shadow-2xs" : "text-slate-600 dark:text-slate-300"
+                  lang === "en" ? "bg-emerald-600 text-white shadow-2xs" : "text-neutral-600 dark:text-neutral-300"
                 }`}
               >
                 EN
@@ -140,7 +140,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 bg-neutral-100 dark:bg-[#1B2B25] hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Log out</span>
@@ -153,27 +153,27 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-[var(--page-px)] py-6 space-y-6">
         {/* Creator Profile Summary Bar */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-[#14211D] rounded-2xl p-4 border border-[#D7DED9]/80 dark:border-[#26372F] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg border-2 border-emerald-400">
               {creator.name.charAt(0)}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-bold text-sm text-slate-900 dark:text-white">
+                <span className="font-headline font-bold text-sm text-[#202824] dark:text-white">
                   {creator.name}
                 </span>
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-[#1B2B25] px-2 py-0.5 rounded-md">
                   Verified Influencer
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                 Addis Ababa &bull; Promotional Attribution Partner
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Real-Time Campaign Attribution Active</span>
           </div>

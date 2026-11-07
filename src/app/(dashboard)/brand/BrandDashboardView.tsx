@@ -12,6 +12,7 @@ import { BrandCampaignActions } from "./BrandCampaignActions";
 import { SalesTerminal, ActiveCampaign, RecentSale } from "./sales/SalesTerminal";
 import { AnalyticsView } from "./analytics/AnalyticsView";
 import { BrandPrivacyAuditView } from "./BrandPrivacyAuditView";
+import { CreatorsView } from "./creators/CreatorsView";
 import { FunnelMetrics, CampaignAnalyticsResponse } from "@/lib/analytics";
 import { ReportIssueModal } from "@/components/support/ReportIssueModal";
 import { CreateCampaignModal } from "@/components/campaign/CreateCampaignModal";
@@ -97,7 +98,7 @@ export interface RecentSaleItem {
   voidedBy?: { id?: string; name?: string } | null;
 }
 
-export type BrandDashboardTab = "overview" | "sales" | "analytics" | "privacy";
+export type BrandDashboardTab = "overview" | "sales" | "analytics" | "privacy" | "creators";
 
 export interface BrandDashboardViewProps {
   brandName: string;
@@ -155,8 +156,8 @@ export function BrandDashboardView({
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab");
-      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy" || tabParam === "overview") {
-        setActiveTab(tabParam);
+      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy" || tabParam === "creators" || tabParam === "overview") {
+        setActiveTab(tabParam as BrandDashboardTab);
       }
     }
   }, []);
@@ -174,8 +175,8 @@ export function BrandDashboardView({
     const handlePopState = () => {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab");
-      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy") {
-        setActiveTab(tabParam);
+      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy" || tabParam === "creators") {
+        setActiveTab(tabParam as BrandDashboardTab);
       } else {
         setActiveTab("overview");
       }
@@ -756,6 +757,8 @@ export function BrandDashboardView({
                     ? "Attribution Analytics"
                     : activeTab === "privacy"
                     ? "Privacy & Data Audit"
+                    : activeTab === "creators"
+                    ? "Influencers & Creators"
                     : "Attribution Cockpit"}
                 </span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-100/70 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] border border-transparent dark:border-[#264D3A] ml-2">
@@ -769,6 +772,8 @@ export function BrandDashboardView({
                   ? "Omnichannel Performance & Conversion Funnel"
                   : activeTab === "privacy"
                   ? "Privacy, Telemetry & Data Retention Audit"
+                  : activeTab === "creators"
+                  ? "Influencers & Creators Directory & Performance Ledger"
                   : "Campaign Attribution & Retail Sales"}
               </h1>
             </div>
@@ -834,6 +839,19 @@ export function BrandDashboardView({
               brandName={brandName}
               onNavigateTab={handleTabChange}
               onOpenReportModal={() => setIsReportModalOpen(true)}
+            />
+          )}
+
+          {activeTab === "creators" && (
+            <CreatorsView
+              brandName={brandName}
+              ownerName={ownerName}
+              brandPhone={brandPhone}
+              role={role}
+              creators={creatorRoster}
+              campaigns={campaigns}
+              embedded={true}
+              onNavigateTab={handleTabChange}
             />
           )}
 
