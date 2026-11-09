@@ -703,7 +703,11 @@ export function CreatorsView({
                   {/* Sort Selector */}
                   <select
                     value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value as any)}
+                    onChange={(e) =>
+                      setSortOption(
+                        e.target.value as "revenue_desc" | "conv_desc" | "recent"
+                      )
+                    }
                     className="py-1.5 pl-2.5 pr-7 text-xs bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-neutral-800 dark:text-neutral-200 focus:border-emerald-600 focus:ring-0 font-medium"
                   >
                     <option value="revenue_desc">Sort: Highest Revenue (ETB)</option>

@@ -10,16 +10,12 @@ import {
   ArrowRight,
   ShieldCheck,
   User,
-  Phone,
   Send,
   AlertCircle,
   Loader2,
   Tag,
   Store,
   Layers,
-  ChevronRight,
-  CheckCircle2,
-  Lock,
 } from "lucide-react";
 
 interface CampaignPreview {

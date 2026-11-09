@@ -143,24 +143,39 @@ export function BrandDashboardView({
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCreateCampaignModalOpen, setIsCreateCampaignModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<BrandDashboardTab>("overview");
+  const [activeTab, setActiveTab] = useState<BrandDashboardTab>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (
+        tabParam === "sales" ||
+        tabParam === "analytics" ||
+        tabParam === "privacy" ||
+        tabParam === "creators" ||
+        tabParam === "overview"
+      ) {
+        return tabParam as BrandDashboardTab;
+      }
+    }
+    return "overview";
+  });
   const [localSales, setLocalSales] = useState<RecentSaleItem[]>(recentSales);
+  const [prevRecentSales, setPrevRecentSales] = useState(recentSales);
+  if (recentSales !== prevRecentSales) {
+    setPrevRecentSales(recentSales);
+    setLocalSales(recentSales);
+  }
+
   const [localCampaigns, setLocalCampaigns] = useState<BrandCampaignItem[]>(campaigns);
+  const [prevCampaigns, setPrevCampaigns] = useState(campaigns);
+  if (campaigns !== prevCampaigns) {
+    setPrevCampaigns(campaigns);
+    setLocalCampaigns(campaigns);
+  }
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "90D" | "ALL">("30D");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  // Read URL query parameter on initial load (e.g., ?tab=sales or ?tab=analytics)
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      if (tabParam === "sales" || tabParam === "analytics" || tabParam === "privacy" || tabParam === "creators" || tabParam === "overview") {
-        setActiveTab(tabParam as BrandDashboardTab);
-      }
-    }
-  }, []);
 
   const handleTabChange = (newTab: BrandDashboardTab) => {
     setActiveTab(newTab);
@@ -184,15 +199,6 @@ export function BrandDashboardView({
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
-
-  // Keep local state in sync when server props revalidate
-  React.useEffect(() => {
-    setLocalSales(recentSales);
-  }, [recentSales]);
-
-  React.useEffect(() => {
-    setLocalCampaigns(campaigns);
-  }, [campaigns]);
 
   // Client-side targeted refresh: updates only the dashboard body in place
   const handleRefreshFeeds = async () => {

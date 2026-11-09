@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Lock,
-  Phone,
   ArrowRight,
   ShieldCheck,
   Store,
@@ -17,8 +16,6 @@ import {
   Send,
   Building,
   CheckCircle2,
-  HelpCircle,
-  ExternalLink,
   ChevronRight,
   Sparkles,
   RefreshCw,
@@ -93,15 +90,6 @@ function LoginForm() {
   const [rememberDevice, setRememberDevice] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Sync role if query params change
-  useEffect(() => {
-    if (initialRoleParam === "cashier" || initialFrom.includes("sales")) {
-      setActiveRole("cashier");
-    } else if (initialRoleParam === "admin" || initialFrom.includes("admin")) {
-      setActiveRole("admin");
-    }
-  }, [initialRoleParam, initialFrom]);
 
   const config = ROLE_CONFIGS[activeRole];
 

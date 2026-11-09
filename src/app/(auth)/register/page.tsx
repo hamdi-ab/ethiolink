@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Lock,
-  Phone,
   User,
   Building,
   ArrowRight,
@@ -14,11 +13,8 @@ import {
   Eye,
   EyeOff,
   Layers,
-  Send,
-  Sparkles,
   MapPin,
   ShieldCheck,
-  Store,
   ChevronRight,
   RefreshCw,
   Zap,

@@ -25,7 +25,7 @@ import { getBaseUrl } from "@/lib/config";
 export interface CreateCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (campaign?: any) => void;
+  onSuccess?: (campaign?: unknown) => void;
 }
 
 export function CreateCampaignModal({
@@ -67,19 +67,22 @@ export function CreateCampaignModal({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setName("");
-      setPromoCode("");
-      setSlug("");
-      setDescription("");
-      setTelegramUrl("");
-      setPhoneNumber("");
-      setMapUrl("");
-      setStartDate("");
-      setEndDate("");
-      setCreatorName("");
-      setError(null);
-      setCreatedInviteUrl(null);
-      setCreatedPublicUrl(null);
+      const timer = setTimeout(() => {
+        setName("");
+        setPromoCode("");
+        setSlug("");
+        setDescription("");
+        setTelegramUrl("");
+        setPhoneNumber("");
+        setMapUrl("");
+        setStartDate("");
+        setEndDate("");
+        setCreatorName("");
+        setError(null);
+        setCreatedInviteUrl(null);
+        setCreatedPublicUrl(null);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
