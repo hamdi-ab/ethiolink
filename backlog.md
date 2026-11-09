@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-032 - feat-creator: modernize creator portal and earnings overview to align with stitch design system (since 2026-11-09)
 ## Queued
 ## Done
 - [x] ETL-031 - feat(ui): integrate shadcn/ui primitives, modernize brand campaign actions, and add accessible dialogs https://github.com/hamdi-ab/ethiolink/pull/39 (kind: feature) (merged 2026-10-30)
