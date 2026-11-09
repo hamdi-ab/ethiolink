@@ -17,7 +17,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LifeBuoy,
-  ChevronDown,
+  ChevronsUpDown,
+  Layers,
   Sparkles,
   AlertTriangle,
 } from "lucide-react";
@@ -76,7 +77,7 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const navSections: NavSection[] = [
     {
-      title: "Platform Intelligence",
+      title: "Cockpit Navigation",
       items: [
         {
           id: "overview",
@@ -85,10 +86,10 @@ export function AdminSidebar({
         },
         {
           id: "analytics",
-          label: "Funnel & Intelligence",
+          label: "Reports & Funnel",
           icon: TrendingUp,
-          badge: "NEW",
-          badgeColor: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
+          badge: "LIVE",
+          badgeColor: "bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]",
         },
       ],
     },
@@ -97,13 +98,13 @@ export function AdminSidebar({
       items: [
         {
           id: "merchants",
-          label: "Brands & Merchants",
+          label: "Brands & Workspaces",
           icon: Store,
           badge: counts.merchants,
         },
         {
           id: "creators",
-          label: "Creator Directory",
+          label: "Creators Directory",
           icon: Users,
           badge: counts.creators,
         },
@@ -115,7 +116,7 @@ export function AdminSidebar({
         },
         {
           id: "sales",
-          label: "Sales & Attribution",
+          label: "Attributed Sales",
           icon: Receipt,
           badge: counts.sales,
         },
@@ -124,7 +125,10 @@ export function AdminSidebar({
           label: "Reported Issues",
           icon: LifeBuoy,
           badge: counts.issues,
-          badgeColor: counts.issues && counts.issues > 0 ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : undefined,
+          badgeColor:
+            counts.issues && counts.issues > 0
+              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+              : undefined,
         },
       ],
     },
@@ -138,7 +142,7 @@ export function AdminSidebar({
         },
         {
           id: "telemetry",
-          label: "Event Telemetry",
+          label: "Raw Telemetry Stream",
           icon: Radio,
           badge: counts.events,
         },
@@ -154,24 +158,24 @@ export function AdminSidebar({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#102F2B] text-slate-100 border-r border-[#1A332C] transition-all duration-300 select-none">
+    <div className="flex flex-col h-full bg-[#10352F] dark:bg-[#08120F] text-white border-r border-[#1B4B42] dark:border-[#1E332B] transition-all duration-300 select-none">
       {/* Brand Header */}
-      <div className="h-[var(--navbar-height)] flex items-center justify-between px-4 border-b border-emerald-900/60 bg-[#0C2421]">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center font-black text-base shadow-sm shadow-emerald-500/30">
-            <Sparkles className="w-5 h-5 text-emerald-100" />
+      <div className="h-[var(--navbar-height)] flex items-center justify-between px-3.5 border-b border-[#1B4B42] dark:border-[#1E332B] bg-[#0C2722]/90 dark:bg-[#050A08]">
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs shrink-0 border border-emerald-400/20 dark:border-transparent">
+            <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
           </div>
           {!isCollapsed && (
             <div className="truncate">
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-black text-base text-white tracking-tight">
-                  Ethio<span className="text-emerald-400">Link</span>
+                <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                  Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-extrabold bg-emerald-500/20 text-emerald-300 dark:text-[#78B99D] border border-emerald-500/30">
                   OPS
                 </span>
               </div>
-              <p className="text-[10px] text-emerald-300/70 font-semibold uppercase tracking-wider truncate">
+              <p className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5 truncate">
                 Attribution Engine
               </p>
             </div>
@@ -181,47 +185,45 @@ export function AdminSidebar({
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-emerald-900/40"
+          className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621]"
           aria-label="Close mobile sidebar"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Workspace Quick-Select Pill (Matching Stitch Screen bd7550b6) */}
+      {/* Workspace Quick-Select Pill (Matching BrandSidebar) */}
       {!isCollapsed && (
         <div className="px-3 pt-3">
-          <div className="p-2 rounded-xl bg-[#0B1E1B] border border-emerald-900/60 flex items-center justify-between gap-2 shadow-2xs">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-emerald-900/60 border border-emerald-700/40 flex items-center justify-center text-emerald-400 shrink-0">
+          <div className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
                 <Store className="w-4 h-4" />
               </div>
               <div className="truncate min-w-0">
-                <div className="text-xs font-bold text-white truncate">
+                <p className="text-xs font-semibold text-white truncate leading-tight">
                   Sheba Artisan Coffee
-                </div>
-                <div className="text-[10px] text-emerald-300/70 truncate">
+                </p>
+                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
                   Bole Flagship • Addis Ababa
-                </div>
+                </p>
               </div>
             </div>
-            <div className="text-emerald-400/80 shrink-0">
-              <ChevronDown className="w-3.5 h-3.5" />
-            </div>
+            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
           </div>
         </div>
       )}
 
       {/* Navigation Sections */}
-      <div className="flex-1 overflow-y-auto sidebar-scroll py-4 px-3 space-y-5">
+      <div className="flex-1 overflow-y-auto sidebar-scroll py-3 px-3 space-y-4">
         {navSections.map((section, idx) => (
           <div key={idx} className="space-y-1">
             {!isCollapsed && (
-              <h3 className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-300/60 mb-1.5 font-headline">
+              <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1] mb-1 font-headline">
                 {section.title}
               </h3>
             )}
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -230,40 +232,41 @@ export function AdminSidebar({
                     key={item.id}
                     onClick={() => handleItemClick(item.id)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                    className={`w-full flex items-center transition-all group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105 mx-auto"
+                        : "justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
                       isActive
-                        ? "bg-emerald-600/30 text-emerald-200 border border-emerald-500/40 shadow-xs"
-                        : "text-emerald-100/70 hover:text-white hover:bg-emerald-900/30 border border-transparent"
-                    } ${isCollapsed ? "justify-center px-0" : ""}`}
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white border border-transparent"
+                    }`}
                   >
-                    <Icon
-                      className={`w-4 h-4 shrink-0 transition-colors ${
-                        isActive
-                          ? "text-emerald-300"
-                          : "text-emerald-300/60 group-hover:text-emerald-200"
-                      }`}
-                    />
-                    {!isCollapsed && (
-                      <>
-                        <span className="truncate flex-1 text-left">{item.label}</span>
-                        {item.badge !== undefined && (
-                          <span
-                            className={`px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-md ${
-                              item.badgeColor ||
-                              (isActive
-                                ? "bg-emerald-500/30 text-emerald-200"
-                                : "bg-emerald-950/60 text-emerald-300/80 border border-emerald-900/50")
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </>
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Icon
+                        className={`w-4 h-4 shrink-0 transition-colors ${
+                          isActive
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </div>
+
+                    {!isCollapsed && item.badge !== undefined && (
+                      <span
+                        className={`px-1.5 py-0.5 text-[11px] font-mono font-bold rounded-md ${
+                          item.badgeColor ||
+                          "bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]"
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
                     )}
 
-                    {/* Active Indicator Bar */}
+                    {/* Active Left Indicator Bar */}
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-400 rounded-r-full" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
                     )}
                   </button>
                 );
@@ -274,90 +277,95 @@ export function AdminSidebar({
       </div>
 
       {/* Admin Profile & Gateway Status Footer */}
-      <div className="p-3 border-t border-emerald-900/60 bg-[#0C2421]">
+      <div className="border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] p-3 space-y-2.5">
         {!isCollapsed ? (
-          <div className="space-y-2.5">
-            {/* Gateway Active Status Indicator */}
-            <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-[#0B1E1B] border border-emerald-900/50 text-[11px]">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-semibold text-emerald-200">Telebirr &amp; CBE Birr</span>
+          <>
+            {/* Interactive Telebirr & CBE Birr Live Integration Card */}
+            <div className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] shadow-2xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                </div>
+                <div className="truncate">
+                  <p className="text-xs font-semibold text-white truncate leading-tight">
+                    Telebirr &amp; CBE Birr
+                  </p>
+                  <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                    Gateway Sync v2.4
+                  </p>
+                </div>
               </div>
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
-                ACTIVE
+              <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
+                Active
               </span>
             </div>
 
-            {/* User Profile Card with Sign Out */}
-            <div className="p-2 rounded-xl bg-[#0B1E1B] border border-emerald-900/60 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-600 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-400/20">
+            {/* User Profile & Theme Toggle Row */}
+            <div className="flex items-center justify-between px-1 h-10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                   {adminName.charAt(0).toUpperCase()}
                 </div>
-                <div className="truncate min-w-0">
-                  <div className="text-xs font-bold text-white truncate">
+                <div className="min-w-0">
+                  <span className="font-semibold text-xs text-white block truncate leading-tight">
                     {adminName}
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-emerald-300/70 font-mono">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                    <span>Superadmin</span>
-                  </div>
+                  </span>
+                  <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
+                    Superadmin
+                  </span>
                 </div>
               </div>
 
-              {/* Sign Out Button */}
-              <form action="/api/auth/logout" method="POST" className="shrink-0">
+              <div className="flex items-center gap-1.5">
+                <ThemeToggle
+                  size="sm"
+                  className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
+                />
                 <button
-                  type="submit"
-                  title="Sign out"
-                  aria-label="Sign out"
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-emerald-300/70 hover:text-rose-400 hover:bg-rose-950/40 transition-colors cursor-pointer"
+                  onClick={onToggleCollapse}
+                  title="Collapse sidebar"
+                  aria-label="Collapse sidebar"
+                  className="hidden lg:flex p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <PanelLeftClose className="w-4 h-4" />
                 </button>
-              </form>
-            </div>
-
-            {/* Bottom Utilities Row */}
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-2">
-                <ThemeToggle size="sm" />
-                <span className="text-[10px] font-medium text-emerald-300/70">Theme</span>
               </div>
-
-              <button
-                onClick={onToggleCollapse}
-                title="Collapse sidebar"
-                aria-label="Collapse sidebar"
-                className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-emerald-300/70 hover:text-white hover:bg-emerald-900/40 transition-colors cursor-pointer"
-              >
-                <PanelLeftClose className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Collapse</span>
-              </button>
             </div>
-          </div>
+
+            {/* Sign Out Action Button */}
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </form>
+          </>
         ) : (
           /* Collapsed Mode */
           <div className="flex flex-col items-center gap-2 py-1">
             <div
               title={`${adminName} (Superadmin)`}
-              className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-400/20 cursor-default"
+              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1C554C] to-[#0D2B26] dark:from-[#18332A] dark:to-[#0D1714] border border-[#2B7366] dark:border-[#28493D] text-white font-bold text-xs flex items-center justify-center ring-2 ring-emerald-400/20 cursor-default"
             >
               {adminName.charAt(0).toUpperCase()}
             </div>
 
-            <div className="w-6 h-px bg-emerald-900/60 my-0.5" />
+            <div className="w-6 h-px bg-[#1B4B42]/60 dark:bg-[#1E332B]/60 my-0.5" />
 
-            <div className="flex items-center justify-center" title="Toggle theme">
-              <ThemeToggle size="sm" />
-            </div>
+            <ThemeToggle
+              size="sm"
+              className="!w-9 !h-9 !bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] rounded-xl flex items-center justify-center shadow-xs cursor-pointer"
+            />
 
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
                 title="Sign out"
                 aria-label="Sign out"
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-emerald-300/70 hover:text-rose-400 hover:bg-rose-950/40 transition-all cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-emerald-200/60 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -367,7 +375,7 @@ export function AdminSidebar({
               onClick={onToggleCollapse}
               title="Expand sidebar"
               aria-label="Expand sidebar"
-              className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-emerald-300/70 hover:text-white hover:bg-emerald-900/40 transition-all cursor-pointer"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-all cursor-pointer"
             >
               <PanelLeftOpen className="w-4 h-4" />
             </button>

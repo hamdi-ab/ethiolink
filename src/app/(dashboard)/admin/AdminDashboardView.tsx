@@ -526,7 +526,7 @@ export function AdminDashboardView({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-body antialiased selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#0D1714] text-[#202824] dark:text-[#F1F5F1] flex font-body antialiased selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-150">
       {/* SaaS Collapsible Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
@@ -549,7 +549,7 @@ export function AdminDashboardView({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Top App Bar */}
-        <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-xs">
+        <header className="bg-white/95 dark:bg-[#0D1714]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-[#1E332B] sticky top-0 z-20 shadow-xs">
           <div className="navbar-shell layout-container-wide gap-4">
             <div className="flex items-center gap-3 min-w-0">
               {/* Mobile hamburger button */}
@@ -645,15 +645,15 @@ export function AdminDashboardView({
           {activeTab === "overview" && (
             <div className="space-y-6">
               {/* Sub-Header / Admin Context Strip */}
-              <div className="px-5 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="px-5 py-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-slate-800 dark:text-[#C5DCD6] bg-[#F1F4F1] dark:bg-[#0A1A15] px-2.5 py-1 rounded border border-slate-200/80 dark:border-[#1E332B]">
                       Superadmin Console · Restricted Access
                     </span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 font-mono">
-                      <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs text-slate-500 dark:text-[#9BAAA1] font-medium flex items-center gap-1.5 font-mono">
+                      <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
                       Production · Addis Ababa Nodes (EAT GMT+3)
                     </span>
                   </div>
@@ -661,16 +661,16 @@ export function AdminDashboardView({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={exportAuditCSV}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 shadow-2xs cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162922] text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] hover:bg-slate-50 dark:hover:bg-[#1C3229] transition-colors flex items-center gap-1.5 border border-slate-200/80 dark:border-[#1E332B] shadow-2xs cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                    <Download className="w-3.5 h-3.5 text-slate-500 dark:text-[#9BAAA1]" />
                     <span>Export Audit CSV</span>
                   </button>
                   <button
                     onClick={() => setActiveTab("health")}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 shadow-2xs cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162922] text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] hover:bg-slate-50 dark:hover:bg-[#1C3229] transition-colors flex items-center gap-1.5 border border-slate-200/80 dark:border-[#1E332B] shadow-2xs cursor-pointer"
                   >
-                    <Server className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <Server className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
                     <span>Platform Health</span>
                   </button>
                   <button
@@ -686,32 +686,32 @@ export function AdminDashboardView({
               {/* 4-up Executive KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Stat 1: Active Brands / Workspaces */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
                       Active Brands / Workspaces
                     </span>
-                    <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-[#78B99D]">
                       <Store className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-slate-100">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
                       {stats.totalBrands}
                     </span>
                     <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                       +2 pending review
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 truncate">
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
                     Bole Roastery, Zoma Leather, Kaldi&apos;s Hub
                   </p>
                 </div>
 
                 {/* Stat 2: Verified Creators */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
                       Verified Creators
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -719,22 +719,22 @@ export function AdminDashboardView({
                     </div>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-slate-100">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
                       {stats.totalCreators}
                     </span>
                     <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                       92.4% Payout Ready
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 truncate">
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
                     Telebirr &amp; CBE Birr linked handles
                   </p>
                 </div>
 
                 {/* Stat 3: 30-Day Platform GMV */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
                       30-Day Platform GMV
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -742,19 +742,19 @@ export function AdminDashboardView({
                     </div>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-slate-100">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
                       {formatETB(stats.totalRevenueETB)}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 truncate">
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
                     {stats.totalSalesCount.toLocaleString()} logs across Telegram &amp; In-Store POS
                   </p>
                 </div>
 
                 {/* Stat 4: Active Discrepancies */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
                       Active Discrepancies
                     </span>
                     <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -765,11 +765,11 @@ export function AdminDashboardView({
                     <span className="text-2xl font-black font-headline text-amber-600 dark:text-amber-400">
                       {issuesList.filter((i) => i.status === "OPEN" || i.status === "IN_REVIEW").length || 3} Items
                     </span>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-[#9BAAA1]">
                       Need Review
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 truncate">
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
                     1 promo code collision, 2 unverified sales
                   </p>
                 </div>
@@ -846,9 +846,9 @@ export function AdminDashboardView({
               {/* Main Workspace Split: Brands Table + Live Tenant Inspector */}
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                 {/* Left 8 Cols: Brand Workspaces Data Table Card */}
-                <div className="xl:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+                <div className="xl:col-span-8 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
                   {/* Filter Toolbar */}
-                  <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="p-4 bg-slate-50 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div className="relative flex-1">
                       <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
@@ -856,20 +856,20 @@ export function AdminDashboardView({
                         placeholder="Search by Brand Name, Merchant TIN, Admin Contact, or Branch..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-900 pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:border-emerald-500 shadow-2xs"
+                        className="w-full bg-white dark:bg-[#162922] text-slate-900 dark:text-[#F1F5F1] pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200/80 dark:border-[#1E332B] outline-none focus:border-emerald-500 shadow-2xs placeholder:text-slate-400 dark:placeholder:text-[#9BAAA1]"
                       />
                     </div>
                     <div className="flex items-center gap-2">
                       <select
                         value={brandStatusFilter}
                         onChange={(e) => setBrandStatusFilter(e.target.value)}
-                        className="py-1.5 pl-3 pr-7 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none font-medium text-slate-700 dark:text-slate-200 shadow-2xs"
+                        className="py-1.5 pl-3 pr-7 text-xs bg-white dark:bg-[#162922] border border-slate-200/80 dark:border-[#1E332B] rounded-xl outline-none font-medium text-slate-700 dark:text-[#C5DCD6] shadow-2xs"
                       >
                         <option value="ALL">Status: All Brands</option>
                         <option value="ACTIVE">Status: Active</option>
                         <option value="SUSPENDED">Status: Suspended</option>
                       </select>
-                      <div className="hidden sm:flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 font-medium shadow-2xs">
+                      <div className="hidden sm:flex items-center gap-1.5 bg-white dark:bg-[#162922] px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-[#1E332B] text-xs text-slate-700 dark:text-[#C5DCD6] font-medium shadow-2xs">
                         <span>Region: Addis Ababa</span>
                       </div>
                     </div>
@@ -878,7 +878,7 @@ export function AdminDashboardView({
                   {/* High Density Table */}
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
-                      <thead className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                      <thead className="bg-slate-50/80 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] text-slate-600 dark:text-[#9BAAA1] font-bold uppercase tracking-wider text-[10px]">
                         <tr>
                           <th className="py-3 px-4">Brand / Entity</th>
                           <th className="py-3 px-4">Merchant TIN</th>
@@ -901,25 +901,25 @@ export function AdminDashboardView({
                               onClick={() => setSelectedBrandId(brand.id)}
                               className={`transition-colors cursor-pointer group ${
                                 isSelected
-                                  ? "bg-emerald-500/10 dark:bg-emerald-950/40"
-                                  : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                                  ? "bg-emerald-500/10 dark:bg-[#162E25]"
+                                  : "hover:bg-slate-50 dark:hover:bg-[#162922]/40"
                               }`}
                             >
                               <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-300 font-bold">
-                                    <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                  <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-[#0A1A15] flex items-center justify-center shrink-0 text-slate-700 dark:text-[#C5DCD6] font-bold">
+                                    <Store className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                                   </div>
                                   <div>
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-bold text-slate-900 dark:text-slate-100 font-headline">
+                                      <span className="font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
                                         {brand.name}
                                       </span>
                                       <span title="Verified Trade License">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
                                       </span>
                                     </div>
-                                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">
                                       {brand.name.includes("Sheba")
                                         ? "Bole Flagship · Sub-City 03"
                                         : brand.name.includes("Zoma")
@@ -933,35 +933,35 @@ export function AdminDashboardView({
                               </td>
 
                               <td className="py-3.5 px-4">
-                                <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                                <span className="font-mono text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] bg-slate-100 dark:bg-[#0A1A15] px-2 py-0.5 rounded border border-slate-200/80 dark:border-[#1E332B]">
                                   ET-TIN-{brand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
                                 </span>
                               </td>
 
                               <td className="py-3.5 px-4">
-                                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                                <span className="font-semibold text-slate-900 dark:text-[#F1F5F1]">
                                   {brand.staffCount * 6 || 18} Creators
                                 </span>
-                                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
+                                <span className="text-slate-500 dark:text-[#9BAAA1] block text-[11px]">
                                   {brand.campaignsCount} Live Campaigns
                                 </span>
                               </td>
 
                               <td className="py-3.5 px-4 text-right">
-                                <span className="font-bold font-mono text-slate-900 dark:text-slate-100">
+                                <span className="font-bold font-mono text-slate-900 dark:text-[#F1F5F1]">
                                   {formatETB(gmv || 480000)}
                                 </span>
-                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-semibold">
+                                <span className="text-[10px] text-emerald-600 dark:text-[#78B99D] block font-semibold">
                                   +14.2% MoM
                                 </span>
                               </td>
 
                               <td className="py-3.5 px-4">
-                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-700 dark:text-[#C5DCD6]">
                                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                                   <span>Telebirr + CBE</span>
                                 </div>
-                                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1]">
                                   POS Terminal #{brand.staffCount || 1} Active
                                 </span>
                               </td>
@@ -972,7 +972,7 @@ export function AdminDashboardView({
                                     Suspended
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
                                     Active
                                   </span>
                                 )}
@@ -985,7 +985,7 @@ export function AdminDashboardView({
                                       e.stopPropagation();
                                       setSelectedBrandId(brand.id);
                                     }}
-                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-600 dark:text-emerald-400 cursor-pointer"
+                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-emerald-600 dark:text-[#78B99D] cursor-pointer"
                                     title="Inspect Tenant"
                                   >
                                     <Eye className="w-4 h-4" />
@@ -995,7 +995,7 @@ export function AdminDashboardView({
                                       e.stopPropagation();
                                       setSelectedBrandId(brand.id);
                                     }}
-                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-slate-400 hover:text-slate-700 dark:hover:text-[#F1F5F1] cursor-pointer"
                                     title="Options"
                                   >
                                     <MoreVertical className="w-4 h-4" />
@@ -1010,14 +1010,14 @@ export function AdminDashboardView({
                   </div>
 
                   {/* Table Footer */}
-                  <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                  <div className="p-4 border-t border-slate-200/80 dark:border-[#1E332B] bg-white dark:bg-[#14211D] flex items-center justify-between text-xs text-slate-500 dark:text-[#9BAAA1]">
                     <span>
-                      Showing <strong className="text-slate-900 dark:text-slate-100">{filteredBrands.length}</strong>{" "}
-                      of <strong className="text-slate-900 dark:text-slate-100">{stats.totalBrands}</strong> brand workspaces
+                      Showing <strong className="text-slate-900 dark:text-[#F1F5F1]">{filteredBrands.length}</strong>{" "}
+                      of <strong className="text-slate-900 dark:text-[#F1F5F1]">{stats.totalBrands}</strong> brand workspaces
                     </span>
                     <div className="flex items-center gap-1 font-semibold text-xs">
                       <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold">1</span>
-                      <button className="px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      <button className="px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-slate-700 dark:text-[#C5DCD6]">
                         2
                       </button>
                     </div>
@@ -1025,50 +1025,50 @@ export function AdminDashboardView({
                 </div>
 
                 {/* Right 4 Cols: Live Tenant Inspector Drawer */}
-                <div className="xl:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="xl:col-span-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
                     <div>
-                      <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                      <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-emerald-600 dark:text-[#78B99D]">
                         Live Tenant Inspector
                       </span>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-[#F1F5F1] mt-0.5">
                         {selectedBrand.name}
                       </h3>
                     </div>
-                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
                       Flagship Tier
                     </span>
                   </div>
 
                   {/* Entity Metadata Grid */}
-                  <div className="space-y-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 text-xs">
+                  <div className="space-y-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl p-4 text-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Workspace ID:</span>
-                      <span className="font-mono text-slate-900 dark:text-slate-100 font-semibold">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Workspace ID:</span>
+                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
                         WS-ETH-{selectedBrand.id.slice(0, 8).toUpperCase().replace(/[^A-Z0-9]/g, "")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Trade TIN:</span>
-                      <span className="font-mono text-slate-900 dark:text-slate-100 font-semibold">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Trade TIN:</span>
+                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
                         ET-TIN-{selectedBrand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Merchant Telebirr:</span>
-                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Merchant Telebirr:</span>
+                      <span className="font-mono text-emerald-600 dark:text-[#78B99D] font-semibold">
                         TLB-ADD-{selectedBrand.id.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "") || "4902"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Registered Owner:</span>
-                      <span className="text-slate-900 dark:text-slate-100 font-semibold">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Registered Owner:</span>
+                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
                         {selectedBrand.ownerName}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">POS Terminals:</span>
-                      <span className="text-slate-900 dark:text-slate-100 font-semibold">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">POS Terminals:</span>
+                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
                         {selectedBrand.staffCount || 3} active registers synced
                       </span>
                     </div>
@@ -1076,17 +1076,17 @@ export function AdminDashboardView({
 
                   {/* Platform Overrides & Limits */}
                   <div className="space-y-3">
-                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide block">
+                    <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F1] uppercase tracking-wide block">
                       Platform Overrides &amp; Limits
                     </span>
 
                     {/* Commission Override */}
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
                       <div>
-                        <p className="font-semibold text-slate-800 dark:text-slate-200">Default Creator Commission</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">Applied to non-custom campaigns</p>
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Default Creator Commission</p>
+                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Applied to non-custom campaigns</p>
                       </div>
-                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs">
                         <button
                           onClick={() => setCommissionOverride((prev) => Math.max(1, prev - 0.5))}
                           className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
@@ -1104,28 +1104,28 @@ export function AdminDashboardView({
                     </div>
 
                     {/* Attribution Volume Cap */}
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
                       <div>
-                        <p className="font-semibold text-slate-800 dark:text-slate-200">Daily Attribution Volume Cap</p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">Security throttle per register</p>
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Daily Attribution Volume Cap</p>
+                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Security throttle per register</p>
                       </div>
-                      <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs font-mono">
+                      <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs font-mono">
                         <span>{volumeCap}</span>
                       </div>
                     </div>
 
                     {/* Telegram Webhook Heartbeat */}
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
                       <div>
-                        <p className="font-semibold text-slate-800 dark:text-slate-200">Telegram Bot Webhook</p>
-                        <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium">
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Telegram Bot Webhook</p>
+                        <p className="text-[11px] text-emerald-600 dark:text-[#78B99D] font-mono font-medium">
                           {webhookPingStatus}
                         </p>
                       </div>
                       <button
                         onClick={handleRePingWebhook}
                         disabled={isPingingWebhook}
-                        className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer disabled:opacity-50"
+                        className="text-xs font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer disabled:opacity-50"
                       >
                         {isPingingWebhook ? "Pinging..." : "Re-ping"}
                       </button>
@@ -1136,14 +1136,14 @@ export function AdminDashboardView({
                   <div className="pt-2 space-y-2">
                     <button
                       onClick={handleImpersonate}
-                      className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                     >
                       <LogIn className="w-3.5 h-3.5 text-slate-500" />
                       <span>Impersonate Workspace Admin</span>
                     </button>
                     <button
                       onClick={handleRegenApiKeys}
-                      className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
                     >
                       <Key className="w-3.5 h-3.5 text-slate-500" />
                       <span>Regenerate Integration API Keys</span>
@@ -1164,24 +1164,24 @@ export function AdminDashboardView({
               </div>
 
               {/* Section 7.8: Escalated Tickets & Attribution Discrepancies Queue */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-[#1E332B]">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
                       <LifeBuoy className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-headline">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
                         Escalated Tickets &amp; Attribution Discrepancies
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
                         Automated anomaly detection alerts flagged by POS and Telegram scanners
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Auto-resolve rule:</span>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                    <span className="text-xs text-slate-500 dark:text-[#9BAAA1]">Auto-resolve rule:</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-[#C5DCD6] bg-[#F1F4F1] dark:bg-[#0A1A15] px-2 py-1 rounded-lg">
                       24hr Hold Period
                     </span>
                   </div>
