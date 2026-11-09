@@ -624,10 +624,10 @@ export default function LoginPage() {
         <div className="max-w-md w-full mx-auto my-auto space-y-6">
           <div className="space-y-1.5">
             <h2 className="font-headline font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white tracking-tight">
-              Sign in to EthioLink
+              Merchant &amp; Staff Portal
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-[#9BAAA1] font-body leading-relaxed">
-              Access your merchant console, cashier terminal, or administrative workspace.
+              Sign in to access your merchant console, cashier terminal, or administrative workspace.
             </p>
           </div>
 

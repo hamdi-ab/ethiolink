@@ -467,7 +467,7 @@ export function CampaignLanding({ campaign }: { campaign: CampaignData }) {
               <div>
                 <span className="font-bold">In-Store Redemption:</span>{" "}
                 <span>
-                  Present code <strong className="font-mono">{campaign.promoCode}</strong> to the cashier prior to billing to claim your discount.
+                  Present this promotional voucher code to the cashier prior to billing to claim your discount.
                 </span>
               </div>
             </div>

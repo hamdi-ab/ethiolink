@@ -165,11 +165,11 @@ export default function Home() {
             </Link>
 
             <Link
-              href="/login?from=/brand/sales"
+              href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white dark:bg-[#0E1D19] hover:bg-slate-50 dark:hover:bg-[#132722] text-slate-900 dark:text-slate-100 font-headline font-bold text-base border border-slate-200 dark:border-[#1A332C] shadow-2xs active:scale-95 transition-all"
             >
               <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>In-Store POS Terminal</span>
+              <span>Merchant &amp; Staff Portal</span>
             </Link>
 
             <Link
