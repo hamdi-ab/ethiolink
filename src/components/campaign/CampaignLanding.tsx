@@ -6,7 +6,6 @@ import { Language, translations } from "@/lib/translations";
 import {
   Send,
   Phone,
-  MapPin,
   Copy,
   Check,
   CheckCircle2,
