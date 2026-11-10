@@ -41,3 +41,6 @@
 
 ## Archived 2026-11-10
 - [x] ETL-023 - feat: in-store sales voiding, transaction corrections, and audit ledger https://github.com/hamdi-ab/ethiolink/pull/31 (merged 2026-10-28)
+
+## Archived 2026-11-10
+- [x] ETL-024 - feat: merchant campaign editing, destination updates, and immutability guardrails https://github.com/hamdi-ab/ethiolink/pull/32 (merged 2026-10-28)
