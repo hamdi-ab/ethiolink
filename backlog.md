@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-033 - feat-pos: modernize in-store pos sales logging terminal matching stitch design tokens and dark mode (since 2026-11-10)
 ## Queued
 ## Done
 - [x] ETL-032 - feat-creator: modernize creator portal and earnings overview to align with stitch design system https://github.com/hamdi-ab/ethiolink/pull/40 (merged 2026-11-10)
