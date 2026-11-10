@@ -579,9 +579,9 @@ export function BrandDashboardView({
         onOpenCreateCampaignModal={() => setIsCreateCampaignModalOpen(true)}
       />
 
-      {/* 2. Main Workspace (Fluid desktop width with lg:pl-64 or lg:pl-20) */}
+      {/* 2. Main Workspace (Fluid desktop width with lg:pl-72 or lg:pl-20) */}
       <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
-        isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"
+        isSidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
       }`}>
         {/* Top Header / Action Bar (Stitch Spec: h-16 sticky) */}
         <header className="bg-white/90 dark:bg-[#14211D]/90 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F]">

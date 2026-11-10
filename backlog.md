@@ -1,6 +1,7 @@
 # Backlog
 
 ## In flight
+- [ ] ETL-034 - feat-brand: modernize brand merchant overview cockpit matching stitch design tokens and dark mode (since 2026-11-10)
 ## Queued
 ## Done
 - [x] ETL-033 - feat-pos: modernize in-store pos sales logging terminal matching stitch design tokens and dark mode https://github.com/hamdi-ab/ethiolink/pull/41 (merged 2026-11-10)
