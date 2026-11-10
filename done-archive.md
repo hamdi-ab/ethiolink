@@ -35,3 +35,6 @@
 
 ## Archived 2026-10-30
 - [x] ETL-021 - Chore: Commit local environment assets, drawings, and turbopack root configuration https://github.com/hamdi-ab/ethiolink/pull/29 (kind: chore) (merged 2026-10-27)
+
+## Archived 2026-11-10
+- [x] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls https://github.com/hamdi-ab/ethiolink/pull/30 (kind: feature) (merged 2026-10-28)
