@@ -57,6 +57,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !user.passwordHash) {
+      console.warn(
+        `⚠️ [AUTH 401] No user found for phone "${normalizedPhone}". Generated candidate queries: ${JSON.stringify(Array.from(phoneCandidates))}`
+      );
       return NextResponse.json(
         { error: "Invalid phone number or password" },
         { status: 401 }
@@ -65,6 +68,9 @@ export async function POST(req: NextRequest) {
 
     const isMatch = await verifyPassword(password, user.passwordHash);
     if (!isMatch) {
+      console.warn(
+        `⚠️ [AUTH 401] Password mismatch for user "${user.name}" (${user.phone}). Note: seeded password is "EthioLink2026!".`
+      );
       return NextResponse.json(
         { error: "Invalid phone number or password" },
         { status: 401 }
