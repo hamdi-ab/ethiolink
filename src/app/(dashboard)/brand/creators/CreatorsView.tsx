@@ -36,9 +36,6 @@ import {
   Wallet,
   X,
   BarChart3,
-  Store,
-  Share2,
-  Layers,
 } from "lucide-react";
 
 export interface CreatorDetailItem {
@@ -1152,168 +1149,6 @@ export function CreatorsView({
                 </div>
               </div>
             </div>
-
-            {/* ========================================================= */}
-            {/* 2A-2. Branch Collateral Pool & Retail Co-Op Grants        */}
-            {/* ========================================================= */}
-            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
-                    <Store className="w-4 h-4" />
-                  </span>
-                  <div>
-                    <h4 className="font-headline font-bold text-sm text-neutral-900 dark:text-white">
-                      Branch Collateral Allocation &amp; Retail Co-Op Quota
-                    </h4>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Physical QR table-tents and tasting vouchers distributed to cashier stations
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => toast.success("Physical marketing collateral batch (PDF) queued for Bole & Kazanchis cashiers")}
-                  className="px-3 py-1.5 bg-neutral-100 dark:bg-[#1A2A24] hover:bg-neutral-200 dark:hover:bg-[#20362E] text-neutral-800 dark:text-neutral-200 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5 text-neutral-500" />
-                  <span>Print Batch (PDF)</span>
-                </button>
-              </div>
-
-              {/* Outlet Collateral Distribution Table */}
-              <div className="space-y-2.5">
-                {[
-                  {
-                    outlet: "Bole Medhanialem Flagship",
-                    type: "500 QR Table Tents & Counter Displays",
-                    creators: "Dawit T., Meron B.",
-                    redeemed: 340,
-                    total: 500,
-                    percent: 68,
-                    speed: "Optimal Velocity",
-                  },
-                  {
-                    outlet: "Kazanchis Tech Corridor",
-                    type: "300 Barcoded Tasting Slips & Flyers",
-                    creators: "Selamawit A., Yohannes K.",
-                    redeemed: 215,
-                    total: 300,
-                    percent: 72,
-                    speed: "High Demand",
-                  },
-                  {
-                    outlet: "Piassa Heritage Roastery",
-                    type: "200 Coffee Tasting Discount Cards",
-                    creators: "Bethlehem G., Rahel M.",
-                    redeemed: 145,
-                    total: 200,
-                    percent: 73,
-                    speed: "Consistent",
-                  },
-                ].map((row) => (
-                  <div
-                    key={row.outlet}
-                    className="p-3.5 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-neutral-900 dark:text-white font-headline">
-                          {row.outlet}
-                        </span>
-                        <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-800/50 font-medium">
-                          {row.speed}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                        {row.type} &bull; <span className="font-medium text-neutral-700 dark:text-neutral-300">Anchored: {row.creators}</span>
-                      </div>
-                    </div>
-
-                    <div className="sm:text-right space-y-1 shrink-0 min-w-[140px]">
-                      <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
-                        <span className="font-bold font-mono text-neutral-900 dark:text-white">
-                          {row.redeemed} / {row.total}
-                        </span>
-                        <span className="text-neutral-400 font-mono text-[11px]">({row.percent}%)</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-neutral-200 dark:bg-[#20362E] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-emerald-500 rounded-full"
-                          style={{ width: `${row.percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Creator Recruitment Onboarding Link */}
-              <div className="pt-2 border-t border-neutral-100 dark:border-[#1E3029] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
-                  <Share2 className="w-4 h-4 text-emerald-600" />
-                  <span className="font-medium">Direct Creator Onboarding Link:</span>
-                </div>
-                <div className="flex items-center gap-2 flex-1 max-w-sm">
-                  <input
-                    type="text"
-                    readOnly
-                    value="https://ethiolink.et/creators/join?brand=tobiya-coffee"
-                    className="w-full px-3 py-1.5 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-xs font-mono text-neutral-700 dark:text-neutral-300 truncate focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleCopy("https://ethiolink.et/creators/join?brand=tobiya-coffee", "brand-invite-link")}
-                    className="px-3 py-1.5 bg-white dark:bg-[#1A2A24] border border-[#D7DED9] dark:border-[#2B4237] hover:bg-neutral-50 dark:hover:bg-[#20362E] text-xs font-semibold text-neutral-800 dark:text-neutral-200 rounded-xl transition-colors shrink-0 cursor-pointer"
-                  >
-                    {copiedKey === "brand-invite-link" ? (
-                      <span className="text-emerald-600 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Copied</span>
-                    ) : (
-                      <span className="flex items-center gap-1"><Copy className="w-3.5 h-3.5 text-neutral-400" /> Copy</span>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* ========================================================= */}
-            {/* 2A-3. Compliance, Float-Drift & Privacy Guarantee         */}
-            {/* ========================================================= */}
-            <div className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#26372F] grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs text-neutral-600 dark:text-neutral-400">
-              <div className="flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
-                    Zero Float-Drift Protection
-                  </span>
-                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                    Calculated in exact integer cents to eliminate floating-point precision loss.
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
-                    Daily Salted Hash Privacy
-                  </span>
-                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                    Zero raw customer IPs stored. 24h rotating SHA-256 telemetry hashing.
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <Wallet className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
-                    Automated Gateway Sync
-                  </span>
-                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                    Instant settlement disbursement pipelines via Telebirr &amp; CBE Birr API rails.
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* 2B. RIGHT COLUMN: Selected Creator Deep Dive Panel (col-span-4) */}
@@ -1729,6 +1564,15 @@ export function CreatorsView({
                   </div>
                   <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300">18% Share</span>
                 </div>
+              </div>
+
+              {/* Regional Summary Footer for balanced baseline alignment */}
+              <div className="pt-2.5 border-t border-neutral-100 dark:border-[#1E3029] flex items-center justify-between text-[11px] text-neutral-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Total Regional Mesh
+                </span>
+                <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">28 Active Terminals</span>
               </div>
             </div>
           </div>
