@@ -858,14 +858,14 @@ export function CreatorsView({
                     <article
                       key={creator.id}
                       onClick={() => setSelectedCreatorId(creator.id)}
-                      className={`bg-white dark:bg-[#14211D] rounded-2xl p-5 border transition-all cursor-pointer relative shadow-xs hover:shadow-md ${
+                      className={`bg-white dark:bg-[#14211D] rounded-2xl p-4 sm:p-5 border transition-all cursor-pointer relative shadow-xs hover:shadow-md space-y-3.5 ${
                         isSelected
                           ? "border-emerald-600 dark:border-emerald-500 ring-2 ring-emerald-500/20"
                           : "border-[#D7DED9]/90 dark:border-[#26372F] hover:border-neutral-400 dark:hover:border-neutral-600"
                       }`}
                     >
                       {/* Top Ribbons */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
@@ -906,18 +906,18 @@ export function CreatorsView({
                       </div>
 
                       {/* Profile Main Row */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 dark:border-[#1E3029]">
-                        <div className="flex items-center gap-3.5">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3.5 border-b border-neutral-100 dark:border-[#1E3029]">
+                        <div className="flex items-center gap-3.5 min-w-0">
                           {/* Initials Avatar */}
-                          <div className="w-12 h-12 rounded-full ring-2 ring-emerald-500/30 overflow-hidden shrink-0 bg-emerald-100 dark:bg-[#16362C] flex items-center justify-center text-emerald-900 dark:text-emerald-200 font-bold font-headline text-lg">
+                          <div className="w-11 h-11 rounded-full ring-2 ring-emerald-500/30 overflow-hidden shrink-0 bg-emerald-100 dark:bg-[#16362C] flex items-center justify-center text-emerald-900 dark:text-emerald-200 font-bold font-headline text-base">
                             {creator.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-headline font-bold text-base text-neutral-900 dark:text-white">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-headline font-bold text-sm sm:text-base text-neutral-900 dark:text-white truncate">
                                 {creator.name}
                               </h3>
                               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
@@ -925,9 +925,9 @@ export function CreatorsView({
                               </span>
                               <BadgeCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+                            <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 flex-wrap">
                               {creator.platforms.telegram && (
-                                <span className="flex items-center gap-1 text-[#229ED9]">
+                                <span className="inline-flex items-center gap-1 text-[#229ED9] font-medium">
                                   <Send className="w-3.5 h-3.5" />
                                   Telegram ({creator.platforms.telegram})
                                 </span>
@@ -938,76 +938,110 @@ export function CreatorsView({
                               {creator.platforms.youtube && (
                                 <span>YouTube ({creator.platforms.youtube})</span>
                               )}
-                              <span>•</span>
-                              <span className="text-neutral-500 font-mono">{creator.payoutWalletMasked}</span>
+                              <span className="text-neutral-300 dark:text-neutral-700">•</span>
+                              <span className="text-neutral-500 font-mono text-[11px]">{creator.phone}</span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Promo Code Pill with Copy */}
-                        <div className="flex items-center gap-2 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl p-1.5 pl-3">
-                          <div className="text-left">
-                            <span className="text-[9px] uppercase tracking-wider text-neutral-500 font-label block font-semibold">
-                              Promo Code
+                        {/* Right: Branch Anchor Badge + Promo Code Pill */}
+                        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+                          <div className="hidden md:flex flex-col items-end text-right pr-2.5 border-r border-neutral-200/70 dark:border-[#26372F]">
+                            <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">
+                              Primary POS
                             </span>
-                            <span className="font-mono font-bold text-xs text-neutral-900 dark:text-white tracking-wider">
-                              {creator.promoCode}
+                            <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                              {creator.posBranch}
                             </span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCopy(creator.promoCode, `code-${creator.id}`);
-                            }}
-                            className="p-1 rounded-lg text-neutral-500 hover:text-emerald-600 hover:bg-white dark:hover:bg-[#1A2A24] transition-colors cursor-pointer"
-                            title="Copy Promo Code"
-                          >
-                            {copiedKey === `code-${creator.id}` ? (
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </button>
+
+                          {/* Promo Code Pill with Copy */}
+                          <div className="flex items-center gap-2 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl p-1.5 pl-3">
+                            <div className="text-left">
+                              <span className="text-[9px] uppercase tracking-wider text-neutral-500 font-label block font-semibold">
+                                Promo Code
+                              </span>
+                              <span className="font-mono font-bold text-xs text-neutral-900 dark:text-white tracking-wider">
+                                {creator.promoCode}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(creator.promoCode, `code-${creator.id}`);
+                              }}
+                              className="p-1 rounded-lg text-neutral-500 hover:text-emerald-600 hover:bg-white dark:hover:bg-[#1A2A24] transition-colors cursor-pointer"
+                              title="Copy Promo Code"
+                            >
+                              {copiedKey === `code-${creator.id}` ? (
+                                <Check className="w-4 h-4 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Stats Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3.5 text-xs">
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Attributed Sales</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+                      {/* Balanced 4-Tile Stats Strip */}
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-0.5 text-xs">
+                        {/* Tile 1: Attributed Sales */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            Attributed Sales
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {formatETB(creator.attributedSalesETB)}
                           </div>
                           <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
                             {creator.recordedOrders} recorded orders
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Telegram Clicks</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+
+                        {/* Tile 2: Telegram Velocity */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            Telegram Clicks
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {creator.telegramClicks.toLocaleString()} clicks
                           </div>
                           <div className="text-[10px] text-neutral-600 dark:text-neutral-400">
                             {creator.conversionRatePercent}% conversion
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">In-Store POS Scans</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+
+                        {/* Tile 3: In-Store POS Scans */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            In-Store POS Scans
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {creator.posScans} In-Store
                           </div>
-                          <div className="text-[10px] text-neutral-600 dark:text-neutral-400 truncate">
+                          <div className="text-[10px] text-neutral-600 dark:text-neutral-400 truncate" title={creator.posBranch}>
                             {creator.posBranch}
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Commission Cut</div>
-                          <div className="font-bold text-emerald-700 dark:text-emerald-300 font-mono text-sm mt-0.5">
+
+                        {/* Tile 4: Commission Cut */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-50/50 dark:bg-[#0E231D] border border-emerald-200/60 dark:border-[#1F4539] space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-label font-semibold">
+                              Commission Cut
+                            </span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold">
+                              {creator.commissionRatePercent}%
+                            </span>
+                          </div>
+                          <div className="font-bold text-emerald-700 dark:text-emerald-300 font-mono text-sm">
                             {formatETB(creator.commissionCutETB)}
                           </div>
-                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
-                            {creator.commissionRatePercent}% · {creator.payoutStatus}
+                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {creator.payoutStatus}
                           </div>
                         </div>
                       </div>
