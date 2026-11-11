@@ -35,6 +35,10 @@ import {
   Menu,
   Wallet,
   X,
+  BarChart3,
+  Store,
+  Share2,
+  Layers,
 } from "lucide-react";
 
 export interface CreatorDetailItem {
@@ -454,11 +458,11 @@ export function CreatorsView({
   };
 
   const content = (
-    <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+    <div className="flex-1 flex flex-col min-w-0 w-full">
       {/* Top Header Navigation: Only rendered in Standalone Mode */}
       {!embedded ? (
         <header className="bg-white/95 dark:bg-[#14211D]/95 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F] shadow-2xs">
-          <div className="navbar-shell layout-container min-h-[var(--navbar-height)] px-[var(--page-px)] flex items-center justify-between gap-4 py-3">
+          <div className="navbar-shell layout-container-wide min-h-[var(--navbar-height)] px-[var(--page-px)] flex items-center justify-between gap-4 py-3">
             {/* Breadcrumb & Mesh Badge */}
             <div className="flex items-center gap-3">
               <button
@@ -572,7 +576,7 @@ export function CreatorsView({
       )}
 
       {/* Main Container */}
-      <main className="layout-container flex-1 py-4 sm:py-6 space-y-6">
+      <div className={`${embedded ? "w-full" : "layout-container-wide"} flex-1 py-4 sm:py-6 space-y-6`}>
         {/* ========================================================= */}
         {/* 1. KPI METRIC CARDS ROW (Mindweave Inspired 4-up Layout)  */}
         {/* ========================================================= */}
@@ -1042,10 +1046,278 @@ export function CreatorsView({
                 </button>
               </div>
             </div>
+
+            {/* ========================================================= */}
+            {/* 2A-1. Omnichannel Attribution Performance & Benchmarks    */}
+            {/* ========================================================= */}
+            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h4 className="font-headline font-bold text-sm text-neutral-900 dark:text-white">
+                      Omnichannel Attribution Velocity &amp; Channel Benchmarks
+                    </h4>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      Cross-channel conversion velocity across Addis Ababa influencer touchpoints
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Sync (30D Mesh)
+                </span>
+              </div>
+
+              {/* 3 Channel Benchmark Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                {/* Channel 1: Telegram Drops & Mini-App */}
+                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
+                      <Send className="w-3.5 h-3.5" />
+                      Telegram Mini-App
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+                      5.2% Conv
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
+                      {formatETB(648842)}
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
+                      <span>1,996 orders</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">+18.2% vs avg</span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
+                    <span>AOV: 325 ETB</span>
+                    <span>15-min IP Dedup</span>
+                  </div>
+                </div>
+
+                {/* Channel 2: In-Store Physical POS QR */}
+                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                      <QrCode className="w-3.5 h-3.5" />
+                      In-Store POS (QR)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
+                      3.9% Conv
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
+                      {formatETB(436047)}
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
+                      <span>1,344 orders</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">14 Active POS</span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
+                    <span>AOV: 324 ETB</span>
+                    <span>Bole · Kazanchis</span>
+                  </div>
+                </div>
+
+                {/* Channel 3: Direct Phone & Social Bio */}
+                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Direct Link &amp; Bio
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
+                      2.1% Conv
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
+                      {formatETB(160961)}
+                    </div>
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
+                      <span>496 orders</span>
+                      <span className="text-neutral-500">Steady volume</span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
+                    <span>AOV: 324 ETB</span>
+                    <span>2-Way Normalized</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ========================================================= */}
+            {/* 2A-2. Branch Collateral Pool & Retail Co-Op Grants        */}
+            {/* ========================================================= */}
+            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                    <Store className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h4 className="font-headline font-bold text-sm text-neutral-900 dark:text-white">
+                      Branch Collateral Allocation &amp; Retail Co-Op Quota
+                    </h4>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      Physical QR table-tents and tasting vouchers distributed to cashier stations
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toast.success("Physical marketing collateral batch (PDF) queued for Bole & Kazanchis cashiers")}
+                  className="px-3 py-1.5 bg-neutral-100 dark:bg-[#1A2A24] hover:bg-neutral-200 dark:hover:bg-[#20362E] text-neutral-800 dark:text-neutral-200 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Print Batch (PDF)</span>
+                </button>
+              </div>
+
+              {/* Outlet Collateral Distribution Table */}
+              <div className="space-y-2.5">
+                {[
+                  {
+                    outlet: "Bole Medhanialem Flagship",
+                    type: "500 QR Table Tents & Counter Displays",
+                    creators: "Dawit T., Meron B.",
+                    redeemed: 340,
+                    total: 500,
+                    percent: 68,
+                    speed: "Optimal Velocity",
+                  },
+                  {
+                    outlet: "Kazanchis Tech Corridor",
+                    type: "300 Barcoded Tasting Slips & Flyers",
+                    creators: "Selamawit A., Yohannes K.",
+                    redeemed: 215,
+                    total: 300,
+                    percent: 72,
+                    speed: "High Demand",
+                  },
+                  {
+                    outlet: "Piassa Heritage Roastery",
+                    type: "200 Coffee Tasting Discount Cards",
+                    creators: "Bethlehem G., Rahel M.",
+                    redeemed: 145,
+                    total: 200,
+                    percent: 73,
+                    speed: "Consistent",
+                  },
+                ].map((row) => (
+                  <div
+                    key={row.outlet}
+                    className="p-3.5 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-neutral-900 dark:text-white font-headline">
+                          {row.outlet}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-800/50 font-medium">
+                          {row.speed}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                        {row.type} &bull; <span className="font-medium text-neutral-700 dark:text-neutral-300">Anchored: {row.creators}</span>
+                      </div>
+                    </div>
+
+                    <div className="sm:text-right space-y-1 shrink-0 min-w-[140px]">
+                      <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
+                        <span className="font-bold font-mono text-neutral-900 dark:text-white">
+                          {row.redeemed} / {row.total}
+                        </span>
+                        <span className="text-neutral-400 font-mono text-[11px]">({row.percent}%)</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-neutral-200 dark:bg-[#20362E] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500 rounded-full"
+                          style={{ width: `${row.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Creator Recruitment Onboarding Link */}
+              <div className="pt-2 border-t border-neutral-100 dark:border-[#1E3029] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+                  <Share2 className="w-4 h-4 text-emerald-600" />
+                  <span className="font-medium">Direct Creator Onboarding Link:</span>
+                </div>
+                <div className="flex items-center gap-2 flex-1 max-w-sm">
+                  <input
+                    type="text"
+                    readOnly
+                    value="https://ethiolink.et/creators/join?brand=tobiya-coffee"
+                    className="w-full px-3 py-1.5 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-xs font-mono text-neutral-700 dark:text-neutral-300 truncate focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleCopy("https://ethiolink.et/creators/join?brand=tobiya-coffee", "brand-invite-link")}
+                    className="px-3 py-1.5 bg-white dark:bg-[#1A2A24] border border-[#D7DED9] dark:border-[#2B4237] hover:bg-neutral-50 dark:hover:bg-[#20362E] text-xs font-semibold text-neutral-800 dark:text-neutral-200 rounded-xl transition-colors shrink-0 cursor-pointer"
+                  >
+                    {copiedKey === "brand-invite-link" ? (
+                      <span className="text-emerald-600 flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Copied</span>
+                    ) : (
+                      <span className="flex items-center gap-1"><Copy className="w-3.5 h-3.5 text-neutral-400" /> Copy</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ========================================================= */}
+            {/* 2A-3. Compliance, Float-Drift & Privacy Guarantee         */}
+            {/* ========================================================= */}
+            <div className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#26372F] grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs text-neutral-600 dark:text-neutral-400">
+              <div className="flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
+                    Zero Float-Drift Protection
+                  </span>
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Calculated in exact integer cents to eliminate floating-point precision loss.
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
+                    Daily Salted Hash Privacy
+                  </span>
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Zero raw customer IPs stored. 24h rotating SHA-256 telemetry hashing.
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Wallet className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-neutral-900 dark:text-white block font-headline">
+                    Automated Gateway Sync
+                  </span>
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Instant settlement disbursement pipelines via Telebirr &amp; CBE Birr API rails.
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* 2B. RIGHT COLUMN: Selected Creator Deep Dive Panel (col-span-4) */}
-          <div className="lg:col-span-4 space-y-4 sticky top-20">
+          <div className="lg:col-span-4 space-y-4">
             <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-5">
               {/* Creator Header */}
               <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dark:border-[#1E3029]">
@@ -1477,7 +1749,7 @@ export function CreatorsView({
             &copy; {new Date().getFullYear()} EthioLink creator attribution platform. Bole, Addis Ababa, Ethiopia.
           </p>
         </footer>
-      </main>
+      </div>
 
       {/* Invite / Add Creator Modal */}
       {isInviteModalOpen && (
