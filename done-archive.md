@@ -44,3 +44,6 @@
 
 ## Archived 2026-11-10
 - [x] ETL-024 - feat: merchant campaign editing, destination updates, and immutability guardrails https://github.com/hamdi-ab/ethiolink/pull/32 (merged 2026-10-28)
+
+## Archived 2026-11-11
+- [x] ETL-025 - feat: campaign comparison matrix, cohort benchmarking, and attribution disclaimers https://github.com/hamdi-ab/ethiolink/pull/33 (kind: feature) (merged 2026-10-28)
