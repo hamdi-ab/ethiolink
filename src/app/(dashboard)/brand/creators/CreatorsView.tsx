@@ -33,7 +33,6 @@ import {
   ChevronRight,
   ChevronDown,
   Menu,
-  Wallet,
   X,
 } from "lucide-react";
 
@@ -1345,6 +1344,28 @@ export function CreatorsView({
                     time: "31m ago",
                     payment: "Telebirr",
                   },
+                  {
+                    id: "TX-9004",
+                    creator: "Yohannes K.",
+                    handle: "@habesha_gear",
+                    channel: "Telegram QR",
+                    branch: "CMC Tech Mall",
+                    amount: 1850,
+                    cut: 185,
+                    time: "42m ago",
+                    payment: "CBE Birr",
+                  },
+                  {
+                    id: "TX-8998",
+                    creator: "Helen Lifestyle & Food",
+                    handle: "@helen_addis_lifestyle",
+                    channel: "Bole Flagship POS",
+                    branch: "Bole Flagship",
+                    amount: 1500,
+                    cut: 150,
+                    time: "58m ago",
+                    payment: "Telebirr",
+                  },
                 ].map((tx) => (
                   <div
                     key={tx.id}
@@ -1376,76 +1397,6 @@ export function CreatorsView({
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Settlement & Payout Schedule Module */}
-            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
-                <div className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <h4 className="font-headline font-bold text-xs uppercase tracking-wider text-neutral-900 dark:text-white">
-                    Commission Payout Schedule
-                  </h4>
-                </div>
-                <span className="text-[10px] font-mono text-neutral-500 font-medium">Nov 1, 2026 Cycle</span>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <div className="flex items-baseline justify-between mb-1">
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">Total Accrued Payout</span>
-                    <span className="text-lg font-bold font-mono font-headline text-neutral-900 dark:text-white">
-                      {formatETB(124580)}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-neutral-400">
-                    Calculated from verified in-store POS scans and Telegram bot voucher redemptions.
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 pt-2 border-t border-neutral-100 dark:border-[#1E3029]">
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-blue-500" />
-                        Telebirr Instant Payouts (68%)
-                      </span>
-                      <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">
-                        {formatETB(84714.4)}
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-neutral-100 dark:bg-[#20362E] rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-500 w-[68%]" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-neutral-600 dark:text-neutral-400 font-medium flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-purple-500" />
-                        CBE Birr Corporate Direct (32%)
-                      </span>
-                      <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">
-                        {formatETB(39865.6)}
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-neutral-100 dark:bg-[#20362E] rounded-full overflow-hidden">
-                      <div className="h-full bg-purple-500 w-[32%]" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleExportCSV}
-                    className="w-full py-2 px-3 rounded-xl border border-[#D7DED9] dark:border-[#2B4237] hover:bg-neutral-50 dark:hover:bg-[#1A2A24] text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5 text-neutral-500" />
-                    <span>Export Payout Batch (CSV/TIN)</span>
-                  </button>
-                </div>
               </div>
             </div>
 
