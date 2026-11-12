@@ -35,7 +35,6 @@ import {
   Menu,
   Wallet,
   X,
-  BarChart3,
 } from "lucide-react";
 
 export interface CreatorDetailItem {
@@ -1075,112 +1074,6 @@ export function CreatorsView({
                 >
                   Next
                 </button>
-              </div>
-            </div>
-
-            {/* ========================================================= */}
-            {/* 2A-1. Omnichannel Attribution Performance & Benchmarks    */}
-            {/* ========================================================= */}
-            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4" />
-                  </span>
-                  <div>
-                    <h4 className="font-headline font-bold text-sm text-neutral-900 dark:text-white">
-                      Omnichannel Attribution Velocity &amp; Channel Benchmarks
-                    </h4>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Cross-channel conversion velocity across Addis Ababa influencer touchpoints
-                    </p>
-                  </div>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Sync (30D Mesh)
-                </span>
-              </div>
-
-              {/* 3 Channel Benchmark Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                {/* Channel 1: Telegram Drops & Mini-App */}
-                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                      <Send className="w-3.5 h-3.5" />
-                      Telegram Mini-App
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
-                      5.2% Conv
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
-                      {formatETB(648842)}
-                    </div>
-                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
-                      <span>1,996 orders</span>
-                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">+18.2% vs avg</span>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
-                    <span>AOV: 325 ETB</span>
-                    <span>15-min IP Dedup</span>
-                  </div>
-                </div>
-
-                {/* Channel 2: In-Store Physical POS QR */}
-                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-                      <QrCode className="w-3.5 h-3.5" />
-                      In-Store POS (QR)
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
-                      3.9% Conv
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
-                      {formatETB(436047)}
-                    </div>
-                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
-                      <span>1,344 orders</span>
-                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">14 Active POS</span>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
-                    <span>AOV: 324 ETB</span>
-                    <span>Bole · Kazanchis</span>
-                  </div>
-                </div>
-
-                {/* Channel 3: Direct Phone & Social Bio */}
-                <div className="p-4 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/70 dark:border-[#2B4237]/70 space-y-2.5 hover:border-emerald-500/40 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      Direct Link &amp; Bio
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
-                      2.1% Conv
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold font-mono text-neutral-900 dark:text-white">
-                      {formatETB(160961)}
-                    </div>
-                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center justify-between mt-0.5">
-                      <span>496 orders</span>
-                      <span className="text-neutral-500">Steady volume</span>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-neutral-200/60 dark:border-[#1E3029] text-[10px] text-neutral-400 flex justify-between">
-                    <span>AOV: 324 ETB</span>
-                    <span>2-Way Normalized</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
