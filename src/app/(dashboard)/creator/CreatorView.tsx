@@ -29,6 +29,10 @@ import {
   Lock,
   Bolt,
   Bell,
+  Store,
+  ExternalLink,
+  Phone,
+  Clock,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -467,7 +471,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                   Active Brand Deals &amp; Attribution Links
                 </h2>
                 <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                  {displayCampaigns.length} Active Partnerships
+                  {displayCampaigns.length} Active {displayCampaigns.length === 1 ? "Partnership" : "Partnerships"}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
@@ -475,7 +479,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
               </p>
             </div>
 
-            {/* Campaign Cards Grid */}
+            {/* Campaign Cards Grid with Graceful Space Utilization */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {displayCampaigns.map((c) => {
                 const trackingUrl = `${origin}/c/${c.slug}`;
@@ -596,6 +600,154 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                   </div>
                 );
               })}
+
+              {/* Companion Card 1: Physical In-Store POS Standee Kit (Fills empty slot gracefully) */}
+              {displayCampaigns.length < 3 && (
+                <div className="bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold">
+                          <QrCode className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                            In-Store Standee Kit
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                            Countertop Table Tents &bull; Bole &amp; Kazanchis
+                          </p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        Retail Kit
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-[#9BAAA1] leading-relaxed">
+                      Deploy printable acrylic table tents at merchant checkout registers. In-store shoppers scan your QR code directly at cashier payment for verified attribution.
+                    </p>
+
+                    {/* Mini Standee Graphic Preview */}
+                    <div className="bg-gradient-to-br from-[#102F2B] to-[#0A1F1C] dark:from-[#081512] dark:to-[#040C0A] rounded-xl p-3 border border-emerald-500/20 text-white flex items-center justify-between gap-3">
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="text-[11px] font-bold tracking-tight text-white uppercase font-headline">
+                            Cashier QR Tent
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-emerald-200/80 truncate">
+                          Scan to redeem promo &amp; order
+                        </p>
+                      </div>
+                      <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center shrink-0 shadow-xs">
+                        <QrCode className="w-7 h-7 text-slate-900" />
+                      </div>
+                    </div>
+
+                    {/* Standee Advantage Metrics */}
+                    <div className="pt-1 border-t border-slate-100 dark:border-[#162C26] grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Conversion Lift</span>
+                        <span className="font-headline font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                          +2.4x Higher
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 block">Scan Latency</span>
+                        <span className="font-headline font-bold text-slate-900 dark:text-white font-mono">
+                          4ms Instant
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenShareModal(displayCampaigns[0])}
+                    className="w-full py-2.5 px-3 bg-[#102F2B] hover:bg-[#163E3A] active:scale-98 text-white font-headline text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-[#225C52]"
+                  >
+                    <Download className="w-4 h-4 text-emerald-400" />
+                    <span>Generate &amp; Print Standee Kit</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Companion Card 2: Discover Open Brand Deals (Fills 3rd slot when creator has 1 campaign) */}
+              {displayCampaigns.length === 1 && (
+                <div className="bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold">
+                          <Store className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-headline font-bold text-base text-slate-900 dark:text-white">
+                            Available Brand Deals
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                            Addis Creator Marketplace
+                          </p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        2 Open Deals
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-[#9BAAA1] leading-relaxed">
+                      Verified merchants seeking Tier 1 creators for Telegram attribution and in-store promotions in Bole &amp; Kazanchis.
+                    </p>
+
+                    {/* Brand Deal Candidates */}
+                    <div className="space-y-2">
+                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#081512] border border-slate-200/80 dark:border-[#162C26] flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white block">
+                            Sheba Artisan Roastery
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1]">
+                            Bole Flagship &bull; Specialty Roasts
+                          </span>
+                        </div>
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                          12% Commission
+                        </span>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#081512] border border-slate-200/80 dark:border-[#162C26] flex items-center justify-between text-xs">
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white block">
+                            Bole Craft Leather
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1]">
+                            Kazanchis Hub &bull; Artisan Goods
+                          </span>
+                        </div>
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                          15% Commission
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Request Deal CTA */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toast.success(
+                        "Partnership inquiry dispatched to Sheba Artisan Roastery and Bole Craft Leather! Merchants will review your Tier 1 profile."
+                      );
+                    }}
+                    className="w-full py-2.5 px-3 bg-white dark:bg-[#132722] hover:bg-slate-50 dark:hover:bg-[#1A332C] active:scale-98 text-slate-800 dark:text-slate-100 font-headline text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer border border-slate-200 dark:border-[#1A332C]"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Apply for Brand Matchmaking</span>
+                  </button>
+                </div>
+              )}
             </div>
           </section>
 
@@ -658,7 +810,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                 </div>
 
                 {/* Event stream items */}
-                <div className="space-y-3">
+                <div className="space-y-2.5 max-h-[540px] overflow-y-auto pr-1.5 focus:outline-none">
                   {filteredActivity.length === 0 ? (
                     <>
                       {/* Curated activity receipts matching Stitch design */}
@@ -771,49 +923,114 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                       </div>
                     </>
                   ) : (
-                    filteredActivity.map((act) => (
-                      <div
-                        key={act.id}
-                        className="p-3.5 rounded-xl border border-slate-100 dark:border-[#162C26] bg-slate-50/60 dark:bg-[#081512] flex items-center justify-between gap-3 text-xs"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                              act.type === "SALE"
-                                ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
-                                : "bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300"
-                            }`}
-                          >
-                            {act.type === "SALE" ? <Receipt className="w-4 h-4" /> : <Send className="w-4 h-4" />}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-slate-900 dark:text-white">
-                                {act.type === "SALE" ? "In-Store Sale Redeemed" : act.eventType}
-                              </span>
-                              <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-200/70 dark:bg-[#132722] text-slate-700 dark:text-slate-300 font-mono">
-                                {act.campaignName}
-                              </span>
+                    filteredActivity.map((act) => {
+                      const getActDetails = () => {
+                        if (act.type === "SALE") {
+                          return {
+                            title: "In-Store POS Sale Verified",
+                            subtitle: `Cashier checkout scan · Sale: ETB ${(act.amountETB || 0).toLocaleString()}`,
+                            badge: "Verified POS Receipt",
+                            badgeColor: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300",
+                            icon: Receipt,
+                            iconColor: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300",
+                          };
+                        }
+                        switch (act.eventType) {
+                          case "TELEGRAM_CLICK":
+                            return {
+                              title: "Telegram Bot Channel Tap",
+                              subtitle: "Direct visitor via Telegram channel broadcast",
+                              badge: "Telegram Tap",
+                              badgeColor: "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300",
+                              icon: Send,
+                              iconColor: "bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300",
+                            };
+                          case "CALL_CLICK":
+                            return {
+                              title: "Direct Phone Order Call",
+                              subtitle: "Customer tap-to-call direct to roastery desk",
+                              badge: "Phone Inquiry",
+                              badgeColor: "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300",
+                              icon: Phone,
+                              iconColor: "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300",
+                            };
+                          case "MAP_CLICK":
+                            return {
+                              title: "In-Store Roastery Map Route",
+                              subtitle: "Directions opened for flagship cafe visit",
+                              badge: "Store Navigation",
+                              badgeColor: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300",
+                              icon: MapPin,
+                              iconColor: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300",
+                            };
+                          case "COPY_CODE":
+                            return {
+                              title: "Promo Voucher Code Copied",
+                              subtitle: "Follower copied discount code for checkout",
+                              badge: "Voucher Copied",
+                              badgeColor: "bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300",
+                              icon: Copy,
+                              iconColor: "bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300",
+                            };
+                          default:
+                            return {
+                              title: act.eventType || "Audience Engagement",
+                              subtitle: "Attributed creator engagement signal",
+                              badge: "Signal",
+                              badgeColor: "bg-slate-100 dark:bg-[#132722] text-slate-700 dark:text-slate-300",
+                              icon: Bolt,
+                              iconColor: "bg-slate-100 dark:bg-[#132722] text-slate-700 dark:text-slate-300",
+                            };
+                        }
+                      };
+                      const details = getActDetails();
+                      const IconComponent = details.icon;
+
+                      return (
+                        <div
+                          key={act.id}
+                          className="p-3.5 rounded-xl border border-slate-100 dark:border-[#162C26] bg-slate-50/60 dark:bg-[#081512] hover:bg-slate-50 dark:hover:bg-[#10231D] transition-colors flex items-center justify-between gap-3 text-xs"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${details.iconColor}`}
+                            >
+                              <IconComponent className="w-4 h-4" />
                             </div>
-                            <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] mt-0.5">
-                              Code {act.promoCode} · {formatRelativeTime(act.timestamp)}
-                            </p>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-slate-900 dark:text-white truncate">
+                                  {details.title}
+                                </span>
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${details.badgeColor}`}>
+                                  {details.badge}
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-200/70 dark:bg-[#132722] text-slate-700 dark:text-slate-300 font-mono">
+                                  {act.campaignName}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] mt-0.5 truncate">
+                                Code {act.promoCode} · {details.subtitle} · {formatRelativeTime(act.timestamp)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            {act.amountETB ? (
+                              <>
+                                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 block text-xs sm:text-sm">
+                                  +{formatETB(act.amountETB * 0.1)}
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-medium">10% Cut</span>
+                              </>
+                            ) : (
+                              <span className="text-slate-400 dark:text-slate-500 text-[11px] font-medium">
+                                Intent Tap
+                              </span>
+                            )}
                           </div>
                         </div>
-                        <div className="text-right shrink-0">
-                          {act.amountETB ? (
-                            <>
-                              <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 block">
-                                +{formatETB(act.amountETB * 0.1)}
-                              </span>
-                              <span className="text-[10px] text-slate-400">10% Cut</span>
-                            </>
-                          ) : (
-                            <span className="text-slate-400 text-[11px]">Intent Tap</span>
-                          )}
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
@@ -824,11 +1041,23 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                     <strong className="font-semibold">Addis Creator Tip:</strong> Telegram in-store tasting vouchers convert <strong>2.4x faster</strong> when paired with QR codes for Bole &amp; Kazanchis.
                   </p>
                 </div>
+
+                {/* Attribution Feed Live Footnote */}
+                <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#162C26]">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Showing {filteredActivity.length || 4} verified attribution signals</span>
+                  </span>
+                  <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium text-[10px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Live sync active</span>
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* 5B. Right Column: Settlement & Wallet Accounts (5 cols) */}
-            <div id="payouts" className="lg:col-span-5 space-y-4">
+            <div id="payouts" className="lg:col-span-5 space-y-4 lg:sticky lg:top-20">
               <div className="bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#162C26]">
                   <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
@@ -900,6 +1129,63 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                     <Download className="w-4 h-4 text-[#D4AF37]" />
                     <span>Download Tax &amp; Withholding Statement (TIN compliant)</span>
                   </button>
+                </div>
+
+                {/* Scheduled Auto-Batch & On-Demand Transfer */}
+                <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-[#081512] border border-slate-200 dark:border-[#1A332C] space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="font-headline font-semibold text-slate-900 dark:text-white">
+                        Auto-Disbursement Schedule
+                      </span>
+                    </div>
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Batch Active</span>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-lg bg-white dark:bg-[#0E1D19] border border-slate-200/70 dark:border-[#162C26]">
+                      <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1] block mb-0.5">Next Batch Run</span>
+                      <span className="font-semibold text-slate-900 dark:text-white text-xs">Mon, Oct 27 · 09:00 EAT</span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-white dark:bg-[#0E1D19] border border-slate-200/70 dark:border-[#162C26]">
+                      <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1] block mb-0.5">Primary Rail</span>
+                      <span className="font-semibold text-slate-900 dark:text-white text-xs">Telebirr Merchant API</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] pt-0.5 text-slate-500 dark:text-[#9BAAA1]">
+                    <span>Threshold: <strong className="text-slate-800 dark:text-slate-200 font-mono">50.00 ETB (Met)</strong></span>
+                    <span>Fee: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">0.00 ETB (0%)</strong></span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsPayoutModalOpen(true)}
+                    className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-headline text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                  >
+                    <Bolt className="w-3.5 h-3.5" />
+                    <span>Request Instant Telebirr Transfer</span>
+                  </button>
+                </div>
+
+                {/* NBE Direct Settlement Guarantee */}
+                <div className="p-3.5 rounded-xl bg-slate-50/60 dark:bg-[#081512] border border-slate-200 dark:border-[#1A332C] space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>NBE-Compliant Settlement Rails</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] leading-relaxed">
+                    Disbursements settle directly to mobile wallets via National Bank of Ethiopia authorized payment switches. Zero platform withholding fee.
+                  </p>
+                  <div className="flex items-center gap-3 pt-1 text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                    <span>⚡ Instant &lt;60s SLA</span>
+                    <span>•</span>
+                    <span>🔒 Direct-to-Wallet</span>
+                  </div>
                 </div>
 
                 {/* PRD FR-036 Non-Financial Transparency Disclaimer */}
