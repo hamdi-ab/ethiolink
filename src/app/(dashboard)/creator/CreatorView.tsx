@@ -275,6 +275,16 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                 <span className="font-medium text-[11px]">This Month (Oct 1 - Oct 22, 2026)</span>
               </div>
 
+              {/* Language Switch */}
+              <button
+                type="button"
+                onClick={() => setLang(lang === "en" ? "am" : "en")}
+                className="px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-slate-100 dark:hover:bg-[#132722] rounded-xl border border-[#D7DED9] dark:border-[#1A332C] transition-colors cursor-pointer"
+                title="Toggle Amharic / English"
+              >
+                {lang === "en" ? "አማ / EN" : "EN / አማ"}
+              </button>
+
               {/* Notification Bell */}
               <button
                 type="button"

@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { formatETB } from "@/lib/sales";
 import {
   Layers,
   LayoutGrid,
@@ -30,12 +29,12 @@ export interface CreatorSidebarProps {
   activeTab: "overview" | "campaigns" | "links" | "payouts";
   onSelectTab: (tab: "overview" | "campaigns" | "links" | "payouts") => void;
   campaignCount: number;
-  estimatedCommissionETB: number;
+  estimatedCommissionETB?: number;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
   onOpenReportModal: () => void;
-  lang: "en" | "am";
-  onToggleLang: () => void;
+  lang?: "en" | "am";
+  onToggleLang?: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
@@ -45,12 +44,9 @@ export function CreatorSidebar({
   activeTab,
   onSelectTab,
   campaignCount,
-  estimatedCommissionETB,
   isMobileOpen,
   onCloseMobile,
   onOpenReportModal,
-  lang,
-  onToggleLang,
   isCollapsed = false,
   onToggleCollapse,
 }: CreatorSidebarProps) {
@@ -496,10 +492,10 @@ export function CreatorSidebar({
                   </div>
                   <div className="text-[11px] text-emerald-300 dark:text-[#83D1A5] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <span>Telebirr Linked</span>
+                    <span>Telebirr &amp; CBE Live</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 font-normal border-t border-[#1E4D43]/60 dark:border-[#26372F] pt-1 mt-0.5 font-mono">
-                    {formatETB(estimatedCommissionETB > 0 ? estimatedCommissionETB : 0)} Available
+                  <div className="text-[10px] text-slate-400 font-normal border-t border-[#1E4D43]/60 dark:border-[#26372F] pt-1 mt-0.5">
+                    Role: <strong className="text-slate-200">Creator Partner</strong>
                   </div>
                 </div>
               </div>
@@ -542,21 +538,16 @@ export function CreatorSidebar({
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse shrink-0" />
-                  <div className="min-w-0">
-                    <span className="text-[11px] font-medium text-slate-200 group-hover/gateway:text-white block truncate">
-                      Telebirr &amp; CBE Birr
-                    </span>
-                    <span className="text-[10px] text-emerald-300 dark:text-[#83D1A5] font-mono block truncate">
-                      {formatETB(estimatedCommissionETB > 0 ? estimatedCommissionETB : 0)} Available
-                    </span>
-                  </div>
+                  <span className="text-[11px] font-medium text-slate-200 group-hover/gateway:text-white truncate">
+                    Telebirr &amp; CBE Birr
+                  </span>
                 </div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-950/80 dark:bg-[#193629] px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
-                  Linked
+                  Active
                 </span>
               </button>
 
-              {/* Creator Profile, Language Toggle, Themed ThemeToggle & Sign Out */}
+              {/* Creator Profile, Theme Toggle & Sign Out (Matching BrandSidebar Spec) */}
               <div className="flex items-center justify-between px-1.5 pt-1">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
@@ -573,14 +564,6 @@ export function CreatorSidebar({
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={onToggleLang}
-                    className="px-2 py-1 text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#163E3A] rounded-lg border border-[#225C52]/60 transition-colors cursor-pointer"
-                    title="Toggle Amharic / English"
-                  >
-                    {lang === "en" ? "አማ / EN" : "EN / አማ"}
-                  </button>
                   <ThemeToggle
                     size="sm"
                     className="!bg-[#163E3A] hover:!bg-[#1C4E49] !border-[#225C52] !text-emerald-100 rounded-lg"
