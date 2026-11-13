@@ -15,7 +15,6 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
-  CheckCircle2,
   PieChart,
 } from "lucide-react";
 
@@ -175,12 +174,9 @@ export function CreatorSidebar({
                   <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#163E3A] rounded-full" />
                 </div>
                 <div className="truncate">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-xs font-semibold text-white truncate leading-tight group-hover/creator:text-emerald-200 transition-colors">
-                      {creator.name}
-                    </p>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  </div>
+                  <p className="text-xs font-semibold text-white truncate leading-tight group-hover/creator:text-emerald-200 transition-colors">
+                    {creator.name}
+                  </p>
                   <p className="text-[10px] text-slate-300 dark:text-[#9BAAA1] truncate mt-0.5 font-mono">
                     {creator.telegramUsername ? `@${creator.telegramUsername}` : "@creator_partner"}
                   </p>
