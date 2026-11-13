@@ -754,11 +754,11 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
           {/* ========================================================= */}
           {/* 5. BOTTOM ACTIVITY & SETTLEMENT SECTION (Two Columns)     */}
           {/* ========================================================= */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             {/* 5A. Left Column: Live Attributed Commission Stream (7 cols) */}
-            <div id="links" className="lg:col-span-7 space-y-4">
-              <div className="bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-[#162C26] pb-3">
+            <div id="links" className="lg:col-span-7 flex flex-col">
+              <div className="h-full bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs flex flex-col justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-[#162C26] pb-3 shrink-0">
                   <div className="flex items-center gap-2">
                     <span className="font-headline font-bold text-sm text-slate-900 dark:text-white">
                       Live Attributed Commission Stream
@@ -810,7 +810,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                 </div>
 
                 {/* Event stream items */}
-                <div className="space-y-2.5 max-h-[540px] overflow-y-auto pr-1.5 focus:outline-none">
+                <div className="flex-1 min-h-[300px] max-h-[605px] overflow-y-auto pr-1.5 focus:outline-none space-y-2.5 custom-scrollbar my-3">
                   {filteredActivity.length === 0 ? (
                     <>
                       {/* Curated activity receipts matching Stitch design */}
@@ -1034,31 +1034,34 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                   )}
                 </div>
 
-                {/* Addis Creator Tip (Amber highlight) */}
-                <div className="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
-                  <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0 mt-0.5">💡</span>
-                  <p>
-                    <strong className="font-semibold">Addis Creator Tip:</strong> Telegram in-store tasting vouchers convert <strong>2.4x faster</strong> when paired with QR codes for Bole &amp; Kazanchis.
-                  </p>
-                </div>
+                {/* Bottom group: Tip + Live Footnote */}
+                <div className="shrink-0 space-y-3 pt-1">
+                  {/* Addis Creator Tip (Amber highlight) */}
+                  <div className="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                    <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0 mt-0.5">💡</span>
+                    <p>
+                      <strong className="font-semibold">Addis Creator Tip:</strong> Telegram in-store tasting vouchers convert <strong>2.4x faster</strong> when paired with QR codes for Bole &amp; Kazanchis.
+                    </p>
+                  </div>
 
-                {/* Attribution Feed Live Footnote */}
-                <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#162C26]">
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Showing {filteredActivity.length || 4} verified attribution signals</span>
-                  </span>
-                  <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium text-[10px]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Live sync active</span>
-                  </span>
+                  {/* Attribution Feed Live Footnote */}
+                  <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-[#9BAAA1] border-t border-slate-100 dark:border-[#162C26]">
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Showing {filteredActivity.length || 4} verified attribution signals</span>
+                    </span>
+                    <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium text-[10px]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Live sync active</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* 5B. Right Column: Settlement & Wallet Accounts (5 cols) */}
-            <div id="payouts" className="lg:col-span-5 space-y-4 lg:sticky lg:top-20">
-              <div className="bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs space-y-4">
+            <div id="payouts" className="lg:col-span-5 flex flex-col">
+              <div className="h-full bg-white dark:bg-[#0E1D19] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#1A332C] shadow-xs flex flex-col space-y-3.5">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#162C26]">
                   <h2 className="font-headline font-bold text-base text-slate-900 dark:text-white">
                     Settlement &amp; Wallet Accounts
