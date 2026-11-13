@@ -77,6 +77,7 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
     brandName: string;
   } | null>(null);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -224,12 +225,18 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
         onOpenReportModal={() => setIsReportIssueOpen(true)}
         lang={lang}
         onToggleLang={() => setLang(lang === "en" ? "am" : "en")}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
       />
 
       {/* ======================================================== */}
       {/* 2. MAIN WORKSPACE CANVAS                                 */}
       {/* ======================================================== */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-[268px] transition-all duration-300">
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
+          isSidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
+        }`}
+      >
         {/* Top Header Navigation (navbar-shell max-w-4xl preserved for layout-tokens test compliance) */}
         <header className="bg-white/95 dark:bg-[#0E1D19]/95 backdrop-blur-md sticky top-0 z-30 border-b border-[#D7DED9]/80 dark:border-[#1A332C] shadow-2xs">
           <div className="navbar-shell max-w-4xl lg:max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
