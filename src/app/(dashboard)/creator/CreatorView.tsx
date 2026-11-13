@@ -28,7 +28,6 @@ import {
   Menu,
   Lock,
   Bolt,
-  Bell,
   Store,
   ExternalLink,
   Phone,
@@ -287,18 +286,6 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                 title="Toggle Amharic / English"
               >
                 {lang === "en" ? "አማ / EN" : "EN / አማ"}
-              </button>
-
-              {/* Notification Bell */}
-              <button
-                type="button"
-                onClick={() => toast.info("Attribution mesh synchronized. All POS and Telegram clicks updated.")}
-                className="relative p-2 rounded-xl bg-slate-50 dark:bg-[#081512] border border-[#D7DED9] dark:border-[#1A332C] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#132722] transition-colors cursor-pointer"
-                title="Notifications"
-                aria-label="View notifications"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0E1D19]" />
               </button>
 
               {/* Request Instant Telebirr Payout CTA */}
