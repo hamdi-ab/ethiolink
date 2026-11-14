@@ -15,7 +15,6 @@ import {
   CreditCard,
   MapPin,
   Clock,
-  Compass,
   Check,
   Copy,
   ExternalLink,
@@ -24,7 +23,6 @@ import {
   QrCode,
   Wallet,
   Globe,
-  Radio,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 

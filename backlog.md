@@ -3,6 +3,7 @@
 ## In flight
 ## Queued
 ## Done
+- [x] ETL-032 - feat-creator: modernize creator portal and earnings overview to align with stitch design system https://github.com/hamdi-ab/ethiolink/pull/40 (merged 2026-11-10)
 - [x] ETL-031 - feat(ui): integrate shadcn/ui primitives, modernize brand campaign actions, and add accessible dialogs https://github.com/hamdi-ab/ethiolink/pull/39 (kind: feature) (merged 2026-10-30)
 - [x] ETL-030 - polish(ui): universal tokens for sidebar, navbars, and page horizontal padding https://github.com/hamdi-ab/ethiolink/pull/38 (kind: polish) (merged 2026-10-30)
 - [x] ETL-029 - chore(core): eliminate mock data, fix hardcoded fallbacks, and centralize environment configuration https://github.com/hamdi-ab/ethiolink/pull/37 (kind: chore) (merged 2026-10-30)
@@ -12,4 +13,3 @@
 - [x] ETL-025 - feat: campaign comparison matrix, cohort benchmarking, and attribution disclaimers https://github.com/hamdi-ab/ethiolink/pull/33 (kind: feature) (merged 2026-10-28)
 - [x] ETL-024 - feat: merchant campaign editing, destination updates, and immutability guardrails https://github.com/hamdi-ab/ethiolink/pull/32 (merged 2026-10-28)
 - [x] ETL-023 - feat: in-store sales voiding, transaction corrections, and audit ledger https://github.com/hamdi-ab/ethiolink/pull/31 (merged 2026-10-28)
-- [x] ETL-022 - feat: campaign lifecycle status machine, expiry gating, and merchant controls https://github.com/hamdi-ab/ethiolink/pull/30 (kind: feature) (merged 2026-10-28)
