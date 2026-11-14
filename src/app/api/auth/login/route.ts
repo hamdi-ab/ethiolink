@@ -21,9 +21,31 @@ export async function POST(req: NextRequest) {
 
     const normalizedPhone = phone.trim();
 
-    // Query user by phone with brand relation
-    const user = await db.user.findUnique({
-      where: { phone: normalizedPhone },
+    // Support flexible Ethiopian phone matching (+2519..., 09..., 2519..., 9...)
+    const phoneCandidates = new Set<string>([normalizedPhone]);
+    const digitsOnly = normalizedPhone.replace(/\D/g, "");
+
+    if (digitsOnly.length === 9 && (digitsOnly.startsWith("9") || digitsOnly.startsWith("7"))) {
+      phoneCandidates.add(`0${digitsOnly}`);
+      phoneCandidates.add(`+251${digitsOnly}`);
+      phoneCandidates.add(`251${digitsOnly}`);
+    } else if (digitsOnly.length === 10 && digitsOnly.startsWith("0")) {
+      const nineDigits = digitsOnly.slice(1);
+      phoneCandidates.add(digitsOnly);
+      phoneCandidates.add(`+251${nineDigits}`);
+      phoneCandidates.add(`251${nineDigits}`);
+    } else if (digitsOnly.length === 12 && digitsOnly.startsWith("251")) {
+      const nineDigits = digitsOnly.slice(3);
+      phoneCandidates.add(`0${nineDigits}`);
+      phoneCandidates.add(`+251${nineDigits}`);
+      phoneCandidates.add(digitsOnly);
+    }
+
+    // Query user by phone candidates with brand relation
+    const user = await db.user.findFirst({
+      where: {
+        phone: { in: Array.from(phoneCandidates) },
+      },
       include: {
         brand: {
           select: {
@@ -35,6 +57,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !user.passwordHash) {
+      console.warn(
+        `⚠️ [AUTH 401] No user found for phone "${normalizedPhone}". Generated candidate queries: ${JSON.stringify(Array.from(phoneCandidates))}`
+      );
       return NextResponse.json(
         { error: "Invalid phone number or password" },
         { status: 401 }
@@ -43,6 +68,9 @@ export async function POST(req: NextRequest) {
 
     const isMatch = await verifyPassword(password, user.passwordHash);
     if (!isMatch) {
+      console.warn(
+        `⚠️ [AUTH 401] Password mismatch for user "${user.name}" (${user.phone}). Note: seeded password is "EthioLink2026!".`
+      );
       return NextResponse.json(
         { error: "Invalid phone number or password" },
         { status: 401 }

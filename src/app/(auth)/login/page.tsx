@@ -33,6 +33,8 @@ interface RoleConfig {
   helperText: string;
   passwordLabel: string;
   defaultDestination: string;
+  demoPhone: string;
+  demoLabel: string;
 }
 
 const ROLE_CONFIGS: Record<OperatingRole, RoleConfig> = {
@@ -45,6 +47,8 @@ const ROLE_CONFIGS: Record<OperatingRole, RoleConfig> = {
     helperText: "Full Brand Governance Access",
     passwordLabel: "Account Password",
     defaultDestination: "/brand",
+    demoPhone: "0911111111",
+    demoLabel: "Tomoca Owner (0911 111 111)",
   },
   cashier: {
     title: "Cashier POS Terminal",
@@ -55,6 +59,8 @@ const ROLE_CONFIGS: Record<OperatingRole, RoleConfig> = {
     helperText: "Retail Storefront Node",
     passwordLabel: "Staff Password or Store PIN",
     defaultDestination: "/brand/sales",
+    demoPhone: "0922222222",
+    demoLabel: "Bole Branch Staff (0922 222 222)",
   },
   admin: {
     title: "Superadmin Workspace",
@@ -65,6 +71,8 @@ const ROLE_CONFIGS: Record<OperatingRole, RoleConfig> = {
     helperText: "Core Infrastructure Governance",
     passwordLabel: "Admin Password & Credentials",
     defaultDestination: "/admin",
+    demoPhone: "0911000001",
+    demoLabel: "Superadmin (0911 000 001)",
   },
 };
 
@@ -237,12 +245,27 @@ function LoginForm() {
           {activeRole === "cashier" && <Receipt className="w-4 h-4" />}
           {activeRole === "admin" && <ShieldCheck className="w-4 h-4" />}
         </div>
-        <div className="space-y-0.5">
-          <div className="font-headline font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span>{config.title}</span>
-            <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-white dark:bg-[#163327] text-emerald-700 dark:text-[#78B99D] border border-emerald-300/50 dark:border-[#204938]">
-              {config.badge}
-            </span>
+        <div className="space-y-1.5 flex-1">
+          <div className="font-headline font-bold text-slate-900 dark:text-white flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span>{config.title}</span>
+              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-white dark:bg-[#163327] text-emerald-700 dark:text-[#78B99D] border border-emerald-300/50 dark:border-[#204938]">
+                {config.badge}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setPhone(config.demoPhone);
+                setPassword("EthioLink2026!");
+                setIsEmailMode(false);
+                setError(null);
+              }}
+              className="text-[10px] font-mono font-bold text-emerald-700 dark:text-[#78B99D] hover:bg-emerald-100 dark:hover:bg-[#1e4435] bg-white/90 dark:bg-[#163327] px-2 py-0.5 rounded-md border border-emerald-300/60 dark:border-[#204938] transition-colors cursor-pointer"
+              title="Click to fill test credentials"
+            >
+              ⚡ Fill Demo ({config.demoPhone})
+            </button>
           </div>
           <p className="text-slate-600 dark:text-[#9BAAA1] leading-relaxed">
             {config.description}
