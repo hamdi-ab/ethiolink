@@ -8,9 +8,14 @@ import { BrandSidebar } from "../BrandSidebar";
 import { CreatorRosterItem } from "../brand-helpers";
 import { toast } from "sonner";
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
   Users,
   Search,
-  Filter,
   Download,
   Calendar,
   CheckCircle2,
@@ -18,7 +23,6 @@ import {
   Copy,
   ExternalLink,
   Send,
-  Phone,
   QrCode,
   MapPin,
   TrendingUp,
@@ -27,11 +31,9 @@ import {
   ShieldCheck,
   BadgeCheck,
   ChevronRight,
+  ChevronDown,
   Menu,
-  Clock,
-  AlertCircle,
   X,
-  Share2,
 } from "lucide-react";
 
 export interface CreatorDetailItem {
@@ -240,6 +242,27 @@ export const DEFAULT_CREATORS: CreatorDetailItem[] = [
   },
 ];
 
+const PLATFORM_OPTIONS = [
+  { value: "ALL", label: "All Platforms (Telegram, TikTok, IG, YT)" },
+  { value: "TELEGRAM", label: "Telegram Channel / Bot" },
+  { value: "TIKTOK", label: "TikTok Ethiopia" },
+  { value: "INSTAGRAM", label: "Instagram" },
+  { value: "YOUTUBE", label: "YouTube" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "ALL", label: "All Statuses (Active, Review, Paused)" },
+  { value: "ACTIVE", label: "Active Partner" },
+  { value: "REVIEW", label: "Review Needed" },
+  { value: "PAUSED", label: "Paused" },
+];
+
+const SORT_OPTIONS: Array<{ value: "revenue_desc" | "conv_desc" | "recent"; label: string }> = [
+  { value: "revenue_desc", label: "Sort: Highest Revenue (ETB)" },
+  { value: "conv_desc", label: "Sort: Highest Conversion %" },
+  { value: "recent", label: "Sort: Most Recent" },
+];
+
 export interface CreatorsViewProps {
   brandName?: string;
   ownerName?: string;
@@ -430,13 +453,13 @@ export function CreatorsView({
   };
 
   const content = (
-    <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-      {/* Top Header Navigation (Shared Component Style Anchor) */}
-      <header className="bg-white/95 dark:bg-[#14211D]/95 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F] shadow-2xs">
-        <div className="navbar-shell layout-container flex items-center justify-between gap-4 py-3">
-          {/* Breadcrumb & Mesh Badge */}
-          <div className="flex items-center gap-3">
-            {!embedded && (
+    <div className="flex-1 flex flex-col min-w-0 w-full">
+      {/* Top Header Navigation: Only rendered in Standalone Mode */}
+      {!embedded ? (
+        <header className="bg-white/95 dark:bg-[#14211D]/95 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F] shadow-2xs">
+          <div className="navbar-shell layout-container-wide min-h-[var(--navbar-height)] px-[var(--page-px)] flex items-center justify-between gap-4 py-3">
+            {/* Breadcrumb & Mesh Badge */}
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-[#C0CCC4] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] transition-colors cursor-pointer"
@@ -444,80 +467,111 @@ export function CreatorsView({
               >
                 <Menu className="w-5 h-5" />
               </button>
-            )}
-            <nav className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
-              <span className="hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors">
-                Affiliate Network
+              <nav className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+                <span className="hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors">
+                  Affiliate Network
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" />
+                <span className="text-[#202824] dark:text-white font-bold font-headline text-sm">
+                  Influencers &amp; Creators
+                </span>
+              </nav>
+              <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Addis Active Mesh
               </span>
-              <ChevronRight className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" />
-              <span className="text-[#202824] dark:text-white font-bold font-headline text-sm">
-                Influencers &amp; Creators
-              </span>
-            </nav>
-            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+            </div>
+
+            {/* Center Search Input */}
+            <div className="hidden lg:flex items-center relative w-72 xl:w-80">
+              <Search className="w-4 h-4 text-neutral-400 dark:text-neutral-500 absolute left-3 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search creators, handle, or campaign..."
+                className="w-full pl-9 pr-12 py-1.5 bg-[#F7F8F5] dark:bg-[#101C18] hover:bg-white dark:hover:bg-[#15231F] focus:bg-white dark:focus:bg-[#15231F] text-xs text-neutral-900 dark:text-white rounded-xl border border-[#D7DED9] dark:border-[#2B4237] focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-600 transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+              />
+              <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 dark:text-neutral-500 bg-white dark:bg-[#1B2B25] border border-neutral-300 dark:border-neutral-700 rounded shadow-2xs">
+                ⌘K
+              </kbd>
+            </div>
+
+            {/* Right Utility Actions */}
+            <div className="flex items-center gap-2.5">
+              {/* Date Selector Pill */}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:border-neutral-400 dark:hover:border-neutral-600 rounded-xl text-xs text-neutral-800 dark:text-neutral-200 cursor-pointer transition-colors shadow-2xs">
+                <Calendar className="w-3.5 h-3.5 text-neutral-500" />
+                <span className="font-medium text-[11px]">Last 30 Days</span>
+              </div>
+
+              {/* Language Switch */}
+              <button
+                onClick={() => setLang(lang === "en" ? "am" : "en")}
+                className="px-2 py-1 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-neutral-100 dark:hover:bg-[#1A2A24] rounded-lg border border-[#D7DED9] dark:border-[#2B4237] transition-colors"
+                title="Toggle Amharic / English"
+              >
+                {lang === "en" ? "አማ / EN" : "EN / አማ"}
+              </button>
+
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
+              {/* Export CSV */}
+              <button
+                onClick={handleExportCSV}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:bg-[#F0F2EF] dark:hover:bg-[#162721] rounded-xl text-xs font-medium text-neutral-800 dark:text-neutral-200 transition-colors shadow-2xs cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
+                <span>Export CSV</span>
+              </button>
+
+              {/* Primary CTA: Invite / Add Creator */}
+              <button
+                onClick={() => setIsInviteModalOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-semibold tracking-wide transition-all shadow-xs cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Invite / Add Creator</span>
+              </button>
+            </div>
+          </div>
+        </header>
+      ) : (
+        /* In Embedded Mode: Clean contextual toolbar that doesn't duplicate the dashboard header */
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-1 pt-1">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Addis Active Mesh
+              Addis Active Mesh · {allCreators.length} Influencer Partners
+            </span>
+            <span className="hidden sm:inline text-xs text-neutral-500 dark:text-neutral-400">
+              10% Standard Commission · CBE &amp; Telebirr Instant Payouts
             </span>
           </div>
 
-          {/* Center Search Input */}
-          <div className="hidden lg:flex items-center relative w-72 xl:w-80">
-            <Search className="w-4 h-4 text-neutral-400 dark:text-neutral-500 absolute left-3 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search creators, handle, or campaign..."
-              className="w-full pl-9 pr-12 py-1.5 bg-[#F7F8F5] dark:bg-[#101C18] hover:bg-white dark:hover:bg-[#15231F] focus:bg-white dark:focus:bg-[#15231F] text-xs text-neutral-900 dark:text-white rounded-xl border border-[#D7DED9] dark:border-[#2B4237] focus:border-emerald-600 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-600 transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
-            />
-            <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-mono text-neutral-400 dark:text-neutral-500 bg-white dark:bg-[#1B2B25] border border-neutral-300 dark:border-neutral-700 rounded shadow-2xs">
-              ⌘K
-            </kbd>
-          </div>
-
-          {/* Right Utility Actions */}
-          <div className="flex items-center gap-2.5">
-            {/* Date Selector Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:border-neutral-400 dark:hover:border-neutral-600 rounded-xl text-xs text-neutral-800 dark:text-neutral-200 cursor-pointer transition-colors shadow-2xs">
-              <Calendar className="w-3.5 h-3.5 text-neutral-500" />
-              <span className="font-medium text-[11px]">Last 30 Days</span>
-            </div>
-
-            {/* Language Switch */}
-            <button
-              onClick={() => setLang(lang === "en" ? "am" : "en")}
-              className="px-2 py-1 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-neutral-100 dark:hover:bg-[#1A2A24] rounded-lg border border-[#D7DED9] dark:border-[#2B4237] transition-colors"
-              title="Toggle Amharic / English"
-            >
-              {lang === "en" ? "አማ / EN" : "EN / አማ"}
-            </button>
-
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {/* Export CSV */}
+          <div className="flex items-center gap-2">
             <button
               onClick={handleExportCSV}
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:bg-[#F0F2EF] dark:hover:bg-[#162721] rounded-xl text-xs font-medium text-neutral-800 dark:text-neutral-200 transition-colors shadow-2xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#2B4237] hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] rounded-xl text-xs font-semibold text-neutral-700 dark:text-[#C0CCC4] transition-colors shadow-2xs cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-400" />
+              <Download className="w-3.5 h-3.5 text-neutral-500 dark:text-[#9BAAA1]" />
               <span>Export CSV</span>
             </button>
 
-            {/* Primary CTA: Invite / Add Creator */}
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-semibold tracking-wide transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold tracking-wide transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>+ Invite / Add Creator</span>
             </button>
           </div>
         </div>
-      </header>
+      )}
 
       {/* Main Container */}
-      <main className="layout-container flex-1 py-6 space-y-6">
+      <div className={`${embedded ? "w-full" : "layout-container-wide"} flex-1 py-4 sm:py-6 space-y-6`}>
         {/* ========================================================= */}
         {/* 1. KPI METRIC CARDS ROW (Mindweave Inspired 4-up Layout)  */}
         {/* ========================================================= */}
@@ -673,47 +727,103 @@ export function CreatorsView({
                   />
                 </div>
 
-                {/* Filter Dropdowns */}
+                {/* Custom Filter Dropdowns */}
                 <div className="flex items-center flex-wrap gap-2 text-xs">
-                  {/* Platform Selector */}
-                  <select
-                    value={platformFilter}
-                    onChange={(e) => setPlatformFilter(e.target.value)}
-                    className="py-1.5 pl-2.5 pr-7 text-xs bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-neutral-800 dark:text-neutral-200 focus:border-emerald-600 focus:ring-0"
-                  >
-                    <option value="ALL">All Platforms (Telegram, TikTok, IG, YT)</option>
-                    <option value="TELEGRAM">Telegram Channel / Bot</option>
-                    <option value="TIKTOK">TikTok Ethiopia</option>
-                    <option value="INSTAGRAM">Instagram</option>
-                    <option value="YOUTUBE">YouTube</option>
-                  </select>
+                  {/* Platform Selector Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="h-8.5 px-3 py-1.5 text-xs bg-neutral-50/80 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 rounded-xl text-neutral-800 dark:text-neutral-200 flex items-center gap-2 shadow-2xs font-medium cursor-pointer transition-all"
+                      >
+                        <span className="truncate max-w-[170px]">
+                          {PLATFORM_OPTIONS.find((p) => p.value === platformFilter)?.label}
+                        </span>
+                        <ChevronDown className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-64 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                    >
+                      {PLATFORM_OPTIONS.map((opt) => (
+                        <DropdownMenuItem
+                          key={opt.value}
+                          onClick={() => setPlatformFilter(opt.value)}
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#1A2A24]"
+                        >
+                          <span>{opt.label}</span>
+                          {platformFilter === opt.value && (
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                  {/* Status Selector */}
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="py-1.5 pl-2.5 pr-7 text-xs bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-neutral-800 dark:text-neutral-200 focus:border-emerald-600 focus:ring-0"
-                  >
-                    <option value="ALL">All Statuses (Active, Review, Paused)</option>
-                    <option value="ACTIVE">Active Partner</option>
-                    <option value="REVIEW">Review Needed</option>
-                    <option value="PAUSED">Paused</option>
-                  </select>
+                  {/* Status Selector Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="h-8.5 px-3 py-1.5 text-xs bg-neutral-50/80 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 rounded-xl text-neutral-800 dark:text-neutral-200 flex items-center gap-2 shadow-2xs font-medium cursor-pointer transition-all"
+                      >
+                        <span className="truncate max-w-[150px]">
+                          {STATUS_OPTIONS.find((s) => s.value === statusFilter)?.label}
+                        </span>
+                        <ChevronDown className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-56 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                    >
+                      {STATUS_OPTIONS.map((opt) => (
+                        <DropdownMenuItem
+                          key={opt.value}
+                          onClick={() => setStatusFilter(opt.value)}
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#1A2A24]"
+                        >
+                          <span>{opt.label}</span>
+                          {statusFilter === opt.value && (
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                  {/* Sort Selector */}
-                  <select
-                    value={sortOption}
-                    onChange={(e) =>
-                      setSortOption(
-                        e.target.value as "revenue_desc" | "conv_desc" | "recent"
-                      )
-                    }
-                    className="py-1.5 pl-2.5 pr-7 text-xs bg-white dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-neutral-800 dark:text-neutral-200 focus:border-emerald-600 focus:ring-0 font-medium"
-                  >
-                    <option value="revenue_desc">Sort: Highest Revenue (ETB)</option>
-                    <option value="conv_desc">Sort: Highest Conversion %</option>
-                    <option value="recent">Sort: Most Recent</option>
-                  </select>
+                  {/* Sort Selector Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="h-8.5 px-3 py-1.5 text-xs bg-neutral-50/80 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 rounded-xl text-neutral-800 dark:text-neutral-200 flex items-center gap-2 shadow-2xs font-medium cursor-pointer transition-all"
+                      >
+                        <span className="truncate max-w-[160px]">
+                          {SORT_OPTIONS.find((s) => s.value === sortOption)?.label}
+                        </span>
+                        <ChevronDown className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-56 p-1.5 bg-white dark:bg-[#14211D] border border-[#D7DED9] dark:border-[#26372F] shadow-lg rounded-xl z-50 text-xs"
+                    >
+                      {SORT_OPTIONS.map((opt) => (
+                        <DropdownMenuItem
+                          key={opt.value}
+                          onClick={() => setSortOption(opt.value)}
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#1A2A24]"
+                        >
+                          <span>{opt.label}</span>
+                          {sortOption === opt.value && (
+                            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -746,14 +856,14 @@ export function CreatorsView({
                     <article
                       key={creator.id}
                       onClick={() => setSelectedCreatorId(creator.id)}
-                      className={`bg-white dark:bg-[#14211D] rounded-2xl p-5 border transition-all cursor-pointer relative shadow-xs hover:shadow-md ${
+                      className={`bg-white dark:bg-[#14211D] rounded-2xl p-4 sm:p-5 border transition-all cursor-pointer relative shadow-xs hover:shadow-md space-y-3.5 ${
                         isSelected
                           ? "border-emerald-600 dark:border-emerald-500 ring-2 ring-emerald-500/20"
                           : "border-[#D7DED9]/90 dark:border-[#26372F] hover:border-neutral-400 dark:hover:border-neutral-600"
                       }`}
                     >
                       {/* Top Ribbons */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
@@ -794,18 +904,18 @@ export function CreatorsView({
                       </div>
 
                       {/* Profile Main Row */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 dark:border-[#1E3029]">
-                        <div className="flex items-center gap-3.5">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3.5 border-b border-neutral-100 dark:border-[#1E3029]">
+                        <div className="flex items-center gap-3.5 min-w-0">
                           {/* Initials Avatar */}
-                          <div className="w-12 h-12 rounded-full ring-2 ring-emerald-500/30 overflow-hidden shrink-0 bg-emerald-100 dark:bg-[#16362C] flex items-center justify-center text-emerald-900 dark:text-emerald-200 font-bold font-headline text-lg">
+                          <div className="w-11 h-11 rounded-full ring-2 ring-emerald-500/30 overflow-hidden shrink-0 bg-emerald-100 dark:bg-[#16362C] flex items-center justify-center text-emerald-900 dark:text-emerald-200 font-bold font-headline text-base">
                             {creator.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-headline font-bold text-base text-neutral-900 dark:text-white">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-headline font-bold text-sm sm:text-base text-neutral-900 dark:text-white truncate">
                                 {creator.name}
                               </h3>
                               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
@@ -813,9 +923,9 @@ export function CreatorsView({
                               </span>
                               <BadgeCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400 mt-0.5">
+                            <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400 mt-0.5 flex-wrap">
                               {creator.platforms.telegram && (
-                                <span className="flex items-center gap-1 text-[#229ED9]">
+                                <span className="inline-flex items-center gap-1 text-[#229ED9] font-medium">
                                   <Send className="w-3.5 h-3.5" />
                                   Telegram ({creator.platforms.telegram})
                                 </span>
@@ -826,76 +936,110 @@ export function CreatorsView({
                               {creator.platforms.youtube && (
                                 <span>YouTube ({creator.platforms.youtube})</span>
                               )}
-                              <span>•</span>
-                              <span className="text-neutral-500 font-mono">{creator.payoutWalletMasked}</span>
+                              <span className="text-neutral-300 dark:text-neutral-700">•</span>
+                              <span className="text-neutral-500 font-mono text-[11px]">{creator.phone}</span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Promo Code Pill with Copy */}
-                        <div className="flex items-center gap-2 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl p-1.5 pl-3">
-                          <div className="text-left">
-                            <span className="text-[9px] uppercase tracking-wider text-neutral-500 font-label block font-semibold">
-                              Promo Code
+                        {/* Right: Branch Anchor Badge + Promo Code Pill */}
+                        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+                          <div className="hidden md:flex flex-col items-end text-right pr-2.5 border-r border-neutral-200/70 dark:border-[#26372F]">
+                            <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">
+                              Primary POS
                             </span>
-                            <span className="font-mono font-bold text-xs text-neutral-900 dark:text-white tracking-wider">
-                              {creator.promoCode}
+                            <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                              {creator.posBranch}
                             </span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCopy(creator.promoCode, `code-${creator.id}`);
-                            }}
-                            className="p-1 rounded-lg text-neutral-500 hover:text-emerald-600 hover:bg-white dark:hover:bg-[#1A2A24] transition-colors cursor-pointer"
-                            title="Copy Promo Code"
-                          >
-                            {copiedKey === `code-${creator.id}` ? (
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </button>
+
+                          {/* Promo Code Pill with Copy */}
+                          <div className="flex items-center gap-2 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl p-1.5 pl-3">
+                            <div className="text-left">
+                              <span className="text-[9px] uppercase tracking-wider text-neutral-500 font-label block font-semibold">
+                                Promo Code
+                              </span>
+                              <span className="font-mono font-bold text-xs text-neutral-900 dark:text-white tracking-wider">
+                                {creator.promoCode}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(creator.promoCode, `code-${creator.id}`);
+                              }}
+                              className="p-1 rounded-lg text-neutral-500 hover:text-emerald-600 hover:bg-white dark:hover:bg-[#1A2A24] transition-colors cursor-pointer"
+                              title="Copy Promo Code"
+                            >
+                              {copiedKey === `code-${creator.id}` ? (
+                                <Check className="w-4 h-4 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Stats Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3.5 text-xs">
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Attributed Sales</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+                      {/* Balanced 4-Tile Stats Strip */}
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-0.5 text-xs">
+                        {/* Tile 1: Attributed Sales */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            Attributed Sales
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {formatETB(creator.attributedSalesETB)}
                           </div>
                           <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
                             {creator.recordedOrders} recorded orders
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Telegram Clicks</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+
+                        {/* Tile 2: Telegram Velocity */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            Telegram Clicks
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {creator.telegramClicks.toLocaleString()} clicks
                           </div>
                           <div className="text-[10px] text-neutral-600 dark:text-neutral-400">
                             {creator.conversionRatePercent}% conversion
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">In-Store POS Scans</div>
-                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm mt-0.5">
+
+                        {/* Tile 3: In-Store POS Scans */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 space-y-1">
+                          <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-label font-semibold">
+                            In-Store POS Scans
+                          </div>
+                          <div className="font-bold text-neutral-950 dark:text-white font-mono text-sm">
                             {creator.posScans} In-Store
                           </div>
-                          <div className="text-[10px] text-neutral-600 dark:text-neutral-400 truncate">
+                          <div className="text-[10px] text-neutral-600 dark:text-neutral-400 truncate" title={creator.posBranch}>
                             {creator.posBranch}
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[11px] text-neutral-500 dark:text-neutral-400">Commission Cut</div>
-                          <div className="font-bold text-emerald-700 dark:text-emerald-300 font-mono text-sm mt-0.5">
+
+                        {/* Tile 4: Commission Cut */}
+                        <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-50/50 dark:bg-[#0E231D] border border-emerald-200/60 dark:border-[#1F4539] space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-label font-semibold">
+                              Commission Cut
+                            </span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-bold">
+                              {creator.commissionRatePercent}%
+                            </span>
+                          </div>
+                          <div className="font-bold text-emerald-700 dark:text-emerald-300 font-mono text-sm">
                             {formatETB(creator.commissionCutETB)}
                           </div>
-                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
-                            {creator.commissionRatePercent}% · {creator.payoutStatus}
+                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            {creator.payoutStatus}
                           </div>
                         </div>
                       </div>
@@ -934,7 +1078,7 @@ export function CreatorsView({
           </div>
 
           {/* 2B. RIGHT COLUMN: Selected Creator Deep Dive Panel (col-span-4) */}
-          <div className="lg:col-span-4 space-y-4 sticky top-20">
+          <div className="lg:col-span-4 space-y-4">
             <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-5">
               {/* Creator Header */}
               <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dark:border-[#1E3029]">
@@ -1139,6 +1283,176 @@ export function CreatorsView({
                 </p>
               </div>
             </div>
+
+            {/* Live Creator Attribution Stream (Eliminates Right-Side Empty Void) */}
+            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-3.5">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-[#1E3029]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <h4 className="font-headline font-bold text-xs uppercase tracking-wider text-neutral-900 dark:text-white">
+                    Live Attribution Stream
+                  </h4>
+                </div>
+                <span className="text-[10px] font-mono font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200/50 dark:border-emerald-800/50">
+                  4ms sync
+                </span>
+              </div>
+
+              <div className="space-y-2.5">
+                {[
+                  {
+                    id: "TX-9021",
+                    creator: "Dawit T.",
+                    handle: "@habesha_tech",
+                    channel: "In-Store POS (QR)",
+                    branch: "Bole Flagship",
+                    amount: 2800,
+                    cut: 280,
+                    time: "2m ago",
+                    payment: "Telebirr",
+                  },
+                  {
+                    id: "TX-9018",
+                    creator: "Meron B.",
+                    handle: "@ethio_lifestyle",
+                    channel: "Telegram Bot",
+                    branch: "Delivery / Bot",
+                    amount: 1450,
+                    cut: 145,
+                    time: "9m ago",
+                    payment: "CBE Birr",
+                  },
+                  {
+                    id: "TX-9014",
+                    creator: "Bethlehem G.",
+                    handle: "@sheba_vibes",
+                    channel: "Retail Voucher",
+                    branch: "Bole Roastery",
+                    amount: 920,
+                    cut: 92,
+                    time: "18m ago",
+                    payment: "Telebirr",
+                  },
+                  {
+                    id: "TX-9009",
+                    creator: "Selamawit A.",
+                    handle: "@addis_artisan",
+                    channel: "Direct Phone / Maps",
+                    branch: "Kazanchis Hub",
+                    amount: 3400,
+                    cut: 340,
+                    time: "31m ago",
+                    payment: "Telebirr",
+                  },
+                  {
+                    id: "TX-9004",
+                    creator: "Yohannes K.",
+                    handle: "@habesha_gear",
+                    channel: "Telegram QR",
+                    branch: "CMC Tech Mall",
+                    amount: 1850,
+                    cut: 185,
+                    time: "42m ago",
+                    payment: "CBE Birr",
+                  },
+                  {
+                    id: "TX-8998",
+                    creator: "Helen Lifestyle & Food",
+                    handle: "@helen_addis_lifestyle",
+                    channel: "Bole Flagship POS",
+                    branch: "Bole Flagship",
+                    amount: 1500,
+                    cut: 150,
+                    time: "58m ago",
+                    payment: "Telebirr",
+                  },
+                ].map((tx) => (
+                  <div
+                    key={tx.id}
+                    className="p-3 rounded-xl bg-neutral-50/70 dark:bg-[#101C18] border border-[#D7DED9]/60 dark:border-[#2B4237]/60 flex items-center justify-between text-xs transition-colors hover:border-emerald-500/40"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-neutral-900 dark:text-white font-headline">
+                          {tx.creator}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-mono">{tx.handle}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-500 dark:text-neutral-400">
+                        <span>{tx.channel}</span>
+                        <span>&bull;</span>
+                        <span>{tx.branch}</span>
+                      </div>
+                    </div>
+                    <div className="text-right space-y-0.5">
+                      <span className="font-bold font-mono text-neutral-900 dark:text-white text-xs block">
+                        +{formatETB(tx.amount)}
+                      </span>
+                      <div className="flex items-center justify-end gap-1 text-[10px]">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-mono font-medium">
+                          Cut: {formatETB(tx.cut)}
+                        </span>
+                        <span className="text-neutral-400">&bull; {tx.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Regional Hotspots & Addis Commerce Attribution */}
+            <div className="bg-white dark:bg-[#14211D] rounded-2xl p-5 border border-[#D7DED9]/90 dark:border-[#26372F] shadow-xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-[#1E3029]">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <h4 className="font-headline font-bold text-xs uppercase tracking-wider text-neutral-900 dark:text-white">
+                    Addis Regional Hotspots
+                  </h4>
+                </div>
+                <span className="text-[10px] font-mono text-neutral-400">3 Outlets</span>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9]/50 dark:border-[#2B4237]/50">
+                  <div className="space-y-0.5">
+                    <span className="font-bold font-headline text-neutral-900 dark:text-white block">
+                      Bole Medhanialem Flagship
+                    </span>
+                    <span className="text-[10px] text-neutral-400">Telegram QR &bull; 14 Terminals</span>
+                  </div>
+                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300">58% Share</span>
+                </div>
+
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9]/50 dark:border-[#2B4237]/50">
+                  <div className="space-y-0.5">
+                    <span className="font-bold font-headline text-neutral-900 dark:text-white block">
+                      Kazanchis Tech Corridor
+                    </span>
+                    <span className="text-[10px] text-neutral-400">Mini-App Deep Link &bull; 8 Terminals</span>
+                  </div>
+                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300">24% Share</span>
+                </div>
+
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9]/50 dark:border-[#2B4237]/50">
+                  <div className="space-y-0.5">
+                    <span className="font-bold font-headline text-neutral-900 dark:text-white block">
+                      Piassa Heritage Roastery
+                    </span>
+                    <span className="text-[10px] text-neutral-400">Physical Tasting &bull; 6 Terminals</span>
+                  </div>
+                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-300">18% Share</span>
+                </div>
+              </div>
+
+              {/* Regional Summary Footer for balanced baseline alignment */}
+              <div className="pt-2.5 border-t border-neutral-100 dark:border-[#1E3029] flex items-center justify-between text-[11px] text-neutral-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Total Regional Mesh
+                </span>
+                <span className="font-mono font-bold text-neutral-800 dark:text-neutral-200">28 Active Terminals</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1157,7 +1471,7 @@ export function CreatorsView({
             &copy; {new Date().getFullYear()} EthioLink creator attribution platform. Bole, Addis Ababa, Ethiopia.
           </p>
         </footer>
-      </main>
+      </div>
 
       {/* Invite / Add Creator Modal */}
       {isInviteModalOpen && (
@@ -1240,21 +1554,24 @@ export function CreatorsView({
                   <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                     Assign Campaign
                   </label>
-                  <select
-                    value={newCreatorCampaign}
-                    onChange={(e) => setNewCreatorCampaign(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-neutral-900 dark:text-white focus:border-emerald-600 focus:ring-0"
-                  >
-                    {campaigns.length > 0 ? (
-                      campaigns.map((c) => (
-                        <option key={c.id} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="Sheba Artisan Coffee Spring Roasts">Sheba Artisan Coffee Spring Roasts</option>
-                    )}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={newCreatorCampaign}
+                      onChange={(e) => setNewCreatorCampaign(e.target.value)}
+                      className="w-full appearance-none px-3.5 py-2.5 pr-9 bg-neutral-50 dark:bg-[#101C18] border border-[#D7DED9] dark:border-[#2B4237] rounded-xl text-xs text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-600 dark:focus:ring-emerald-400 transition-colors cursor-pointer"
+                    >
+                      {campaigns.length > 0 ? (
+                        campaigns.map((c) => (
+                          <option key={c.id} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="Sheba Artisan Coffee Spring Roasts">Sheba Artisan Coffee Spring Roasts</option>
+                      )}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-neutral-400 dark:text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
                 <div>
                   <label className="block font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
@@ -1324,7 +1641,7 @@ export function CreatorsView({
       {/* 2. Main Workspace */}
       <div
         className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
-          isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"
+          isSidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
         }`}
       >
         {content}

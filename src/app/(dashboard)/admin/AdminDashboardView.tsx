@@ -841,9 +841,11 @@ export function AdminDashboardView({
               )}
 
               {/* Main Workspace Split: Brands Table + Live Tenant Inspector */}
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-                {/* Left 8 Cols: Brand Workspaces Data Table Card */}
-                <div className="xl:col-span-8 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+                {/* Left 8 Cols: Brand Workspaces Data Table + Live Activity Feeds */}
+                <div className="xl:col-span-8 flex flex-col justify-between gap-6">
+                  {/* Brand Workspaces Data Table Card */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
                   {/* Filter Toolbar */}
                   <div className="p-4 bg-slate-50 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div className="relative flex-1">
@@ -1021,140 +1023,259 @@ export function AdminDashboardView({
                   </div>
                 </div>
 
-                {/* Right 4 Cols: Live Tenant Inspector Drawer */}
-                <div className="xl:col-span-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-6">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
+                {/* Two Column Sub-Grid: Recent Sales & Top Campaigns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch flex-1">
+                  {/* Recent Sales Preview */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-emerald-600 dark:text-[#78B99D]">
-                        Live Tenant Inspector
-                      </span>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-[#F1F5F1] mt-0.5">
-                        {selectedBrand.name}
-                      </h3>
-                    </div>
-                    <span className="text-xs font-bold text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                      Flagship Tier
-                    </span>
-                  </div>
-
-                  {/* Entity Metadata Grid */}
-                  <div className="space-y-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl p-4 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-[#9BAAA1]">Workspace ID:</span>
-                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
-                        WS-ETH-{selectedBrand.id.slice(0, 8).toUpperCase().replace(/[^A-Z0-9]/g, "")}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-[#9BAAA1]">Trade TIN:</span>
-                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
-                        ET-TIN-{selectedBrand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-[#9BAAA1]">Merchant Telebirr:</span>
-                      <span className="font-mono text-emerald-600 dark:text-[#78B99D] font-semibold">
-                        TLB-ADD-{selectedBrand.id.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "") || "4902"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-[#9BAAA1]">Registered Owner:</span>
-                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
-                        {selectedBrand.ownerName}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-[#9BAAA1]">POS Terminals:</span>
-                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
-                        {selectedBrand.staffCount || 3} active registers synced
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Platform Overrides & Limits */}
-                  <div className="space-y-3">
-                    <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F1] uppercase tracking-wide block">
-                      Platform Overrides &amp; Limits
-                    </span>
-
-                    {/* Commission Override */}
-                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Default Creator Commission</p>
-                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Applied to non-custom campaigns</p>
-                      </div>
-                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
+                        <div>
+                          <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1] flex items-center gap-2">
+                            <Receipt className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                            <span>Recent POS Transactions</span>
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5">
+                            Latest sales logged by in-store cashiers
+                          </p>
+                        </div>
                         <button
-                          onClick={() => setCommissionOverride((prev) => Math.max(1, prev - 0.5))}
-                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                          onClick={() => setActiveTab("sales")}
+                          className="text-xs font-bold text-emerald-600 dark:text-[#78B99D] hover:underline flex items-center gap-1 cursor-pointer shrink-0"
                         >
-                          -
-                        </button>
-                        <span className="font-mono">{commissionOverride.toFixed(1)}%</span>
-                        <button
-                          onClick={() => setCommissionOverride((prev) => Math.min(50, prev + 0.5))}
-                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-                        >
-                          +
+                          <span>View All</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
+
+                      <div className="divide-y divide-slate-100 dark:divide-[#1E332B]">
+                        {audit.sales.slice(0, 2).map((sale) => (
+                          <div key={sale.id} className="py-3 flex items-center justify-between text-xs">
+                            <div className="min-w-0 pr-2">
+                              <div className="font-bold text-slate-900 dark:text-[#F1F5F1] truncate">
+                                {sale.brandName}
+                              </div>
+                              <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] truncate mt-0.5">
+                                Campaign: {sale.campaignName} • Promo:{" "}
+                                <span className="font-mono font-bold text-emerald-700 dark:text-[#78B99D]">
+                                  {sale.promoCode}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className="font-black font-mono text-emerald-700 dark:text-[#78B99D]">
+                                {formatETB(sale.amountETB)}
+                              </div>
+                              <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                {new Date(sale.recordedAt).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Performing Campaigns Leaderboard Preview */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
+                        <div>
+                          <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1] flex items-center gap-2">
+                            <Tag className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                            <span>Top Campaigns</span>
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-0.5">
+                            Ranked by verified revenue
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setActiveTab("analytics")}
+                          className="text-xs font-bold text-emerald-600 dark:text-[#78B99D] hover:underline flex items-center gap-1 cursor-pointer shrink-0"
+                        >
+                          <span>Analytics</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="divide-y divide-slate-100 dark:divide-[#1E332B]">
+                        {analytics.topCampaigns.length === 0 ? (
+                          <div className="py-6 text-center text-xs text-slate-400 dark:text-[#9BAAA1]">
+                            No sales recorded yet for active campaigns.
+                          </div>
+                        ) : (
+                          analytics.topCampaigns.slice(0, 2).map((camp, idx) => (
+                            <div key={camp.id} className="py-3 flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-[#0A1A15] text-slate-700 dark:text-[#C5DCD6] font-mono font-bold text-[10px] flex items-center justify-center border border-slate-200/60 dark:border-[#1E332B] shrink-0">
+                                  #{idx + 1}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="font-bold text-slate-900 dark:text-[#F1F5F1] truncate">
+                                    {camp.name}
+                                  </div>
+                                  <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] truncate mt-0.5">
+                                    {camp.brandName} • Code:{" "}
+                                    <span className="font-mono font-bold text-slate-700 dark:text-[#C5DCD6]">
+                                      {camp.promoCode}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="font-black font-mono text-emerald-700 dark:text-[#78B99D]">
+                                  {formatETB(camp.revenueETB)}
+                                </div>
+                                <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono mt-0.5">
+                                  {camp.salesCount} orders
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                {/* Right 4 Cols: Live Tenant Inspector Drawer */}
+                <div className="xl:col-span-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-5 flex flex-col justify-between space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
+                      <div>
+                        <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-emerald-600 dark:text-[#78B99D]">
+                          Live Tenant Inspector
+                        </span>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-[#F1F5F1] mt-0.5">
+                          {selectedBrand.name}
+                        </h3>
+                      </div>
+                      <span className="text-xs font-bold text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                        Flagship Tier
+                      </span>
                     </div>
 
-                    {/* Attribution Volume Cap */}
-                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Daily Attribution Volume Cap</p>
-                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Security throttle per register</p>
+                    {/* Entity Metadata Grid */}
+                    <div className="space-y-2 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl p-3.5 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-[#9BAAA1]">Workspace ID:</span>
+                        <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                          WS-ETH-{selectedBrand.id.slice(0, 8).toUpperCase().replace(/[^A-Z0-9]/g, "")}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs font-mono">
-                        <span>{volumeCap}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-[#9BAAA1]">Trade TIN:</span>
+                        <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                          ET-TIN-{selectedBrand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-[#9BAAA1]">Merchant Telebirr:</span>
+                        <span className="font-mono text-emerald-600 dark:text-[#78B99D] font-semibold">
+                          TLB-ADD-{selectedBrand.id.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "") || "4902"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-[#9BAAA1]">Registered Owner:</span>
+                        <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                          {selectedBrand.ownerName}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-[#9BAAA1]">POS Terminals:</span>
+                        <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                          {selectedBrand.staffCount || 3} active registers synced
+                        </span>
                       </div>
                     </div>
 
-                    {/* Telegram Webhook Heartbeat */}
-                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Telegram Bot Webhook</p>
-                        <p className="text-[11px] text-emerald-600 dark:text-[#78B99D] font-mono font-medium">
-                          {webhookPingStatus}
-                        </p>
+                    {/* Platform Overrides & Limits */}
+                    <div className="space-y-2.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F1] uppercase tracking-wide block">
+                        Platform Overrides &amp; Limits
+                      </span>
+
+                      {/* Commission & Volume Cap in 2-col row */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Commission */}
+                        <div className="p-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs flex flex-col justify-between">
+                          <p className="font-semibold text-slate-800 dark:text-[#F1F5F1] text-[11px] leading-tight">Creator Comm.</p>
+                          <div className="flex items-center justify-between font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs mt-1.5">
+                            <button
+                              onClick={() => setCommissionOverride((prev) => Math.max(1, prev - 0.5))}
+                              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer text-xs"
+                            >
+                              -
+                            </button>
+                            <span className="font-mono text-xs">{commissionOverride.toFixed(1)}%</span>
+                            <button
+                              onClick={() => setCommissionOverride((prev) => Math.min(50, prev + 0.5))}
+                              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer text-xs"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Volume Cap */}
+                        <div className="p-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs flex flex-col justify-between">
+                          <p className="font-semibold text-slate-800 dark:text-[#F1F5F1] text-[11px] leading-tight">Daily Vol. Cap</p>
+                          <div className="font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs font-mono text-xs text-center mt-1.5">
+                            {volumeCap}
+                          </div>
+                        </div>
                       </div>
-                      <button
-                        onClick={handleRePingWebhook}
-                        disabled={isPingingWebhook}
-                        className="text-xs font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer disabled:opacity-50"
-                      >
-                        {isPingingWebhook ? "Pinging..." : "Re-ping"}
-                      </button>
+
+                      {/* Telegram Webhook Heartbeat */}
+                      <div className="flex items-center justify-between p-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
+                        <div>
+                          <p className="font-semibold text-slate-800 dark:text-[#F1F5F1] text-[11px]">Telegram Bot Webhook</p>
+                          <p className="text-[10px] text-emerald-600 dark:text-[#78B99D] font-mono font-medium">
+                            {webhookPingStatus}
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleRePingWebhook}
+                          disabled={isPingingWebhook}
+                          className="text-[11px] font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer disabled:opacity-50"
+                        >
+                          {isPingingWebhook ? "Pinging..." : "Re-ping"}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Administrative Actions */}
-                  <div className="pt-2 space-y-2">
-                    <button
-                      onClick={handleImpersonate}
-                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <LogIn className="w-3.5 h-3.5 text-slate-500" />
-                      <span>Impersonate Workspace Admin</span>
-                    </button>
-                    <button
-                      onClick={handleRegenApiKeys}
-                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Key className="w-3.5 h-3.5 text-slate-500" />
-                      <span>Regenerate Integration API Keys</span>
-                    </button>
+                  <div className="space-y-2 pt-1">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleImpersonate}
+                        className="py-2 px-2 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <LogIn className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span className="truncate">Impersonate</span>
+                      </button>
+                      <button
+                        onClick={handleRegenApiKeys}
+                        className="py-2 px-2 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Key className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <span className="truncate">Regen Keys</span>
+                      </button>
+                    </div>
                     <button
                       onClick={toggleSuspendWorkspace}
-                      className={`w-full py-2.5 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                      className={`w-full py-2 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                         isSelectedSuspended
                           ? "bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
                           : "bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
                       }`}
                     >
-                      <Ban className="w-3.5 h-3.5" />
-                      <span>{isSelectedSuspended ? "Re-activate Merchant Workspace" : "Suspend Merchant Account"}</span>
+                      <Ban className="w-3.5 h-3.5 shrink-0" />
+                      <span>{isSelectedSuspended ? "Re-activate Workspace" : "Suspend Merchant Account"}</span>
                     </button>
                   </div>
                 </div>
@@ -1307,119 +1428,6 @@ export function AdminDashboardView({
                         <span>Approve Release</span>
                       </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Two Column Grid: Recent Sales & Top Campaigns */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Sales Preview */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Recent POS Transactions</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Latest sales logged by in-store cashiers
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setActiveTab("sales")}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>View All</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {audit.sales.slice(0, 5).map((sale) => (
-                      <div key={sale.id} className="py-3 flex items-center justify-between text-xs">
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-slate-100">
-                            {sale.brandName}
-                          </div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Campaign: {sale.campaignName} • Promo:{" "}
-                            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                              {sale.promoCode}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-black font-mono text-emerald-700 dark:text-emerald-400">
-                            {formatETB(sale.amountETB)}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {new Date(sale.recordedAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Performing Campaigns Leaderboard Preview */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Top Campaigns Leaderboard</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Ranked by verified revenue generated
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setActiveTab("analytics")}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Deep Analytics</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {analytics.topCampaigns.length === 0 ? (
-                      <div className="py-6 text-center text-xs text-slate-400">
-                        No sales recorded yet for active campaigns.
-                      </div>
-                    ) : (
-                      analytics.topCampaigns.slice(0, 5).map((camp, idx) => (
-                        <div key={camp.id} className="py-3 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-3">
-                            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono font-bold text-[10px] flex items-center justify-center">
-                              #{idx + 1}
-                            </span>
-                            <div>
-                              <div className="font-bold text-slate-900 dark:text-slate-100">
-                                {camp.name}
-                              </div>
-                              <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                                {camp.brandName} • Code:{" "}
-                                <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
-                                  {camp.promoCode}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-black font-mono text-emerald-700 dark:text-emerald-400">
-                              {formatETB(camp.revenueETB)}
-                            </div>
-                            <div className="text-[10px] text-slate-400 font-mono">
-                              {camp.salesCount} orders
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
               </div>

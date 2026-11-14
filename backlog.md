@@ -3,6 +3,7 @@
 ## In flight
 ## Queued
 ## Done
+- [x] ETL-036 - fix-brand-creators: align navbar, custom styled dropdowns, and eliminate empty space in creators view https://github.com/hamdi-ab/ethiolink/pull/44 (merged 2026-11-11)
 - [x] ETL-035 - feat-analytics: modernize brand performance analytics portal matching stitch design tokens and dark mode https://github.com/hamdi-ab/ethiolink/pull/43 (merged 2026-11-11)
 - [x] ETL-034 - feat-brand: modernize brand merchant overview cockpit matching stitch design tokens and dark mode https://github.com/hamdi-ab/ethiolink/pull/42 (merged 2026-11-10)
 - [x] ETL-033 - feat-pos: modernize in-store pos sales logging terminal matching stitch design tokens and dark mode https://github.com/hamdi-ab/ethiolink/pull/41 (merged 2026-11-10)
@@ -12,4 +13,3 @@
 - [x] ETL-029 - chore(core): eliminate mock data, fix hardcoded fallbacks, and centralize environment configuration https://github.com/hamdi-ab/ethiolink/pull/37 (kind: chore) (merged 2026-10-30)
 - [x] ETL-028 - feat: production database backup pipeline, telemetry retention engine, and privacy policy (PRD Section 10.3, 16, FR-020) https://github.com/hamdi-ab/ethiolink/pull/36 (kind: feature) (merged 2026-10-29)
 - [x] ETL-027 - feat: operational issue management & merchant discrepancy reporting (PRD FR-040, FR-038) https://github.com/hamdi-ab/ethiolink/pull/35 (kind: feature) (merged 2026-10-29)
-- [x] ETL-026 - feat: creator dashboard PRD FR-036 compliance, impact statement, and recent activity feed https://github.com/hamdi-ab/ethiolink/pull/34 (kind: feature) (merged 2026-10-28)

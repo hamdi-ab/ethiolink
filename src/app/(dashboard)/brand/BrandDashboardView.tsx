@@ -585,7 +585,7 @@ export function BrandDashboardView({
       }`}>
         {/* Top Header / Action Bar (Stitch Spec: h-16 sticky) */}
         <header className="bg-white/90 dark:bg-[#14211D]/90 backdrop-blur-md sticky top-0 z-20 border-b border-[#D7DED9]/80 dark:border-[#26372F]">
-          <div className="px-5 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="max-w-[1600px] w-full mx-auto px-5 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             {/* Search Input & Mobile Drawer Toggle */}
             <div className="flex items-center gap-3 flex-1 max-w-md">
               <button

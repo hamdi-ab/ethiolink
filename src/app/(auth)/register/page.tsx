@@ -94,16 +94,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row w-full bg-[#F7F8F5] dark:bg-[#07120F] text-slate-900 dark:text-[#F1F5F1] transition-colors duration-200">
+    <div className="min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden flex flex-col lg:flex-row w-full bg-[#F7F8F5] dark:bg-[#07120F] text-slate-900 dark:text-[#F1F5F1] transition-colors duration-200">
       {/* LEFT PANEL: Merchant Growth & Addis Ababa Commerce Showcase */}
-      <div className="lg:w-[50%] xl:w-[52%] bg-[#102F2B] dark:bg-[#071714] text-slate-100 flex flex-col justify-between p-6 sm:p-10 lg:p-14 relative overflow-hidden border-b lg:border-b-0 lg:border-r border-[#1B4B42] dark:border-[#1E332B]">
+      <div className="lg:w-[50%] xl:w-[52%] bg-[#102F2B] dark:bg-[#071714] text-slate-100 flex flex-col justify-between p-6 sm:p-8 lg:p-8 xl:p-10 lg:py-6 relative overflow-hidden border-b lg:border-b-0 lg:border-r border-[#1B4B42] dark:border-[#1E332B]">
         {/* Ambient Decorative Gradients */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#287362] opacity-25 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-600 opacity-20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(#287362_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
 
         {/* Header Branding Strip */}
-        <div className="relative z-10 space-y-6">
+        <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* Logo & Bilingual Identity */}
             <Link href="/" className="flex items-center gap-3 group">
@@ -135,11 +135,11 @@ export default function RegisterPage() {
           </div>
 
           {/* Headline & Value Proposition */}
-          <div className="pt-4 lg:pt-8 max-w-xl space-y-3">
-            <h1 className="font-headline font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight leading-tight">
+          <div className="pt-2 lg:pt-3 max-w-xl space-y-1.5">
+            <h1 className="font-headline font-extrabold text-2xl sm:text-3xl lg:text-[28px] text-white tracking-tight leading-tight">
               Scale Your Ethiopian Brand with Verifiable Influencer ROI.
             </h1>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-body">
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-body">
               Launch trackable campaigns, eliminate attribution guesswork across Telegram and social
               media, and verify in-store sales at checkout counters in real time.
             </p>
@@ -147,18 +147,18 @@ export default function RegisterPage() {
         </div>
 
         {/* Feature Highlights Grid */}
-        <div className="relative z-10 my-8 space-y-4">
-          <div className="grid grid-cols-1 gap-3.5">
+        <div className="relative z-10 my-2 lg:my-auto space-y-2 sm:space-y-2.5">
+          <div className="grid grid-cols-1 gap-2 sm:gap-2.5">
             {/* Feature 1 */}
-            <div className="p-4 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600/30 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
-                <Smartphone className="w-5 h-5" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600/30 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                <Smartphone className="w-4 h-4" />
               </div>
               <div className="space-y-0.5">
-                <h4 className="text-sm font-headline font-bold text-white">
+                <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   Zero-Hardware Deployment
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Store cashiers log and verify promo codes on any smartphone or tablet without
                   expensive proprietary POS equipment.
                 </p>
@@ -166,15 +166,15 @@ export default function RegisterPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="p-4 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-[#D4AF37] flex items-center justify-center shrink-0 mt-0.5">
-                <Zap className="w-5 h-5" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-[#D4AF37] flex items-center justify-center shrink-0 mt-0.5">
+                <Zap className="w-4 h-4" />
               </div>
               <div className="space-y-0.5">
-                <h4 className="text-sm font-headline font-bold text-white">
+                <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   Telebirr &amp; CBE Birr Integrated
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Automated receipt pairing, instant payment reconciliation, and 4ms sync latency
                   for all transactions.
                 </p>
@@ -182,15 +182,15 @@ export default function RegisterPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="p-4 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
-                <BarChart3 className="w-5 h-5" />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
+              <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                <BarChart3 className="w-4 h-4" />
               </div>
               <div className="space-y-0.5">
-                <h4 className="text-sm font-headline font-bold text-white">
+                <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   2-Tier Merchant Governance
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Full analytics cockpit for Brand Owners, plus isolated fast cashier mode for
                   storefront sales staff.
                 </p>
@@ -199,12 +199,12 @@ export default function RegisterPage() {
           </div>
 
           {/* Social Proof Quote Card */}
-          <div className="p-4 rounded-2xl bg-[#10352F]/90 border border-emerald-500/20 shadow-md">
-            <p className="text-xs text-emerald-200/90 italic font-body leading-relaxed">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-[#10352F]/90 border border-emerald-500/20 shadow-md">
+            <p className="text-[11px] sm:text-xs text-emerald-200/90 italic font-body leading-relaxed">
               &ldquo;EthioLink eliminated coupon chaos across our Bole &amp; Kazanchis branches. We
               tracked 1,200+ attributed sales in our first month alone.&rdquo;
             </p>
-            <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-300">
+            <div className="mt-1.5 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-300">
               <span className="font-semibold text-white">Sheba Artisan Coffee</span>
               <span className="font-mono text-emerald-400">Addis Ababa Retail Flagship</span>
             </div>
@@ -212,7 +212,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Footer */}
-        <div className="relative z-10 pt-4 border-t border-emerald-900/60 flex items-center justify-between text-xs text-slate-300">
+        <div className="relative z-10 pt-2.5 lg:pt-3 border-t border-emerald-900/60 flex items-center justify-between text-xs text-slate-300">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
             <span>Trusted by 240+ retail businesses in Addis Ababa.</span>
@@ -224,9 +224,9 @@ export default function RegisterPage() {
       </div>
 
       {/* RIGHT PANEL: Registration Form & Branch Configuration */}
-      <div className="lg:w-[50%] xl:w-[48%] bg-white dark:bg-[#0D1714] flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto">
+      <div className="lg:w-[50%] xl:w-[48%] bg-white dark:bg-[#0D1714] flex flex-col justify-between p-6 sm:p-8 lg:p-8 xl:p-10 lg:py-6 overflow-y-auto lg:overflow-hidden">
         {/* Top Action Bar */}
-        <div className="w-full flex items-center justify-between pb-6 sm:pb-8">
+        <div className="w-full flex items-center justify-between pb-3 sm:pb-4">
           <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-[#9BAAA1]">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
             <span>Instant Workspace Provisioning</span>
@@ -245,9 +245,9 @@ export default function RegisterPage() {
         </div>
 
         {/* Main Registration Form */}
-        <div className="max-w-md w-full mx-auto my-auto space-y-6">
-          <div className="space-y-1.5">
-            <h2 className="font-headline font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white tracking-tight">
+        <div className="max-w-md w-full mx-auto my-auto space-y-3.5 sm:space-y-4">
+          <div className="space-y-1">
+            <h2 className="font-headline font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white tracking-tight">
               Register Your Brand
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-[#9BAAA1] font-body leading-relaxed">
@@ -257,18 +257,18 @@ export default function RegisterPage() {
 
           {/* Error Banner */}
           {error && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2.5 animate-fadeIn">
+            <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2.5 animate-fadeIn">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               <span className="font-medium">{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
             {/* Brand / Business Name */}
             <div>
               <label
                 htmlFor="brandName"
-                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5"
+                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1"
               >
                 Business / Brand Name
               </label>
@@ -284,7 +284,7 @@ export default function RegisterPage() {
                   placeholder="e.g. Habesha Coffee Roasters"
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  className="block w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                  className="block w-full pl-10 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -293,7 +293,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="ownerName"
-                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5"
+                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1"
               >
                 Owner Full Name
               </label>
@@ -309,7 +309,7 @@ export default function RegisterPage() {
                   placeholder="e.g. Abebe Kebede"
                   value={ownerName}
                   onChange={(e) => setOwnerName(e.target.value)}
-                  className="block w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                  className="block w-full pl-10 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
                 />
               </div>
             </div>
@@ -318,12 +318,12 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5"
+                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1"
               >
                 Owner Phone Number
               </label>
               <div className="relative flex rounded-xl shadow-xs">
-                <div className="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 dark:border-[#1E332B] bg-[#F1F4F1] dark:bg-[#0A1A15] text-slate-700 dark:text-[#C5DCD6] text-xs font-semibold gap-1.5 select-none">
+                <div className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 dark:border-[#1E332B] bg-[#F1F4F1] dark:bg-[#0A1A15] text-slate-700 dark:text-[#C5DCD6] text-xs font-semibold gap-1.5 select-none">
                   <span className="text-sm">🇪🇹</span>
                   <span className="font-mono text-slate-800 dark:text-white">+251</span>
                 </div>
@@ -335,35 +335,36 @@ export default function RegisterPage() {
                   placeholder="0911 223 344"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="block w-full min-w-0 flex-1 rounded-none rounded-r-xl border border-slate-200 dark:border-[#1E332B] px-3.5 py-2.5 text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono tracking-wide transition-colors"
+                  className="block w-full min-w-0 flex-1 rounded-none rounded-r-xl border border-slate-200 dark:border-[#1E332B] px-3.5 py-2 text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono tracking-wide transition-colors"
                 />
               </div>
             </div>
 
             {/* Primary Branch Location District */}
             <div>
-              <label className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5">
+              <label
+                htmlFor="selectedBranch"
+                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1"
+              >
                 Primary Store District
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                {ADDIS_BRANCH_PRESETS.map((branch) => {
-                  const isSelected = selectedBranch === branch;
-                  return (
-                    <button
-                      key={branch}
-                      type="button"
-                      onClick={() => setSelectedBranch(branch)}
-                      className={`px-3 py-2 rounded-xl text-xs font-medium text-left truncate transition-colors cursor-pointer border ${
-                        isSelected
-                          ? "bg-emerald-50 dark:bg-[#18332A] text-emerald-900 dark:text-[#F1F5F1] border-emerald-300 dark:border-[#225C52] font-semibold"
-                          : "bg-[#F7F8F5] dark:bg-[#11211C] text-slate-600 dark:text-[#9BAAA1] border-slate-200/80 dark:border-[#1E332B] hover:border-slate-300"
-                      }`}
-                    >
-                      <MapPin className="w-3 h-3 inline-block mr-1.5 text-emerald-600 dark:text-[#78B99D]" />
-                      <span>{branch}</span>
-                    </button>
-                  );
-                })}
+              <div className="relative rounded-xl shadow-xs">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-[#78887F]">
+                  <MapPin className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                </div>
+                <select
+                  id="selectedBranch"
+                  name="selectedBranch"
+                  value={selectedBranch}
+                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  className="block w-full pl-10 pr-8 py-2 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors cursor-pointer"
+                >
+                  {ADDIS_BRANCH_PRESETS.map((branch) => (
+                    <option key={branch} value={branch} className="bg-white dark:bg-[#14211D] text-slate-900 dark:text-white">
+                      {branch}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -371,7 +372,7 @@ export default function RegisterPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5"
+                className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1"
               >
                 Account Password
               </label>
@@ -387,7 +388,7 @@ export default function RegisterPage() {
                   placeholder="At least 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 tracking-wider transition-colors"
+                  className="block w-full pl-10 pr-10 py-2 rounded-xl border border-slate-200 dark:border-[#1E332B] text-sm bg-white dark:bg-[#14211D] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 tracking-wider transition-colors"
                 />
                 <button
                   type="button"
@@ -398,17 +399,17 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] mt-1">
+              <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] mt-0.5">
                 Must be at least 6 characters. Used for owner console access.
               </p>
             </div>
 
             {/* Primary Action Button */}
-            <div className="pt-2">
+            <div className="pt-1.5">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl bg-[#10352F] hover:bg-[#16443D] active:scale-[0.99] text-white font-headline font-bold text-sm tracking-wide shadow-md shadow-emerald-950/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#10352F] hover:bg-[#16443D] active:scale-[0.99] text-white font-headline font-bold text-sm tracking-wide shadow-md shadow-emerald-950/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -426,7 +427,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Quick Links */}
-          <div className="pt-4 border-t border-slate-100 dark:border-[#1E332B] space-y-2.5 text-center">
+          <div className="pt-2.5 border-t border-slate-100 dark:border-[#1E332B] space-y-1.5 text-center">
             <p className="text-xs text-slate-600 dark:text-[#9BAAA1]">
               Already registered?{" "}
               <Link
@@ -449,7 +450,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Legal & Compliance Footer */}
-        <div className="pt-8 border-t border-slate-100 dark:border-[#1E332B] text-center space-y-2">
+        <div className="pt-3 sm:pt-4 border-t border-slate-100 dark:border-[#1E332B] text-center space-y-1.5">
           <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1] font-body">
             By creating an account, you agree to EthioLink&apos;s Terms of Service and Privacy Policy.
           </p>

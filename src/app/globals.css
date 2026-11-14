@@ -36,6 +36,10 @@
   --page-px: clamp(1rem, 2.5vw, 2rem); /* 16px to 32px fluid horizontal padding */
   --container-max-w: 80rem;           /* 1280px (max-w-7xl) */
   --container-admin-max-w: 100rem;    /* 1600px */
+
+  /* Typography Font Families */
+  --font-headline: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .dark {
@@ -113,8 +117,8 @@
 }
 
 @theme inline {
-  --font-headline: var(--font-headline), "Plus Jakarta Sans", sans-serif;
-  --font-body: var(--font-body), "Inter", sans-serif;
+  --font-headline: var(--font-headline, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --font-body: var(--font-body, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
