@@ -21,8 +21,16 @@ import {
   Check,
   Ban,
   X,
-
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export interface ActiveCampaign {
   id: string;
@@ -53,12 +61,16 @@ export interface RecentSale {
   };
 }
 
-interface SalesTerminalProps {
+export interface SalesTerminalProps {
   userName: string;
   userRole: string;
   brandName: string;
   initialCampaigns: ActiveCampaign[];
   initialSales: RecentSale[];
+  embedded?: boolean;
+  onSaleLogged?: (sale: RecentSale) => void;
+  onSaleVoided?: (saleId: string, reason: string) => void;
+  onNavigateTab?: (tab: "overview" | "sales" | "analytics" | "privacy") => void;
 }
 
 export function SalesTerminal({
@@ -67,6 +79,10 @@ export function SalesTerminal({
   brandName,
   initialCampaigns,
   initialSales,
+  embedded = false,
+  onSaleLogged,
+  onSaleVoided,
+  onNavigateTab,
 }: SalesTerminalProps) {
   const isOwner = userRole === "OWNER";
   const canVoid = userRole === "OWNER" || userRole === "ADMIN";
@@ -111,6 +127,10 @@ export function SalesTerminal({
             : s
         )
       );
+
+      if (onSaleVoided) {
+        onSaleVoided(voidModalSale.id, voidReason.trim());
+      }
 
       setVoidModalSale(null);
       setVoidReason("");
@@ -197,6 +217,10 @@ export function SalesTerminal({
       setLastLoggedSale(recorded);
       setSalesList((prev) => [recorded, ...prev]);
 
+      if (onSaleLogged) {
+        onSaleLogged(recorded);
+      }
+
       // Reset form
       setAmountInput("");
       setNotes("");
@@ -213,75 +237,22 @@ export function SalesTerminal({
     .reduce((sum, s) => sum + s.amountETB, 0);
   const activeSelectedCampaign = initialCampaigns.find((c) => c.id === selectedCampaignId);
 
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
-      {/* Top Header */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
-        <div className="navbar-shell layout-container px-[var(--page-px)]">
-          <div className="flex items-center gap-3">
-            {isOwner && (
-              <Link
-                href="/brand"
-                className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
-                title="Back to Brand Overview"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-            )}
-            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-xs">
-              <Store className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-headline font-bold text-base text-slate-900 dark:text-white leading-tight">
-                  {brandName}
-                </h1>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  POS TERMINAL
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <span>Cashier: <strong className="text-slate-800 dark:text-slate-200">{userName}</strong></span>
-                <span>•</span>
-                <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  EthioLink Sync Live (2ms)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <form action="/api/auth/logout" method="POST">
-              <button
-                type="submit"
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Log out</span>
-              </button>
-            </form>
-          </div>
+  const terminalContent = (
+    <div className="space-y-6">
+      {/* Today's Shift Summary Pill */}
+      <div className="p-3.5 rounded-2xl bg-white dark:bg-[#14211D] border border-slate-200 dark:border-[#26372F] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs transition-colors">
+        <div className="flex items-center gap-2 text-slate-700 dark:text-[#C0CCC4]">
+          <Receipt className="w-4 h-4 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+          <span>
+            {isOwner
+              ? "Retail POS Terminal: Log and attribute in-store receipts to active influencer promo codes."
+              : "Active Cashier Shift: In-store sales logging and promo code attribution enabled."}
+          </span>
         </div>
-      </header>
-
-      {/* Main Terminal Grid */}
-      <main className="layout-container px-[var(--page-px)] py-6 space-y-6">
-        {/* Today's Shift Summary Pill */}
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
-          <div className="flex items-center gap-2 text-slate-700">
-            <Receipt className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>
-              {isOwner
-                ? "Retail POS Terminal: Log and attribute in-store receipts to active influencer promo codes."
-                : "Active Cashier Shift: In-store sales logging and promo code attribution enabled."}
-            </span>
-          </div>
-          <div className="font-bold text-slate-900 font-mono text-sm bg-slate-50 px-3 py-1 rounded-lg border border-slate-200">
-            Shift Total: <span className="text-emerald-700">{formatETB(totalETBToday)}</span>
-          </div>
+        <div className="font-bold text-slate-900 dark:text-[#F1F5F1] font-mono text-sm bg-slate-50 dark:bg-[#101C18] px-3 py-1 rounded-lg border border-slate-200 dark:border-[#26372F]">
+          Shift Total: <span className="text-emerald-700 dark:text-[#78B99D]">{formatETB(totalETBToday)}</span>
         </div>
+      </div>
 
         {/* Success Feedback Card */}
         {lastLoggedSale && (
@@ -318,22 +289,22 @@ export function SalesTerminal({
         {/* 2-Column POS Register Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Fast Tender & Amount Entry (7 cols) */}
-          <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-6">
+          <div className="lg:col-span-7 bg-white dark:bg-[#14211D] rounded-2xl p-6 border border-slate-200/80 dark:border-[#26372F] shadow-xs flex flex-col justify-between space-y-6 transition-colors">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-headline font-bold text-base text-slate-900">
+                <h2 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
                   Sale Amount (ETB)
                 </h2>
-                <span className="text-xs font-semibold text-slate-400">Ethiopian Birr</span>
+                <span className="text-xs font-semibold text-slate-400 dark:text-[#9BAAA1]">Ethiopian Birr</span>
               </div>
 
               {/* Large Monospace Amount Display */}
               <div className="relative mb-4">
-                <div className="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 flex items-baseline justify-between focus-within:border-emerald-500 focus-within:bg-white transition-all">
-                  <span className="font-mono font-black text-3xl sm:text-4xl text-slate-900 tracking-tight">
+                <div className="w-full bg-slate-50 dark:bg-[#101C18] border-2 border-slate-200 dark:border-[#26372F] rounded-2xl p-4 flex items-baseline justify-between focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-[#14211D] transition-all">
+                  <span className="font-mono font-black text-3xl sm:text-4xl text-slate-900 dark:text-[#F1F5F1] tracking-tight">
                     {amountInput ? amountInput : "0.00"}
                   </span>
-                  <span className="font-headline font-bold text-emerald-700 text-lg">ETB</span>
+                  <span className="font-headline font-bold text-emerald-700 dark:text-[#78B99D] text-lg">ETB</span>
                 </div>
               </div>
 
@@ -344,7 +315,7 @@ export function SalesTerminal({
                     key={preset}
                     type="button"
                     onClick={() => handleAddPreset(preset)}
-                    className="flex-1 min-w-[70px] py-2 px-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 text-xs font-bold font-mono transition-all active:scale-95 cursor-pointer shadow-2xs"
+                    className="flex-1 min-w-[70px] py-2 px-3 rounded-xl bg-slate-50 hover:bg-emerald-50 dark:bg-[#101C18] dark:hover:bg-[#193629] text-slate-700 hover:text-emerald-800 dark:text-[#F1F5F1] dark:hover:text-[#83D1A5] border border-slate-200 dark:border-[#26372F] text-xs font-bold font-mono transition-all active:scale-95 cursor-pointer shadow-2xs"
                   >
                     +{preset}
                   </button>
@@ -352,7 +323,7 @@ export function SalesTerminal({
                 <button
                   type="button"
                   onClick={() => setAmountInput("")}
-                  className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                  className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all active:scale-95 cursor-pointer"
                 >
                   Clear
                 </button>
@@ -365,7 +336,7 @@ export function SalesTerminal({
                     key={btn}
                     type="button"
                     onClick={() => handleKeypadPress(btn)}
-                    className="h-12 sm:h-14 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl font-mono font-bold text-lg text-slate-800 border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                    className="h-12 sm:h-14 bg-slate-50 hover:bg-slate-100 dark:bg-[#101C18] dark:hover:bg-[#192E26] active:bg-slate-200 dark:active:bg-[#203D32] rounded-xl font-mono font-bold text-lg text-slate-800 dark:text-[#F1F5F1] border border-slate-200 dark:border-[#26372F] shadow-2xs transition-all active:scale-95 cursor-pointer"
                   >
                     {btn}
                   </button>
@@ -375,7 +346,7 @@ export function SalesTerminal({
 
             {/* Notes field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-[#9BAAA1] mb-1.5">
                 Receipt Note / Cashier Reference (Optional)
               </label>
               <input
@@ -383,23 +354,23 @@ export function SalesTerminal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="e.g. Receipt #1042, 2x Whole Bean Sidama"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-[#101C18] border border-slate-200 dark:border-[#26372F] rounded-xl text-xs text-slate-900 dark:text-[#F1F5F1] placeholder:text-slate-400 dark:placeholder:text-[#9BAAA1]/50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
 
           {/* Right Column: Influencer Attribution & Payment Tender (5 cols) */}
-          <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-6">
+          <div className="lg:col-span-5 bg-white dark:bg-[#14211D] rounded-2xl p-6 border border-slate-200/80 dark:border-[#26372F] shadow-xs flex flex-col justify-between space-y-6 transition-colors">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-headline font-bold text-base text-slate-900">
+                <h3 className="font-headline font-bold text-base text-slate-900 dark:text-[#F1F5F1]">
                   Influencer Attribution
                 </h3>
-                <Tag className="w-4 h-4 text-emerald-600" />
+                <Tag className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
               </div>
 
               {error && (
-                <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -408,7 +379,7 @@ export function SalesTerminal({
               {/* Promo Code Input or Campaign Select */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#9BAAA1] mb-1.5">
                     Customer Promo Code (Instant Match)
                   </label>
                   <input
@@ -416,37 +387,76 @@ export function SalesTerminal({
                     value={customPromoCode}
                     onChange={(e) => setCustomPromoCode(e.target.value)}
                     placeholder="e.g. ETHIO20"
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-sm tracking-wider uppercase text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-2.5 bg-slate-50 dark:bg-[#101C18] border border-slate-300 dark:border-[#26372F] rounded-xl font-mono font-bold text-sm tracking-wider uppercase text-slate-900 dark:text-[#F1F5F1] placeholder:text-slate-400 dark:placeholder:text-[#9BAAA1]/50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#9BAAA1] mb-1.5">
                     Or Select Active Campaign
                   </label>
-                  <select
-                    value={selectedCampaignId}
-                    onChange={(e) => {
-                      setSelectedCampaignId(e.target.value);
-                      setCustomPromoCode("");
-                    }}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    {initialCampaigns.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.promoCode})
-                      </option>
-                    ))}
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-[#101C18] border border-slate-200 dark:border-[#26372F] rounded-xl text-xs font-semibold text-slate-800 dark:text-[#F1F5F1] shadow-2xs hover:bg-[#F0F2EF] dark:hover:bg-[#1A2A24] focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center justify-between cursor-pointer transition-all"
+                      >
+                        <span className="truncate">
+                          {activeSelectedCampaign
+                            ? `${activeSelectedCampaign.name} (${activeSelectedCampaign.promoCode})`
+                            : "Select Active Campaign"}
+                        </span>
+                        <ChevronDown className="w-4 h-4 text-slate-400 dark:text-[#9BAAA1] shrink-0 ml-2" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="w-80 max-h-72 overflow-y-auto p-1.5 bg-white dark:bg-[#14211D] border border-slate-200 dark:border-[#26372F] shadow-xl rounded-xl z-50 text-xs"
+                    >
+                      <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1]">
+                        Active Campaigns
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-[#26372F]" />
+                      {initialCampaigns.map((c) => {
+                        const isSelected = selectedCampaignId === c.id;
+                        return (
+                          <DropdownMenuItem
+                            key={c.id}
+                            onClick={() => {
+                              setSelectedCampaignId(c.id);
+                              setCustomPromoCode("");
+                            }}
+                            className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                              isSelected
+                                ? "bg-emerald-50 dark:bg-[#193629] text-emerald-800 dark:text-[#83D1A5] font-semibold"
+                                : "text-slate-700 dark:text-[#C0CCC4] hover:bg-slate-50 dark:hover:bg-[#1A2A24]"
+                            }`}
+                          >
+                            <div className="truncate pr-2">
+                              <div className="font-semibold text-slate-900 dark:text-[#F1F5F1] truncate">
+                                {c.name}
+                              </div>
+                              <div className="text-[10px] text-emerald-700 dark:text-[#78B99D] font-mono">
+                                Promo Code: {c.promoCode}
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-emerald-600 dark:text-[#78B99D] shrink-0" />
+                            )}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Attribution Proof Banner */}
-                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+                <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-[#193629] border border-emerald-200 dark:border-[#264D3A] text-xs text-emerald-900 dark:text-[#F1F5F1] space-y-1">
                   <div className="font-bold flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                     <span>Attribution Target:</span>
                   </div>
-                  <p className="text-[11px] text-emerald-800">
+                  <p className="text-[11px] text-emerald-800 dark:text-[#A4D8BD]">
                     {customPromoCode
                       ? `Promo Code: ${customPromoCode.toUpperCase()}`
                       : activeSelectedCampaign
@@ -457,7 +467,7 @@ export function SalesTerminal({
 
                 {/* Ethiopian Payment Method Selector */}
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[#9BAAA1] mb-2">
                     Payment Method
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -466,11 +476,11 @@ export function SalesTerminal({
                       onClick={() => setPaymentMethod("telebirr")}
                       className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                         paymentMethod === "telebirr"
-                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
-                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          ? "bg-emerald-50 dark:bg-[#193629] border-emerald-500 dark:border-[#78B99D] text-emerald-900 dark:text-[#83D1A5] shadow-2xs"
+                          : "bg-slate-50 dark:bg-[#101C18] border-slate-200 dark:border-[#26372F] text-slate-600 dark:text-[#9BAAA1] hover:bg-slate-100 dark:hover:bg-[#192E26]"
                       }`}
                     >
-                      <QrCode className="w-4 h-4 text-emerald-600" />
+                      <QrCode className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                       <span>Telebirr</span>
                     </button>
                     <button
@@ -478,11 +488,11 @@ export function SalesTerminal({
                       onClick={() => setPaymentMethod("cbe")}
                       className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                         paymentMethod === "cbe"
-                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
-                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          ? "bg-emerald-50 dark:bg-[#193629] border-emerald-500 dark:border-[#78B99D] text-emerald-900 dark:text-[#83D1A5] shadow-2xs"
+                          : "bg-slate-50 dark:bg-[#101C18] border-slate-200 dark:border-[#26372F] text-slate-600 dark:text-[#9BAAA1] hover:bg-slate-100 dark:hover:bg-[#192E26]"
                       }`}
                     >
-                      <CreditCard className="w-4 h-4 text-purple-600" />
+                      <CreditCard className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       <span>CBE Birr</span>
                     </button>
                     <button
@@ -490,11 +500,11 @@ export function SalesTerminal({
                       onClick={() => setPaymentMethod("cash")}
                       className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
                         paymentMethod === "cash"
-                          ? "bg-emerald-50 border-emerald-500 text-emerald-900 shadow-2xs"
-                          : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          ? "bg-emerald-50 dark:bg-[#193629] border-emerald-500 dark:border-[#78B99D] text-emerald-900 dark:text-[#83D1A5] shadow-2xs"
+                          : "bg-slate-50 dark:bg-[#101C18] border-slate-200 dark:border-[#26372F] text-slate-600 dark:text-[#9BAAA1] hover:bg-slate-100 dark:hover:bg-[#192E26]"
                       }`}
                     >
-                      <Banknote className="w-4 h-4 text-amber-600" />
+                      <Banknote className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                       <span>Cash</span>
                     </button>
                   </div>
@@ -523,17 +533,17 @@ export function SalesTerminal({
         </div>
 
         {/* Bottom Live Activity Stream */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+        <div className="bg-white dark:bg-[#14211D] rounded-2xl border border-slate-200/80 dark:border-[#26372F] p-6 shadow-xs transition-colors">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-headline font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-400" />
+            <h3 className="font-headline font-bold text-sm text-slate-900 dark:text-[#F1F5F1] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-400 dark:text-[#9BAAA1]" />
               <span>Recent In-Store Attributions</span>
             </h3>
-            <span className="text-xs text-slate-400">Last 20 Receipts</span>
+            <span className="text-xs text-slate-400 dark:text-[#9BAAA1]">Last 20 Receipts</span>
           </div>
 
           {salesList.length === 0 ? (
-            <div className="py-8 text-center text-slate-400 text-xs">
+            <div className="py-8 text-center text-slate-400 dark:text-[#9BAAA1] text-xs">
               No sales logged yet for this shift.
             </div>
           ) : (
@@ -544,7 +554,7 @@ export function SalesTerminal({
                   className={`py-3 px-2 flex items-center justify-between text-xs transition-colors ${
                     sale.isVoided
                       ? "bg-rose-50/40 dark:bg-rose-950/20 opacity-75"
-                      : "hover:bg-slate-50/80 dark:hover:bg-slate-900/50"
+                      : "hover:bg-slate-50/80 dark:hover:bg-[#101C18]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -623,7 +633,6 @@ export function SalesTerminal({
             </div>
           )}
         </div>
-      </main>
 
       {/* Void Confirmation Modal */}
       {voidModalSale && (
@@ -720,6 +729,70 @@ export function SalesTerminal({
           </div>
         </div>
       )}
+    </div>
+  );
+
+  if (embedded) {
+    return terminalContent;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-body antialiased pb-16 selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
+      {/* Top Header */}
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-xs">
+        <div className="navbar-shell layout-container px-[var(--page-px)]">
+          <div className="flex items-center gap-3">
+            {isOwner && (
+              <Link
+                href="/brand"
+                className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+                title="Back to Brand Overview"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-xs">
+              <Store className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-headline font-bold text-base text-slate-900 dark:text-white leading-tight">
+                  {brandName}
+                </h1>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                  POS TERMINAL
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span>Cashier: <strong className="text-slate-800 dark:text-slate-200">{userName}</strong></span>
+                <span>•</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  EthioLink Sync Live (2ms)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log out</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Terminal Grid */}
+      <main className="layout-container px-[var(--page-px)] py-6 space-y-6">
+        {terminalContent}
+      </main>
     </div>
   );
 }

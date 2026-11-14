@@ -10,12 +10,12 @@ import {
   ArrowRight,
   ShieldCheck,
   User,
-  Phone,
   Send,
   AlertCircle,
   Loader2,
   Tag,
   Store,
+  Layers,
 } from "lucide-react";
 
 interface CampaignPreview {
@@ -87,27 +87,27 @@ function JoinContent() {
     e.preventDefault();
     if (!token) return;
 
-    if (!name.trim()) {
-      setSubmitError("Please enter your full name.");
-      return;
-    }
-
-    if (!phone.trim()) {
-      setSubmitError("Please enter your phone number.");
-      return;
-    }
-
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
+      // Normalize Ethiopian phone number
+      let submittedPhone = phone.trim();
+      if (/^9\d{8}$/.test(submittedPhone)) {
+        submittedPhone = `0${submittedPhone}`;
+      }
+      if (/^\+?251(\d{9})$/.test(submittedPhone)) {
+        const match = submittedPhone.match(/^\+?251(\d{9})$/);
+        if (match) submittedPhone = `0${match[1]}`;
+      }
+
       const res = await fetch("/api/auth/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token,
           name: name.trim(),
-          phone: phone.trim(),
+          phone: submittedPhone,
           telegramUsername: telegramUsername.trim() || undefined,
         }),
       });
@@ -125,7 +125,6 @@ function JoinContent() {
 
       router.push(data.redirectUrl || "/creator");
     } catch (err: unknown) {
-
       setSubmitError(formatClientError(err, "Something went wrong. Please check your network."));
       setIsSubmitting(false);
     }
@@ -133,29 +132,33 @@ function JoinContent() {
 
   if (isLoadingPreview) {
     return (
-      <div className="bg-white py-12 px-6 rounded-3xl border border-slate-100 shadow-xl max-w-md w-full text-center">
-        <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-4" />
-        <h2 className="text-base font-bold text-slate-800">Verifying Creator Invitation...</h2>
-        <p className="text-xs text-slate-500 mt-1">Connecting to merchant campaign</p>
+      <div className="bg-white dark:bg-[#14211D] py-12 px-6 rounded-3xl border border-slate-200/80 dark:border-[#1E332B] shadow-lg max-w-md w-full text-center space-y-4">
+        <Loader2 className="w-8 h-8 text-emerald-600 dark:text-[#78B99D] animate-spin mx-auto" />
+        <h2 className="text-base font-headline font-bold text-slate-800 dark:text-white">
+          Verifying Creator Invitation...
+        </h2>
+        <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+          Connecting to merchant partner campaign node
+        </p>
       </div>
     );
   }
 
   if (tokenError) {
     return (
-      <div className="bg-white py-8 px-6 shadow-xl rounded-3xl border border-slate-100 max-w-md w-full text-center">
-        <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+      <div className="bg-white dark:bg-[#14211D] py-8 px-6 shadow-xl rounded-3xl border border-slate-200/80 dark:border-[#1E332B] max-w-md w-full text-center">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-200/60 dark:border-rose-900/60">
           <AlertCircle className="w-7 h-7" />
         </div>
-        <h1 className="text-xl font-black text-slate-900 tracking-tight mb-2">
+        <h1 className="text-xl font-headline font-black text-slate-900 dark:text-white tracking-tight mb-2">
           Invitation Expired or Invalid
         </h1>
-        <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+        <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mb-6 leading-relaxed">
           {tokenError}
         </p>
         <Link
           href="/"
-          className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-sm"
+          className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#10352F] hover:bg-[#16443D] text-white font-headline font-semibold text-xs transition-all shadow-sm"
         >
           <span>Return to Homepage</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -165,102 +168,114 @@ function JoinContent() {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 py-8 px-6 shadow-xl shadow-slate-200/50 dark:shadow-none rounded-3xl border border-slate-100 dark:border-slate-800 max-w-md w-full text-left transition-colors duration-200">
+    <div className="bg-white dark:bg-[#14211D] py-8 px-6 sm:px-8 shadow-xl shadow-slate-200/40 dark:shadow-none rounded-3xl border border-slate-200/80 dark:border-[#1E332B] max-w-md w-full text-left transition-colors duration-200">
       {/* Brand & Campaign Header Preview */}
-      <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100/80 mb-6">
-        <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-          <Sparkles className="w-6 h-6" />
+      <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-[#EAF5F0] dark:bg-[#11261E] border border-emerald-200/80 dark:border-[#1E4336] mb-6">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-[#10352F] text-white flex items-center justify-center shrink-0 shadow-sm border border-emerald-400/20">
+          <Sparkles className="w-6 h-6 text-white" />
         </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-800">
-            <Store className="w-3 h-3 text-emerald-600" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-800 dark:text-[#78B99D]">
+            <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
             <span className="truncate">{campaignPreview?.brandName}</span>
           </div>
-          <h2 className="text-sm font-black text-slate-900 truncate">
+          <h2 className="text-sm font-headline font-bold text-slate-900 dark:text-white truncate">
             {campaignPreview?.name}
           </h2>
-          <div className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200 mt-1">
+          <div className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-700 dark:text-[#78B99D] bg-white dark:bg-[#163327] px-2 py-0.5 rounded-md border border-emerald-200 dark:border-[#204938] mt-1">
             <Tag className="w-2.5 h-2.5" />
-            <span>Code: {campaignPreview?.promoCode}</span>
+            <span>Promo Code: {campaignPreview?.promoCode}</span>
           </div>
         </div>
       </div>
 
-      <div className="mb-6">
-        <h1 className="text-lg font-black text-slate-900 tracking-tight">
-          Join Campaign & Access Portal
+      <div className="mb-6 space-y-1">
+        <h1 className="text-xl font-headline font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Join Campaign &amp; Access Portal
         </h1>
-        <p className="text-xs text-slate-500 mt-1">
-          Complete your creator profile to retrieve your personal tracking link and live performance analytics.
+        <p className="text-xs text-slate-500 dark:text-[#9BAAA1] leading-relaxed">
+          Complete your creator profile to retrieve your personal tracking link and live Telebirr
+          commission analytics.
         </p>
       </div>
 
       {submitError && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2 mb-4">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{submitError}</span>
+        <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 mb-4 animate-fadeIn">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+          <span className="font-medium">{submitError}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Full Name */}
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+          <label className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5">
             Your Full Name
           </label>
-          <div className="relative">
-            <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <div className="relative rounded-xl shadow-xs">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-[#78887F]">
+              <User className="w-4 h-4" />
+            </div>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Helen Bedilu"
-              className="w-full bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-900 text-xs font-medium pl-10 pr-3.5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+              className="w-full bg-white dark:bg-[#101C18] text-slate-900 dark:text-white text-sm font-medium pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E332B] focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 dark:placeholder:text-[#78887F] transition-colors"
             />
           </div>
         </div>
 
+        {/* Ethiopian Phone Number */}
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+          <label className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5">
             Phone Number (Ethiopia)
           </label>
-          <div className="relative">
-            <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <div className="relative flex rounded-xl shadow-xs">
+            <div className="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-200 dark:border-[#1E332B] bg-[#F1F4F1] dark:bg-[#0A1A15] text-slate-700 dark:text-[#C5DCD6] text-xs font-semibold gap-1.5 select-none">
+              <span className="text-sm">🇪🇹</span>
+              <span className="font-mono text-slate-800 dark:text-white">+251</span>
+            </div>
             <input
               type="tel"
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="e.g. 0911223344"
-              className="w-full bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-900 text-xs font-medium pl-10 pr-3.5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+              placeholder="0911 223 344"
+              className="block w-full min-w-0 flex-1 rounded-none rounded-r-xl border border-slate-200 dark:border-[#1E332B] px-3.5 py-2.5 text-sm bg-white dark:bg-[#101C18] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#78887F] focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono tracking-wide transition-colors"
             />
           </div>
-          <span className="text-[10px] text-slate-400 mt-1 block">
-            Used as your unique sign-in identifier.
+          <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1] mt-1 block">
+            Used as your unique sign-in identifier for creator payouts.
           </span>
         </div>
 
+        {/* Telegram Username */}
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1.5">
-            Telegram Username <span className="text-slate-400 font-normal">(Optional)</span>
+          <label className="block text-xs font-headline font-bold uppercase tracking-wider text-slate-700 dark:text-[#C5DCD6] mb-1.5">
+            Telegram Username <span className="text-slate-400 dark:text-[#78887F] font-normal lowercase">(optional)</span>
           </label>
-          <div className="relative">
-            <Send className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <div className="relative rounded-xl shadow-xs">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-[#78887F]">
+              <Send className="w-4 h-4 text-blue-500" />
+            </div>
             <input
               type="text"
               value={telegramUsername}
               onChange={(e) => setTelegramUsername(e.target.value)}
               placeholder="e.g. @helen_creator"
-              className="w-full bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-slate-900 text-xs font-medium pl-10 pr-3.5 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+              className="w-full bg-white dark:bg-[#101C18] text-slate-900 dark:text-white text-sm font-medium pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E332B] focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-slate-400 dark:placeholder:text-[#78887F] transition-colors"
             />
           </div>
         </div>
 
+        {/* Submit Button */}
         <div className="pt-2">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-sm shadow-emerald-600/20 disabled:opacity-50 cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#10352F] hover:bg-[#16443D] active:scale-[0.99] text-white font-headline font-bold text-sm tracking-wide shadow-md shadow-emerald-950/20 disabled:opacity-50 transition-all cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -269,17 +284,17 @@ function JoinContent() {
               </>
             ) : (
               <>
-                <span>Accept & Open Creator Portal</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Accept &amp; Open Creator Portal</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               </>
             )}
           </button>
         </div>
       </form>
 
-      <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-400">
-        <ShieldCheck className="w-4 h-4 text-emerald-600" />
-        <span>Verified Magic-Link Onboarding</span>
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-[#1E332B] flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-[#9BAAA1]">
+        <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+        <span>Verified Magic-Link Onboarding · Telebirr Ready</span>
       </div>
     </div>
   );
@@ -287,25 +302,31 @@ function JoinContent() {
 
 export default function JoinPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center px-4 py-12 relative transition-colors duration-200">
+    <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#07120F] flex flex-col justify-center items-center px-4 py-12 relative transition-colors duration-200">
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <ThemeToggle />
       </div>
+
       <div className="text-center mb-6">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-500/20">
-            E
+        <Link href="/" className="inline-flex items-center gap-2.5 group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-[#10352F] text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-950/20 border border-emerald-400/20 group-hover:scale-105 transition-transform">
+            <Layers className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">EthioLink</span>
+          <span className="text-2xl font-headline font-black text-slate-900 dark:text-white tracking-tight">
+            EthioLink
+          </span>
         </Link>
+        <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-1 font-body">
+          Influencer Campaign Invitation Gateway
+        </p>
       </div>
 
       <Suspense
         fallback={
-          <div className="bg-white py-12 px-6 rounded-3xl border border-slate-100 shadow-xl max-w-md w-full text-center animate-pulse">
-            <div className="w-12 h-12 bg-slate-200 rounded-2xl mx-auto mb-4" />
-            <div className="w-48 h-6 bg-slate-200 rounded mx-auto mb-2" />
-            <div className="w-64 h-4 bg-slate-100 rounded mx-auto mb-6" />
+          <div className="bg-white dark:bg-[#14211D] py-12 px-6 rounded-3xl border border-slate-200/80 dark:border-[#1E332B] shadow-xl max-w-md w-full text-center animate-pulse space-y-4">
+            <div className="w-12 h-12 bg-slate-100 dark:bg-[#101C18] rounded-2xl mx-auto mb-4" />
+            <div className="w-48 h-6 bg-slate-100 dark:bg-[#101C18] rounded mx-auto mb-2" />
+            <div className="w-64 h-4 bg-slate-100 dark:bg-[#101C18] rounded mx-auto mb-6" />
           </div>
         }
       >

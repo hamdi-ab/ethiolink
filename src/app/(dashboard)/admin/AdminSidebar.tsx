@@ -17,6 +17,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LifeBuoy,
+  ChevronsUpDown,
+  Layers,
+  Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 
 export type AdminTab =
@@ -73,7 +77,7 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const navSections: NavSection[] = [
     {
-      title: "Platform Intelligence",
+      title: "Cockpit Navigation",
       items: [
         {
           id: "overview",
@@ -82,10 +86,10 @@ export function AdminSidebar({
         },
         {
           id: "analytics",
-          label: "Funnel & Intelligence",
+          label: "Reports & Funnel",
           icon: TrendingUp,
-          badge: "NEW",
-          badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300",
+          badge: "LIVE",
+          badgeColor: "bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]",
         },
       ],
     },
@@ -93,10 +97,16 @@ export function AdminSidebar({
       title: "Management & Rosters",
       items: [
         {
-          id: "sales",
-          label: "Sales Ledger",
-          icon: Receipt,
-          badge: counts.sales,
+          id: "merchants",
+          label: "Brands & Workspaces",
+          icon: Store,
+          badge: counts.merchants,
+        },
+        {
+          id: "creators",
+          label: "Creators Directory",
+          icon: Users,
+          badge: counts.creators,
         },
         {
           id: "campaigns",
@@ -105,22 +115,20 @@ export function AdminSidebar({
           badge: counts.campaigns,
         },
         {
-          id: "merchants",
-          label: "Registered Brands",
-          icon: Store,
-          badge: counts.merchants,
-        },
-        {
-          id: "creators",
-          label: "Creator Directory",
-          icon: Users,
-          badge: counts.creators,
+          id: "sales",
+          label: "Attributed Sales",
+          icon: Receipt,
+          badge: counts.sales,
         },
         {
           id: "issues",
-          label: "Operational Issues",
+          label: "Reported Issues",
           icon: LifeBuoy,
           badge: counts.issues,
+          badgeColor:
+            counts.issues && counts.issues > 0
+              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+              : undefined,
         },
       ],
     },
@@ -128,15 +136,15 @@ export function AdminSidebar({
       title: "Infrastructure & Audit",
       items: [
         {
-          id: "telemetry",
-          label: "Event Telemetry",
-          icon: Radio,
-          badge: counts.events,
+          id: "health",
+          label: "Platform Ops & Health",
+          icon: Server,
         },
         {
-          id: "health",
-          label: "System Health",
-          icon: Server,
+          id: "telemetry",
+          label: "Raw Telemetry Stream",
+          icon: Radio,
+          badge: counts.events,
         },
       ],
     },
@@ -150,25 +158,25 @@ export function AdminSidebar({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300">
+    <div className="flex flex-col h-full bg-[#10352F] dark:bg-[#08120F] text-white border-r border-[#1B4B42] dark:border-[#1E332B] transition-all duration-300 select-none">
       {/* Brand Header */}
-      <div className="h-[var(--navbar-height)] flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 shrink-0 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-base shadow-xs">
-            EL
+      <div className="h-[var(--navbar-height)] flex items-center justify-between px-3.5 border-b border-[#1B4B42] dark:border-[#1E332B] bg-[#0C2722]/90 dark:bg-[#050A08]">
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs shrink-0 border border-emerald-400/20 dark:border-transparent">
+            <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
           </div>
           {!isCollapsed && (
             <div className="truncate">
               <div className="flex items-center gap-1.5">
-                <span className="font-headline font-black text-base text-slate-900 dark:text-slate-100 tracking-tight">
-                  Ethio<span className="text-emerald-600 dark:text-emerald-400">Link</span>
+                <span className="font-headline font-bold text-lg text-white leading-none tracking-tight">
+                  Ethio<span className="text-emerald-400 dark:text-[#78B99D]">Link</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-extrabold bg-emerald-500/20 text-emerald-300 dark:text-[#78B99D] border border-emerald-500/30">
                   OPS
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                Admin Console
+              <p className="text-[11px] font-semibold text-emerald-300 dark:text-[#83D1A5] uppercase tracking-wider mt-0.5 truncate">
+                Attribution Engine
               </p>
             </div>
           )}
@@ -177,19 +185,41 @@ export function AdminSidebar({
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621]"
           aria-label="Close mobile sidebar"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
+      {/* Workspace Quick-Select Pill (Matching BrandSidebar) */}
+      {!isCollapsed && (
+        <div className="px-3 pt-3">
+          <div className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
+                <Store className="w-4 h-4" />
+              </div>
+              <div className="truncate min-w-0">
+                <p className="text-xs font-semibold text-white truncate leading-tight">
+                  Sheba Artisan Coffee
+                </p>
+                <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                  Bole Flagship • Addis Ababa
+                </p>
+              </div>
+            </div>
+            <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
+          </div>
+        </div>
+      )}
+
       {/* Navigation Sections */}
-      <div className="flex-1 overflow-y-auto sidebar-scroll py-4 px-3 space-y-6">
+      <div className="flex-1 overflow-y-auto sidebar-scroll py-3 px-3 space-y-4">
         {navSections.map((section, idx) => (
           <div key={idx} className="space-y-1">
             {!isCollapsed && (
-              <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-headline">
+              <h3 className="px-3 text-[11px] font-bold uppercase tracking-wider text-emerald-200/60 dark:text-[#9BAAA1] mb-1 font-headline">
                 {section.title}
               </h3>
             )}
@@ -202,40 +232,41 @@ export function AdminSidebar({
                     key={item.id}
                     onClick={() => handleItemClick(item.id)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900 ${
+                    className={`w-full flex items-center transition-all group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                      isCollapsed
+                        ? "w-10 h-10 rounded-xl justify-center relative hover:scale-105 mx-auto"
+                        : "justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left"
+                    } ${
                       isActive
-                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 border border-transparent"
-                    } ${isCollapsed ? "justify-center px-0" : ""}`}
+                        ? "bg-[#1C554C] dark:bg-[#18332A] text-white border border-emerald-400/30 dark:border-[#28493D] shadow-xs font-bold"
+                        : "text-[#C5DCD6] dark:text-[#9BAAA1] hover:bg-[#16443D] dark:hover:bg-[#11211C] hover:text-white dark:hover:text-white border border-transparent"
+                    }`}
                   >
-                    <Icon
-                      className={`w-4 h-4 shrink-0 transition-colors ${
-                        isActive
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"
-                      }`}
-                    />
-                    {!isCollapsed && (
-                      <>
-                        <span className="truncate flex-1 text-left">{item.label}</span>
-                        {item.badge !== undefined && (
-                          <span
-                            className={`px-1.5 py-0.5 text-[11px] font-mono font-bold rounded-md ${
-                              item.badgeColor ||
-                              (isActive
-                                ? "bg-emerald-200/60 dark:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400")
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </>
+                    <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
+                      <Icon
+                        className={`w-4 h-4 shrink-0 transition-colors ${
+                          isActive
+                            ? "text-emerald-300 dark:text-[#78B99D]"
+                            : "text-emerald-200/60 dark:text-[#9BAAA1]"
+                        }`}
+                      />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </div>
+
+                    {!isCollapsed && item.badge !== undefined && (
+                      <span
+                        className={`px-1.5 py-0.5 text-[11px] font-mono font-bold rounded-md ${
+                          item.badgeColor ||
+                          "bg-[#0D2B26] dark:bg-[#060D0B] border border-emerald-500/40 dark:border-[#20362E] text-emerald-200 dark:text-[#78B99D]"
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
                     )}
 
-                    {/* Active Indicator Bar */}
+                    {/* Active Left Indicator Bar */}
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-emerald-600 dark:bg-emerald-400 rounded-r-full" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-emerald-400 dark:bg-[#78B99D] shadow-xs" />
                     )}
                   </button>
                 );
@@ -245,98 +276,106 @@ export function AdminSidebar({
         ))}
       </div>
 
-      {/* Admin Profile & Footer Actions */}
-      <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+      {/* Admin Profile & Gateway Status Footer */}
+      <div className="border-t border-[#1B4B42] dark:border-[#1E332B] bg-[#0B2520] dark:bg-[#050A08] p-3 space-y-2.5">
         {!isCollapsed ? (
-          /* Expanded Mode: Integrated Profile Card & Aligned Toolbar */
-          <div className="space-y-2.5">
-            {/* User Profile Card with Embedded Sign Out */}
-            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-2xs flex items-center justify-between gap-2.5">
+          <>
+            {/* Interactive Telebirr & CBE Birr Live Integration Card */}
+            <div className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] shadow-2xs">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 shrink-0 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-500/20 shadow-2xs">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
+                </div>
+                <div className="truncate">
+                  <p className="text-xs font-semibold text-white truncate leading-tight">
+                    Telebirr &amp; CBE Birr
+                  </p>
+                  <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
+                    Gateway Sync v2.4
+                  </p>
+                </div>
+              </div>
+              <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
+                Active
+              </span>
+            </div>
+
+            {/* User Profile & Theme Toggle Row */}
+            <div className="flex items-center justify-between px-1 h-10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                   {adminName.charAt(0).toUpperCase()}
                 </div>
-                <div className="truncate min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                      {adminName}
-                    </span>
-                    <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                    <span>Superadmin</span>
-                  </div>
+                <div className="min-w-0">
+                  <span className="font-semibold text-xs text-white block truncate leading-tight">
+                    {adminName}
+                  </span>
+                  <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
+                    Superadmin
+                  </span>
                 </div>
               </div>
 
-              {/* Integrated Sign Out Button */}
-              <form action="/api/auth/logout" method="POST" className="shrink-0">
+              <div className="flex items-center gap-1.5">
+                <ThemeToggle
+                  size="sm"
+                  className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
+                />
                 <button
-                  type="submit"
-                  title="Sign out"
-                  aria-label="Sign out"
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                  onClick={onToggleCollapse}
+                  title="Collapse sidebar"
+                  aria-label="Collapse sidebar"
+                  className="hidden lg:flex p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <PanelLeftClose className="w-4 h-4" />
                 </button>
-              </form>
-            </div>
-
-            {/* Bottom Utilities Row: Theme Toggle + Sidebar Collapse */}
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-2">
-                <ThemeToggle size="sm" />
-                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Theme</span>
               </div>
-
-              <button
-                onClick={onToggleCollapse}
-                title="Collapse sidebar"
-                aria-label="Collapse sidebar"
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-              >
-                <PanelLeftClose className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Collapse</span>
-              </button>
             </div>
-          </div>
+
+            {/* Sign Out Action Button */}
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </form>
+          </>
         ) : (
-          /* Collapsed Mode: Uniform 36x36px Centered Action Stack */
+          /* Collapsed Mode */
           <div className="flex flex-col items-center gap-2 py-1">
-            {/* User Avatar */}
             <div
               title={`${adminName} (Superadmin)`}
-              className="w-9 h-9 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center ring-2 ring-emerald-500/20 shadow-2xs cursor-default"
+              className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1C554C] to-[#0D2B26] dark:from-[#18332A] dark:to-[#0D1714] border border-[#2B7366] dark:border-[#28493D] text-white font-bold text-xs flex items-center justify-center ring-2 ring-emerald-400/20 cursor-default"
             >
               {adminName.charAt(0).toUpperCase()}
             </div>
 
-            <div className="w-6 h-px bg-slate-200 dark:bg-slate-800 my-0.5" />
+            <div className="w-6 h-px bg-[#1B4B42]/60 dark:bg-[#1E332B]/60 my-0.5" />
 
-            {/* Theme Toggle (36x36px) */}
-            <div className="flex items-center justify-center" title="Toggle theme">
-              <ThemeToggle size="md" />
-            </div>
+            <ThemeToggle
+              size="sm"
+              className="!w-9 !h-9 !bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] rounded-xl flex items-center justify-center shadow-xs cursor-pointer"
+            />
 
-            {/* Sign Out (36x36px) */}
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
                 title="Sign out"
                 aria-label="Sign out"
-                className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/50 transition-all cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-emerald-200/60 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/50 transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </form>
 
-            {/* Expand Sidebar (36x36px) */}
             <button
               onClick={onToggleCollapse}
               title="Expand sidebar"
               aria-label="Expand sidebar"
-              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-xl text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-all cursor-pointer"
             >
               <PanelLeftOpen className="w-4 h-4" />
             </button>

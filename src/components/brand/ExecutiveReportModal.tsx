@@ -61,20 +61,20 @@ export function ExecutiveReportModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="report-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white print:static print:z-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 dark:bg-[#070D0B]/85 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white print:static print:z-auto"
     >
-      <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-auto print:border-none print:shadow-none print:rounded-none print:w-full print:max-w-none print:bg-white print:text-black">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#14211D] rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-[#26372F] shadow-2xl overflow-hidden my-auto print:border-none print:shadow-none print:rounded-none print:w-full print:max-w-none print:bg-white print:text-black">
         {/* Modal Action Bar (Hidden during print) */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 print:hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-[#26372F] bg-slate-50/80 dark:bg-[#101C18] print:hidden">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold">
               <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h2 id="report-modal-title" className="font-headline font-bold text-sm text-slate-900 dark:text-white">
+              <h2 id="report-modal-title" className="font-headline font-bold text-sm text-slate-900 dark:text-[#F1F5F1]">
                 Executive Attribution Report
               </h2>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">
                 Official Board &amp; Audit-Ready Summary
               </p>
             </div>
@@ -83,16 +83,16 @@ export function ExecutiveReportModal({
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadSummaryCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-[#C0CCC4] bg-white dark:bg-[#14211D] hover:bg-slate-100 dark:hover:bg-[#1A2A24] border border-slate-200 dark:border-[#304239] rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               title="Download Executive Summary as CSV"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
               <span className="hidden sm:inline">Export CSV</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#287362] hover:bg-[#205B50] dark:bg-[#78B99D] dark:hover:bg-[#91C9AE] dark:text-[#0D2119] rounded-lg shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 font-bold"
               title="Print or Save as PDF"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -101,7 +101,7 @@ export function ExecutiveReportModal({
 
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all cursor-pointer ml-1"
+              className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-[#9BAAA1] dark:hover:text-[#F1F5F1] hover:bg-slate-100 dark:hover:bg-[#1A2A24] rounded-lg transition-all cursor-pointer ml-1"
               aria-label="Close report"
             >
               <X className="w-5 h-5" />
@@ -110,35 +110,35 @@ export function ExecutiveReportModal({
         </div>
 
         {/* Printable Executive Report Paper Canvas */}
-        <div id="executive-report-document" className="p-6 sm:p-10 space-y-8 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 print:p-8 print:bg-white print:text-black">
+        <div id="executive-report-document" className="p-6 sm:p-10 space-y-8 bg-white dark:bg-[#14211D] text-slate-900 dark:text-[#F1F5F1] print:p-8 print:bg-white print:text-black">
           {/* Document Header & Seal */}
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 print:border-slate-300">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-slate-200 dark:border-[#26372F] pb-6 print:border-slate-300">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 print:border-emerald-700 print:text-emerald-800">
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700 dark:text-[#83D1A5] bg-emerald-50 dark:bg-[#193629] px-2.5 py-0.5 rounded border border-emerald-200 dark:border-[#264D3A] print:border-emerald-700 print:text-emerald-800">
                   EthioLink Verified
                 </span>
-                <span className="text-xs text-slate-400 print:text-slate-600 font-mono">
+                <span className="text-xs text-slate-400 dark:text-[#9BAAA1] print:text-slate-600 font-mono">
                   {generatedTimestamp}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black font-headline tracking-tight text-slate-900 dark:text-white print:text-black">
+              <h1 className="text-2xl sm:text-3xl font-black font-headline tracking-tight text-slate-900 dark:text-[#F1F5F1] print:text-black">
                 {brandName}
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 print:text-slate-700 mt-1">
+              <p className="text-xs text-slate-500 dark:text-[#9BAAA1] print:text-slate-700 mt-1">
                 Executive Promotional Attribution &amp; Omnichannel Performance Statement
               </p>
             </div>
 
             <div className="flex sm:flex-col items-end gap-1 text-right">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 print:text-black">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-[#C0CCC4] print:text-black">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                 <span>Audit Certificate</span>
               </div>
-              <div className="text-[11px] text-slate-400 print:text-slate-600 font-mono">
+              <div className="text-[11px] text-slate-400 dark:text-[#9BAAA1] print:text-slate-600 font-mono">
                 Scope: {activeCampaign ? activeCampaign.campaignName : `All Active Campaigns (${targetCampaigns.length})`}
               </div>
-              <div className="text-[10px] text-slate-400 print:text-slate-500">
+              <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] print:text-slate-500">
                 Period: Cumulative Telemetry
               </div>
             </div>
@@ -146,50 +146,50 @@ export function ExecutiveReportModal({
 
           {/* Key Executive Financial Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 print:break-inside-avoid">
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#101C18] border border-slate-200/80 dark:border-[#26372F] print:bg-slate-50 print:border-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                 Reported Gross Sales
               </span>
-              <div className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400 print:text-emerald-800 mt-1">
+              <div className="text-xl sm:text-2xl font-black font-mono text-emerald-700 dark:text-[#83D1A5] print:text-emerald-800 mt-1">
                 {formatETB(metrics.totalRevenueETB)}
               </div>
-              <div className="text-[10px] text-slate-500 print:text-slate-600 mt-1">
+              <div className="text-[10px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 mt-1">
                 Merchant-recorded in-store &amp; POS
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#101C18] border border-slate-200/80 dark:border-[#26372F] print:bg-slate-50 print:border-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                 Merchant-Recorded Orders
               </span>
-              <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white print:text-black mt-1">
+              <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-[#F1F5F1] print:text-black mt-1">
                 {metrics.salesCount.toLocaleString()}
               </div>
-              <div className="text-[10px] text-slate-500 print:text-slate-600 mt-1">
-                AOV: <strong className="font-mono">{formatETB(metrics.aovETB)}</strong>
+              <div className="text-[10px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 mt-1">
+                AOV: <strong className="font-mono text-slate-800 dark:text-[#F1F5F1]">{formatETB(metrics.aovETB)}</strong>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#101C18] border border-slate-200/80 dark:border-[#26372F] print:bg-slate-50 print:border-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                 Funnel Conversion Rate
               </span>
-              <div className="text-xl sm:text-2xl font-black font-mono text-indigo-700 dark:text-indigo-400 print:text-indigo-900 mt-1">
+              <div className="text-xl sm:text-2xl font-black font-mono text-indigo-700 dark:text-[#93C5FD] print:text-indigo-900 mt-1">
                 {metrics.salesConversionRate}%
               </div>
-              <div className="text-[10px] text-slate-500 print:text-slate-600 mt-1">
-                Click-Through: <strong>{metrics.clickThroughRate}%</strong>
+              <div className="text-[10px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 mt-1">
+                Click-Through: <strong className="text-slate-800 dark:text-[#F1F5F1]">{metrics.clickThroughRate}%</strong>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 print:bg-slate-50 print:border-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#101C18] border border-slate-200/80 dark:border-[#26372F] print:bg-slate-50 print:border-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                 Total Intent Taps
               </span>
-              <div className="text-xl sm:text-2xl font-black font-mono text-sky-700 dark:text-sky-400 print:text-sky-900 mt-1">
+              <div className="text-xl sm:text-2xl font-black font-mono text-sky-700 dark:text-[#78B99D] print:text-sky-900 mt-1">
                 {metrics.totalClicks.toLocaleString()}
               </div>
-              <div className="text-[10px] text-slate-500 print:text-slate-600 mt-1">
+              <div className="text-[10px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 mt-1">
                 Across {metrics.uniqueVisitors.toLocaleString()} visitors
               </div>
             </div>
@@ -197,48 +197,48 @@ export function ExecutiveReportModal({
 
           {/* 5-Stage Funnel Table */}
           <div className="space-y-3 print:break-inside-avoid">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2 print:border-slate-300">
-              <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 print:text-black flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-emerald-600" />
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#26372F] pb-2 print:border-slate-300">
+              <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-[#C0CCC4] print:text-black flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
                 <span>Conversion Pipeline Progression</span>
               </h3>
-              <span className="text-[11px] text-slate-400 print:text-slate-600">
+              <span className="text-[11px] text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                 Efficiency: {metrics.salesConversionRate}%
               </span>
             </div>
 
             <div className="grid grid-cols-5 gap-2 text-center text-xs">
-              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-transparent print:border-slate-300">
-                <div className="text-[11px] text-slate-600 dark:text-slate-400 print:text-slate-600 font-bold uppercase">1. Views</div>
-                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
+              <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-[#101C18] border border-transparent dark:border-[#26372F]/50 print:border-slate-300">
+                <div className="text-[11px] text-slate-600 dark:text-[#9BAAA1] print:text-slate-600 font-bold uppercase">1. Views</div>
+                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-[#F1F5F1] print:text-black">
                   {metrics.pageViews.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-transparent print:border-slate-300">
-                <div className="text-[11px] text-indigo-700 dark:text-indigo-400 print:text-slate-600 font-bold uppercase">2. Visitors</div>
-                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
+              <div className="p-3 rounded-xl bg-indigo-50/40 dark:bg-[#101C18] border border-transparent dark:border-[#26372F]/50 print:border-slate-300">
+                <div className="text-[11px] text-indigo-700 dark:text-[#93C5FD] print:text-slate-600 font-bold uppercase">2. Visitors</div>
+                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-[#F1F5F1] print:text-black">
                   {metrics.uniqueVisitors.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-sky-50/40 dark:bg-sky-950/20 border border-transparent print:border-slate-300">
-                <div className="text-[11px] text-sky-700 dark:text-sky-400 print:text-slate-600 font-bold uppercase">3. Action Taps</div>
-                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
+              <div className="p-3 rounded-xl bg-sky-50/40 dark:bg-[#101C18] border border-transparent dark:border-[#26372F]/50 print:border-slate-300">
+                <div className="text-[11px] text-sky-700 dark:text-[#78B99D] print:text-slate-600 font-bold uppercase">3. Action Taps</div>
+                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-[#F1F5F1] print:text-black">
                   {metrics.totalClicks.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-transparent print:border-slate-300">
-                <div className="text-[11px] text-amber-700 dark:text-amber-400 print:text-slate-600 font-bold uppercase">4. Orders</div>
-                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-white print:text-black">
+              <div className="p-3 rounded-xl bg-amber-50/40 dark:bg-[#101C18] border border-transparent dark:border-[#26372F]/50 print:border-slate-300">
+                <div className="text-[11px] text-amber-700 dark:text-[#F0B85C] print:text-slate-600 font-bold uppercase">4. Orders</div>
+                <div className="text-base font-black font-mono mt-1 text-slate-900 dark:text-[#F1F5F1] print:text-black">
                   {metrics.salesCount.toLocaleString()}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-transparent print:border-slate-300">
-                <div className="text-[11px] text-emerald-800 dark:text-emerald-400 print:text-slate-600 font-bold uppercase">5. Gross ETB</div>
-                <div className="text-sm sm:text-base font-black font-mono mt-1 text-emerald-700 dark:text-emerald-400 print:text-emerald-900">
+              <div className="p-3 rounded-xl bg-emerald-50/40 dark:bg-[#193629]/40 border border-transparent dark:border-[#264D3A] print:border-slate-300">
+                <div className="text-[11px] text-emerald-800 dark:text-[#83D1A5] print:text-slate-600 font-bold uppercase">5. Gross ETB</div>
+                <div className="text-sm sm:text-base font-black font-mono mt-1 text-emerald-700 dark:text-[#83D1A5] print:text-emerald-900">
                   {formatETB(metrics.totalRevenueETB)}
                 </div>
               </div>
@@ -247,61 +247,61 @@ export function ExecutiveReportModal({
 
           {/* Omnichannel Distribution Breakdown */}
           <div className="space-y-3 print:break-inside-avoid">
-            <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 print:text-black border-b border-slate-200 dark:border-slate-800 pb-2 print:border-slate-300">
+            <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-[#C0CCC4] print:text-black border-b border-slate-200 dark:border-[#26372F] pb-2 print:border-slate-300">
               Omnichannel Touchpoint Breakdown
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent dark:border-[#26372F]/50 bg-slate-50/70 dark:bg-[#101C18] flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
-                  <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Telegram Clicks</div>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
+                  <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 font-medium">Telegram Clicks</div>
+                  <div className="text-lg font-black font-mono text-slate-900 dark:text-[#F1F5F1] print:text-black mt-0.5">
                     {metrics.telegramClicks}
                   </div>
                 </div>
                 <Send className="w-4 h-4 text-[#229ED9]" />
               </div>
 
-              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent dark:border-[#26372F]/50 bg-slate-50/70 dark:bg-[#101C18] flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
-                  <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Direct Calls</div>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
+                  <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 font-medium">Direct Calls</div>
+                  <div className="text-lg font-black font-mono text-slate-900 dark:text-[#F1F5F1] print:text-black mt-0.5">
                     {metrics.callClicks}
                   </div>
                 </div>
-                <Phone className="w-4 h-4 text-emerald-600" />
+                <Phone className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
               </div>
 
-              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent dark:border-[#26372F]/50 bg-slate-50/70 dark:bg-[#101C18] flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
-                  <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Map Directions</div>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
+                  <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 font-medium">Map Directions</div>
+                  <div className="text-lg font-black font-mono text-slate-900 dark:text-[#F1F5F1] print:text-black mt-0.5">
                     {metrics.mapClicks}
                   </div>
                 </div>
-                <MapPin className="w-4 h-4 text-indigo-600" />
+                <MapPin className="w-4 h-4 text-indigo-600 dark:text-[#93C5FD]" />
               </div>
 
-              <div className="p-3 rounded-xl border border-transparent bg-slate-50/70 dark:bg-slate-800/40 flex items-center justify-between print:bg-slate-50 print:border-slate-300">
+              <div className="p-3 rounded-xl border border-transparent dark:border-[#26372F]/50 bg-slate-50/70 dark:bg-[#101C18] flex items-center justify-between print:bg-slate-50 print:border-slate-300">
                 <div>
-                  <div className="text-[11px] text-slate-500 print:text-slate-600 font-medium">Promo Code Copies</div>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-white print:text-black mt-0.5">
+                  <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1] print:text-slate-600 font-medium">Promo Code Copies</div>
+                  <div className="text-lg font-black font-mono text-slate-900 dark:text-[#F1F5F1] print:text-black mt-0.5">
                     {metrics.copyCodeClicks}
                   </div>
                 </div>
-                <Copy className="w-4 h-4 text-amber-600" />
+                <Copy className="w-4 h-4 text-amber-600 dark:text-[#F0B85C]" />
               </div>
             </div>
           </div>
 
           {/* Campaign Audit Table */}
           <div className="space-y-3 print:break-inside-avoid">
-            <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 print:text-black border-b border-slate-200 dark:border-slate-800 pb-2 print:border-slate-300">
+            <h3 className="font-headline font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-[#C0CCC4] print:text-black border-b border-slate-200 dark:border-[#26372F] pb-2 print:border-slate-300">
               Campaign &amp; Creator Breakdown
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider text-slate-400 print:text-slate-600">
+                  <tr className="border-b border-slate-200 dark:border-[#26372F] text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                     <th className="py-2 px-2">Campaign</th>
                     <th className="py-2 px-2">Promo Code</th>
                     <th className="py-2 px-2 text-right">Views</th>
@@ -312,39 +312,39 @@ export function ExecutiveReportModal({
                     <th className="py-2 px-2 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 print:divide-slate-200">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#26372F] print:divide-slate-200">
                   {targetCampaigns.map((camp) => (
-                    <tr key={camp.campaignId} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 print:hover:bg-transparent">
+                    <tr key={camp.campaignId} className="hover:bg-slate-50 dark:hover:bg-[#101C18]/60 print:hover:bg-transparent transition-colors">
                       <td className="py-2.5 px-2">
-                        <div className="font-bold text-slate-900 dark:text-white print:text-black">
+                        <div className="font-bold text-slate-900 dark:text-[#F1F5F1] print:text-black">
                           {camp.campaignName}
                         </div>
-                        <div className="text-[10px] text-slate-400 print:text-slate-600">
+                        <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] print:text-slate-600">
                           {camp.creators.length > 0
                             ? camp.creators.map((c) => c.name).join(", ")
                             : "No assigned creators"}
                         </div>
                       </td>
-                      <td className="py-2.5 px-2 font-mono font-semibold text-emerald-700 dark:text-emerald-400 print:text-black">
+                      <td className="py-2.5 px-2 font-mono font-semibold text-emerald-700 dark:text-[#78B99D] print:text-black">
                         {camp.promoCode}
                       </td>
-                      <td className="py-2.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300 print:text-black">
+                      <td className="py-2.5 px-2 text-right font-mono text-slate-600 dark:text-[#C0CCC4] print:text-black">
                         {camp.pageViews.toLocaleString()}
                       </td>
-                      <td className="py-2.5 px-2 text-right font-mono text-slate-600 dark:text-slate-300 print:text-black">
+                      <td className="py-2.5 px-2 text-right font-mono text-slate-600 dark:text-[#C0CCC4] print:text-black">
                         {camp.totalClicks.toLocaleString()}
                       </td>
-                      <td className="py-2.5 px-2 text-right font-mono font-bold text-slate-900 dark:text-white print:text-black">
+                      <td className="py-2.5 px-2 text-right font-mono font-bold text-slate-900 dark:text-[#F1F5F1] print:text-black">
                         {camp.salesCount.toLocaleString()}
                       </td>
-                      <td className="py-2.5 px-2 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400 print:text-black">
+                      <td className="py-2.5 px-2 text-right font-mono font-bold text-emerald-700 dark:text-[#83D1A5] print:text-black">
                         {formatETB(camp.totalRevenueETB)}
                       </td>
-                      <td className="py-2.5 px-2 text-right font-mono text-slate-700 dark:text-slate-300 print:text-black">
+                      <td className="py-2.5 px-2 text-right font-mono text-slate-700 dark:text-[#C0CCC4] print:text-black">
                         {camp.salesConversionRate}%
                       </td>
                       <td className="py-2.5 px-2 text-center">
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 print:border print:border-slate-300">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#101C18] text-slate-700 dark:text-[#C0CCC4] border border-transparent dark:border-[#26372F] print:border print:border-slate-300">
                           {camp.status}
                         </span>
                       </td>
@@ -356,12 +356,12 @@ export function ExecutiveReportModal({
           </div>
 
           {/* Attribution Limitations & Methodology Notes (PRD FR-025 / FR-029) */}
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-[11px] space-y-2 print:border-slate-300 print:bg-slate-50 print:break-inside-avoid">
-            <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200 print:text-black">
-              <Info className="w-3.5 h-3.5 text-emerald-600 print:text-black shrink-0" />
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#101C18] border border-slate-200/80 dark:border-[#26372F] text-[11px] space-y-2 print:border-slate-300 print:bg-slate-50 print:break-inside-avoid">
+            <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-[#F1F5F1] print:text-black">
+              <Info className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D] print:text-black shrink-0" />
               <span>Attribution Limitations &amp; Methodology Transparency (PRD FR-025 / FR-029)</span>
             </div>
-            <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 print:text-slate-700 leading-relaxed">
+            <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-[#9BAAA1] print:text-slate-700 leading-relaxed">
               <li>
                 <strong>Merchant-Recorded Redemptions:</strong> Sales and revenue values reflect in-store transaction receipts manually recorded by store staff upon promo code or QR presentation, rather than independent bank/clearinghouse settlements.
               </li>
@@ -378,9 +378,9 @@ export function ExecutiveReportModal({
           </div>
 
           {/* Verification & Legal Footer */}
-          <div className="pt-6 border-t border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:border-slate-300 print:text-slate-600 print:break-inside-avoid">
+          <div className="pt-6 border-t border-slate-200 dark:border-[#26372F] text-slate-400 dark:text-[#9BAAA1] text-[10px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:border-slate-300 print:text-slate-600 print:break-inside-avoid">
             <div>
-              <p className="font-semibold text-slate-600 dark:text-slate-400 print:text-black">
+              <p className="font-semibold text-slate-600 dark:text-[#C0CCC4] print:text-black">
                 EthioLink Certified Telemetry &amp; POS Attribution Ledger
               </p>
               <p className="mt-0.5">

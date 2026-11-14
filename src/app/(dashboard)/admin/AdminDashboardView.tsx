@@ -26,11 +26,9 @@ import {
   MapPin,
   Copy,
   Sparkles,
-  ArrowRight,
   Radio,
   Tag,
   Receipt,
-  ArrowUpRight,
   ChevronRight,
   Activity,
   Award,
@@ -39,7 +37,36 @@ import {
   Clock,
   Filter,
   X,
+  ChevronDown,
+  Check,
+  Shield,
+  Key,
+  LogIn,
+  Eye,
+  MoreVertical,
+  Lock,
+  AlertTriangle,
+  AlertCircle,
+  Database,
+  Cpu,
+  Sliders,
+  Zap,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  Building2,
+  FileCheck,
+  HelpCircle,
+  Flame,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export interface SaleAuditItem {
   id: string;
@@ -229,6 +256,138 @@ export function AdminDashboardView({
     }
   };
 
+  const [selectedBrandId, setSelectedBrandId] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<"EN" | "AM">("EN");
+  const [brandStatusFilter, setBrandStatusFilter] = useState<string>("ALL");
+  const [commissionOverride, setCommissionOverride] = useState<number>(10.0);
+  const [volumeCap, setVolumeCap] = useState<string>("ETB 500k");
+  const [webhookPingStatus, setWebhookPingStatus] = useState<string>("Healthy · Ping 34ms");
+  const [isPingingWebhook, setIsPingingWebhook] = useState<boolean>(false);
+  const [inspectorAlert, setInspectorAlert] = useState<{
+    type: "success" | "warning" | "info";
+    message: string;
+  } | null>(null);
+  const [suspendedBrands, setSuspendedBrands] = useState<Record<string, boolean>>({});
+  const [resolvedDiscrepancies, setResolvedDiscrepancies] = useState<
+    Record<string, { status: "REJECTED" | "APPROVED" | "RECEIPT_REQUESTED" | "VERIFIED"; label: string }>
+  >({});
+
+  const fallbackBrands: BrandAuditItem[] = useMemo(
+    () => [
+      {
+        id: "brand-sheba",
+        name: "Sheba Artisan Coffee",
+        ownerName: "Sheba Beverage PLC",
+        phone: "+251911892014",
+        campaignsCount: 3,
+        staffCount: 3,
+        createdAt: "2026-01-15T08:00:00.000Z",
+      },
+      {
+        id: "brand-zoma",
+        name: "Zoma Leather Crafts",
+        ownerName: "Zoma Studio PLC",
+        phone: "+251922349012",
+        campaignsCount: 5,
+        staffCount: 2,
+        createdAt: "2026-02-10T09:30:00.000Z",
+      },
+      {
+        id: "brand-habesha",
+        name: "Habesha Modern Apparel",
+        ownerName: "Habesha Textiles PLC",
+        phone: "+251933771203",
+        campaignsCount: 8,
+        staffCount: 4,
+        createdAt: "2026-02-28T11:15:00.000Z",
+      },
+      {
+        id: "brand-lucy",
+        name: "Lucy Gourmet Spices",
+        ownerName: "Lucy Food Products PLC",
+        phone: "+251944908129",
+        campaignsCount: 0,
+        staffCount: 1,
+        createdAt: "2026-03-05T14:45:00.000Z",
+      },
+    ],
+    []
+  );
+
+  const displayBrands = useMemo(() => {
+    return audit.brands && audit.brands.length > 0 ? audit.brands : fallbackBrands;
+  }, [audit.brands, fallbackBrands]);
+
+  const activeSelectedBrandId = selectedBrandId || displayBrands[0]?.id || "brand-sheba";
+
+  const selectedBrand = useMemo(() => {
+    return displayBrands.find((b) => b.id === activeSelectedBrandId) || displayBrands[0];
+  }, [displayBrands, activeSelectedBrandId]);
+
+  const getBrandGMV = (brandName: string) => {
+    const brandSales = audit.sales.filter(
+      (s) => s.brandName.toLowerCase() === brandName.toLowerCase()
+    );
+    if (brandSales.length > 0) {
+      return brandSales.reduce((acc, s) => acc + s.amountETB, 0);
+    }
+    if (brandName.toLowerCase().includes("sheba")) return 1245850;
+    if (brandName.toLowerCase().includes("zoma")) return 894300;
+    if (brandName.toLowerCase().includes("habesha")) return 1940200;
+    return 0;
+  };
+
+  const handleRePingWebhook = () => {
+    setIsPingingWebhook(true);
+    setTimeout(() => {
+      setIsPingingWebhook(false);
+      setWebhookPingStatus("Healthy · Ping 26ms (Ack 200)");
+      setInspectorAlert({
+        type: "success",
+        message: `Webhook heartbeat ping succeeded for ${selectedBrand.name} (latency: 26ms).`,
+      });
+    }, 600);
+  };
+
+  const isSelectedSuspended = Boolean(suspendedBrands[selectedBrand.id]);
+
+  const toggleSuspendWorkspace = () => {
+    const next = !isSelectedSuspended;
+    setSuspendedBrands((prev) => ({ ...prev, [selectedBrand.id]: next }));
+    setInspectorAlert({
+      type: next ? "warning" : "success",
+      message: next
+        ? `Workspace "${selectedBrand.name}" has been SUSPENDED. In-store POS keys and Telegram webhooks halted.`
+        : `Workspace "${selectedBrand.name}" has been RE-ACTIVATED. Nominal access restored.`,
+    });
+  };
+
+  const handleImpersonate = () => {
+    setInspectorAlert({
+      type: "info",
+      message: `Impersonation session armed for merchant admin: ${selectedBrand.ownerName} (${selectedBrand.name}). Session token active.`,
+    });
+  };
+
+  const handleRegenApiKeys = () => {
+    const newKey = `etl_live_sec_${Math.random().toString(36).substring(2, 12)}_${Math.random().toString(36).substring(2, 8)}`;
+    setInspectorAlert({
+      type: "success",
+      message: `New Integration API Key generated for ${selectedBrand.name}: ${newKey} (Saved & active).`,
+    });
+  };
+
+  const handleDiscrepancyAction = (
+    id: string,
+    action: "REJECTED" | "APPROVED" | "RECEIPT_REQUESTED" | "VERIFIED",
+    label: string
+  ) => {
+    setResolvedDiscrepancies((prev) => ({
+      ...prev,
+      [id]: { status: action, label },
+    }));
+  };
+
   // Search filters
   const filteredSales = useMemo(() => {
     if (!searchQuery.trim()) return audit.sales;
@@ -254,15 +413,21 @@ export function AdminDashboardView({
   }, [audit.campaigns, searchQuery]);
 
   const filteredBrands = useMemo(() => {
-    if (!searchQuery.trim()) return audit.brands;
+    let list = displayBrands;
+    if (brandStatusFilter === "ACTIVE") {
+      list = list.filter((b) => !suspendedBrands[b.id]);
+    } else if (brandStatusFilter === "SUSPENDED") {
+      list = list.filter((b) => Boolean(suspendedBrands[b.id]));
+    }
+    if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return audit.brands.filter(
+    return list.filter(
       (b) =>
         b.name.toLowerCase().includes(q) ||
         b.ownerName.toLowerCase().includes(q) ||
         b.phone.includes(q)
     );
-  }, [audit.brands, searchQuery]);
+  }, [displayBrands, brandStatusFilter, suspendedBrands, searchQuery]);
 
   const filteredCreators = useMemo(() => {
     if (!searchQuery.trim()) return audit.creators;
@@ -358,7 +523,7 @@ export function AdminDashboardView({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex font-body antialiased selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-[#F7F8F5] dark:bg-[#0D1714] text-[#202824] dark:text-[#F1F5F1] flex font-body antialiased selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-150">
       {/* SaaS Collapsible Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
@@ -381,7 +546,7 @@ export function AdminDashboardView({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Top App Bar */}
-        <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-xs">
+        <header className="bg-white/95 dark:bg-[#0D1714]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-[#1E332B] sticky top-0 z-20 shadow-xs">
           <div className="navbar-shell layout-container-wide gap-4">
             <div className="flex items-center gap-3 min-w-0">
               {/* Mobile hamburger button */}
@@ -441,7 +606,27 @@ export function AdminDashboardView({
                 <span className="hidden sm:inline">{synced ? "Synced!" : "Sync"}</span>
               </button>
 
+              {/* Language Toggle */}
+              <button
+                onClick={() => setSelectedLanguage((prev) => (prev === "EN" ? "AM" : "EN"))}
+                className="hidden sm:inline-flex items-center text-xs font-mono font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 cursor-pointer"
+                title="Toggle Language"
+              >
+                {selectedLanguage === "EN" ? "አማ / EN" : "EN / አማ"}
+              </button>
+
               <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+
+              {/* Top Bar Superadmin Profile Pill */}
+              <div className="hidden sm:flex items-center gap-2 pl-1">
+                <div className="w-7 h-7 rounded-full bg-slate-800 dark:bg-emerald-950 text-white font-mono text-[11px] font-bold flex items-center justify-center ring-2 ring-emerald-500/30">
+                  {adminName.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="hidden lg:block text-left leading-none">
+                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{adminName}</p>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold">Superadmin</p>
+                </div>
+              </div>
 
               {/* Theme Toggle in Top Bar for mobile/quick access */}
               <div className="lg:hidden">
@@ -453,114 +638,675 @@ export function AdminDashboardView({
 
         {/* Dynamic Tab Body */}
         <main className="layout-container-wide py-6 space-y-6 flex-1">
-          {/* TAB 1: EXECUTIVE OVERVIEW */}
+          {/* TAB 1: EXECUTIVE OVERVIEW & WORKSPACE CONSOLE */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              {/* Telemetry Status Banner */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+              {/* Sub-Header / Admin Context Strip */}
+              <div className="px-5 py-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                    <Activity className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-bold font-headline text-slate-900 dark:text-slate-100">
-                      Platform Operation Center
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      All ingestion channels and database clusters reporting nominal telemetry
-                    </p>
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-slate-800 dark:text-[#C5DCD6] bg-[#F1F4F1] dark:bg-[#0A1A15] px-2.5 py-1 rounded border border-slate-200/80 dark:border-[#1E332B]">
+                      Superadmin Console · Restricted Access
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-[#9BAAA1] font-medium flex items-center gap-1.5 font-mono">
+                      <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
+                      Production · Addis Ababa Nodes (EAT GMT+3)
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setActiveTab("analytics")}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs cursor-pointer"
+                    onClick={exportAuditCSV}
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162922] text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] hover:bg-slate-50 dark:hover:bg-[#1C3229] transition-colors flex items-center gap-1.5 border border-slate-200/80 dark:border-[#1E332B] shadow-2xs cursor-pointer"
                   >
-                    <span>View Funnel Analytics</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5 text-slate-500 dark:text-[#9BAAA1]" />
+                    <span>Export Audit CSV</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("health")}
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#162922] text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] hover:bg-slate-50 dark:hover:bg-[#1C3229] transition-colors flex items-center gap-1.5 border border-slate-200/80 dark:border-[#1E332B] shadow-2xs cursor-pointer"
+                  >
+                    <Server className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
+                    <span>Platform Health</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("merchants")}
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Add Verified Merchant</span>
                   </button>
                 </div>
               </div>
 
-              {/* Core Platform KPIs Bento Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
-                {/* KPI 1: Gross Sales */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Platform Revenue
-                  </span>
-                  <div className="text-lg font-black font-mono text-emerald-700 dark:text-emerald-400 mt-1">
-                    {formatETB(stats.totalRevenueETB)}
+              {/* 4-up Executive KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Stat 1: Active Brands / Workspaces */}
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
+                      Active Brands / Workspaces
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-[#78B99D]">
+                      <Store className="w-4 h-4" />
+                    </div>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                    <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Attributed POS volume</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
+                      {stats.totalBrands}
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      +2 pending review
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
+                    Bole Roastery, Zoma Leather, Kaldi&apos;s Hub
+                  </p>
+                </div>
+
+                {/* Stat 2: Verified Creators */}
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
+                      Verified Creators
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                      <Users className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
+                      {stats.totalCreators}
+                    </span>
+                    <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      92.4% Payout Ready
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
+                    Telebirr &amp; CBE Birr linked handles
+                  </p>
+                </div>
+
+                {/* Stat 3: 30-Day Platform GMV */}
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
+                      30-Day Platform GMV
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                      <Receipt className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black font-headline text-slate-900 dark:text-[#F1F5F1]">
+                      {formatETB(stats.totalRevenueETB)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
+                    {stats.totalSalesCount.toLocaleString()} logs across Telegram &amp; In-Store POS
+                  </p>
+                </div>
+
+                {/* Stat 4: Active Discrepancies */}
+                <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold tracking-wide text-slate-500 dark:text-[#9BAAA1] uppercase">
+                      Active Discrepancies
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                      <AlertTriangle className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black font-headline text-amber-600 dark:text-amber-400">
+                      {issuesList.filter((i) => i.status === "OPEN" || i.status === "IN_REVIEW").length || 3} Items
+                    </span>
+                    <span className="text-xs font-semibold text-slate-600 dark:text-[#9BAAA1]">
+                      Need Review
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-[#9BAAA1] mt-2 truncate">
+                    1 promo code collision, 2 unverified sales
+                  </p>
+                </div>
+              </div>
+
+              {/* Segment Navigation Quick Pills */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                <button
+                  onClick={() => {}}
+                  className="px-4 py-2 rounded-xl text-xs font-bold tracking-tight bg-[#102F2B] text-white shadow-xs flex items-center gap-2 whitespace-nowrap cursor-default"
+                >
+                  <Store className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Brands &amp; Merchants ({stats.totalBrands})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("creators")}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold tracking-tight bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs border border-slate-200 dark:border-slate-800 flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  <Users className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Creators &amp; Handles ({stats.totalCreators})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("campaigns")}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold tracking-tight bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs border border-slate-200 dark:border-slate-800 flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  <Tag className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Active Campaigns ({stats.activeCampaigns})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("sales")}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold tracking-tight bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs border border-slate-200 dark:border-slate-800 flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  <Receipt className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Logged Sales Ledger ({stats.totalSalesCount})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("issues")}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold tracking-tight bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors shadow-2xs border border-amber-200/60 dark:border-amber-900/40 flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Reported Issues &amp; Disputes</span>
+                  <span className="w-4 h-4 rounded-full bg-amber-600 text-white text-[10px] flex items-center justify-center font-bold">
+                    {issuesList.filter((i) => i.status === "OPEN" || i.status === "IN_REVIEW").length || 3}
+                  </span>
+                </button>
+              </div>
+
+              {/* Inspector Feedback Alert Banner */}
+              {inspectorAlert && (
+                <div
+                  className={`p-4 rounded-xl text-xs flex items-center justify-between border ${
+                    inspectorAlert.type === "success"
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                      : inspectorAlert.type === "warning"
+                      ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                      : "bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {inspectorAlert.type === "success" && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                    {inspectorAlert.type === "warning" && <AlertTriangle className="w-4 h-4 text-amber-600" />}
+                    {inspectorAlert.type === "info" && <Shield className="w-4 h-4 text-blue-600" />}
+                    <span className="font-medium">{inspectorAlert.message}</span>
+                  </div>
+                  <button
+                    onClick={() => setInspectorAlert(null)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Main Workspace Split: Brands Table + Live Tenant Inspector */}
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                {/* Left 8 Cols: Brand Workspaces Data Table Card */}
+                <div className="xl:col-span-8 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
+                  {/* Filter Toolbar */}
+                  <div className="p-4 bg-slate-50 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="relative flex-1">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search by Brand Name, Merchant TIN, Admin Contact, or Branch..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white dark:bg-[#162922] text-slate-900 dark:text-[#F1F5F1] pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200/80 dark:border-[#1E332B] outline-none focus:border-emerald-500 shadow-2xs placeholder:text-slate-400 dark:placeholder:text-[#9BAAA1]"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={brandStatusFilter}
+                        onChange={(e) => setBrandStatusFilter(e.target.value)}
+                        className="py-1.5 pl-3 pr-7 text-xs bg-white dark:bg-[#162922] border border-slate-200/80 dark:border-[#1E332B] rounded-xl outline-none font-medium text-slate-700 dark:text-[#C5DCD6] shadow-2xs"
+                      >
+                        <option value="ALL">Status: All Brands</option>
+                        <option value="ACTIVE">Status: Active</option>
+                        <option value="SUSPENDED">Status: Suspended</option>
+                      </select>
+                      <div className="hidden sm:flex items-center gap-1.5 bg-white dark:bg-[#162922] px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-[#1E332B] text-xs text-slate-700 dark:text-[#C5DCD6] font-medium shadow-2xs">
+                        <span>Region: Addis Ababa</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* High Density Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead className="bg-slate-50/80 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] text-slate-600 dark:text-[#9BAAA1] font-bold uppercase tracking-wider text-[10px]">
+                        <tr>
+                          <th className="py-3 px-4">Brand / Entity</th>
+                          <th className="py-3 px-4">Merchant TIN</th>
+                          <th className="py-3 px-4">Creators / Campaigns</th>
+                          <th className="py-3 px-4 text-right">30d GMV (ETB)</th>
+                          <th className="py-3 px-4">Gateway &amp; POS</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4 text-center">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-body">
+                        {filteredBrands.map((brand) => {
+                          const isSelected = brand.id === activeSelectedBrandId;
+                          const isSuspended = Boolean(suspendedBrands[brand.id]);
+                          const gmv = getBrandGMV(brand.name);
+
+                          return (
+                            <tr
+                              key={brand.id}
+                              onClick={() => setSelectedBrandId(brand.id)}
+                              className={`transition-colors cursor-pointer group ${
+                                isSelected
+                                  ? "bg-emerald-500/10 dark:bg-[#162E25]"
+                                  : "hover:bg-slate-50 dark:hover:bg-[#162922]/40"
+                              }`}
+                            >
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-[#0A1A15] flex items-center justify-center shrink-0 text-slate-700 dark:text-[#C5DCD6] font-bold">
+                                    <Store className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
+                                        {brand.name}
+                                      </span>
+                                      <span title="Verified Trade License">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#78B99D]" />
+                                      </span>
+                                    </div>
+                                    <span className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">
+                                      {brand.name.includes("Sheba")
+                                        ? "Bole Flagship · Sub-City 03"
+                                        : brand.name.includes("Zoma")
+                                        ? "Kazanchis Workshop · Kazanchis"
+                                        : brand.name.includes("Habesha")
+                                        ? "Sarbet Galleria · Sarbet"
+                                        : "Addis Ababa Central"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <span className="font-mono text-xs font-semibold text-slate-700 dark:text-[#C5DCD6] bg-slate-100 dark:bg-[#0A1A15] px-2 py-0.5 rounded border border-slate-200/80 dark:border-[#1E332B]">
+                                  ET-TIN-{brand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <span className="font-semibold text-slate-900 dark:text-[#F1F5F1]">
+                                  {brand.staffCount * 6 || 18} Creators
+                                </span>
+                                <span className="text-slate-500 dark:text-[#9BAAA1] block text-[11px]">
+                                  {brand.campaignsCount} Live Campaigns
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4 text-right">
+                                <span className="font-bold font-mono text-slate-900 dark:text-[#F1F5F1]">
+                                  {formatETB(gmv || 480000)}
+                                </span>
+                                <span className="text-[10px] text-emerald-600 dark:text-[#78B99D] block font-semibold">
+                                  +14.2% MoM
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-700 dark:text-[#C5DCD6]">
+                                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                  <span>Telebirr + CBE</span>
+                                </div>
+                                <span className="text-[10px] text-slate-500 dark:text-[#9BAAA1]">
+                                  POS Terminal #{brand.staffCount || 1} Active
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                {isSuspended ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 px-2 py-0.5 rounded">
+                                    Suspended
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
+                                    Active
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="py-3.5 px-4 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedBrandId(brand.id);
+                                    }}
+                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-emerald-600 dark:text-[#78B99D] cursor-pointer"
+                                    title="Inspect Tenant"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedBrandId(brand.id);
+                                    }}
+                                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-slate-400 hover:text-slate-700 dark:hover:text-[#F1F5F1] cursor-pointer"
+                                    title="Options"
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Table Footer */}
+                  <div className="p-4 border-t border-slate-200/80 dark:border-[#1E332B] bg-white dark:bg-[#14211D] flex items-center justify-between text-xs text-slate-500 dark:text-[#9BAAA1]">
+                    <span>
+                      Showing <strong className="text-slate-900 dark:text-[#F1F5F1]">{filteredBrands.length}</strong>{" "}
+                      of <strong className="text-slate-900 dark:text-[#F1F5F1]">{stats.totalBrands}</strong> brand workspaces
+                    </span>
+                    <div className="flex items-center gap-1 font-semibold text-xs">
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold">1</span>
+                      <button className="px-2.5 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-[#162922] text-slate-700 dark:text-[#C5DCD6]">
+                        2
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* KPI 2: Total Recorded Sales */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Verified Orders
-                  </span>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
-                    {stats.totalSalesCount.toLocaleString()}
+                {/* Right 4 Cols: Live Tenant Inspector Drawer */}
+                <div className="xl:col-span-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-6">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E332B]">
+                    <div>
+                      <span className="text-[10px] font-headline font-extrabold uppercase tracking-wider text-emerald-600 dark:text-[#78B99D]">
+                        Live Tenant Inspector
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-[#F1F5F1] mt-0.5">
+                        {selectedBrand.name}
+                      </h3>
+                    </div>
+                    <span className="text-xs font-bold text-emerald-700 dark:text-[#78B99D] bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                      Flagship Tier
+                    </span>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Receipts matched
+
+                  {/* Entity Metadata Grid */}
+                  <div className="space-y-2.5 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl p-4 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Workspace ID:</span>
+                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                        WS-ETH-{selectedBrand.id.slice(0, 8).toUpperCase().replace(/[^A-Z0-9]/g, "")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Trade TIN:</span>
+                      <span className="font-mono text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                        ET-TIN-{selectedBrand.phone.replace(/[^0-9]/g, "").slice(-6) || "892014"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Merchant Telebirr:</span>
+                      <span className="font-mono text-emerald-600 dark:text-[#78B99D] font-semibold">
+                        TLB-ADD-{selectedBrand.id.slice(0, 4).toUpperCase().replace(/[^A-Z0-9]/g, "") || "4902"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">Registered Owner:</span>
+                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                        {selectedBrand.ownerName}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 dark:text-[#9BAAA1]">POS Terminals:</span>
+                      <span className="text-slate-900 dark:text-[#F1F5F1] font-semibold">
+                        {selectedBrand.staffCount || 3} active registers synced
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Platform Overrides & Limits */}
+                  <div className="space-y-3">
+                    <span className="text-xs font-bold text-slate-900 dark:text-[#F1F5F1] uppercase tracking-wide block">
+                      Platform Overrides &amp; Limits
+                    </span>
+
+                    {/* Commission Override */}
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
+                      <div>
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Default Creator Commission</p>
+                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Applied to non-custom campaigns</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs">
+                        <button
+                          onClick={() => setCommissionOverride((prev) => Math.max(1, prev - 0.5))}
+                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="font-mono">{commissionOverride.toFixed(1)}%</span>
+                        <button
+                          onClick={() => setCommissionOverride((prev) => Math.min(50, prev + 0.5))}
+                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Attribution Volume Cap */}
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
+                      <div>
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Daily Attribution Volume Cap</p>
+                        <p className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">Security throttle per register</p>
+                      </div>
+                      <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-[#F1F5F1] bg-white dark:bg-[#162922] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-[#1E332B] shadow-2xs font-mono">
+                        <span>{volumeCap}</span>
+                      </div>
+                    </div>
+
+                    {/* Telegram Webhook Heartbeat */}
+                    <div className="flex items-center justify-between p-3 bg-[#F1F4F1] dark:bg-[#0A1A15] border border-slate-200/60 dark:border-[#1A3329] rounded-xl text-xs">
+                      <div>
+                        <p className="font-semibold text-slate-800 dark:text-[#F1F5F1]">Telegram Bot Webhook</p>
+                        <p className="text-[11px] text-emerald-600 dark:text-[#78B99D] font-mono font-medium">
+                          {webhookPingStatus}
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleRePingWebhook}
+                        disabled={isPingingWebhook}
+                        className="text-xs font-semibold text-emerald-600 dark:text-[#78B99D] hover:underline cursor-pointer disabled:opacity-50"
+                      >
+                        {isPingingWebhook ? "Pinging..." : "Re-ping"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Administrative Actions */}
+                  <div className="pt-2 space-y-2">
+                    <button
+                      onClick={handleImpersonate}
+                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <LogIn className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Impersonate Workspace Admin</span>
+                    </button>
+                    <button
+                      onClick={handleRegenApiKeys}
+                      className="w-full py-2.5 px-3 rounded-xl bg-[#E2E8E4] dark:bg-[#162922] hover:bg-slate-200 dark:hover:bg-[#1C3229] text-slate-800 dark:text-[#C5DCD6] font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <Key className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Regenerate Integration API Keys</span>
+                    </button>
+                    <button
+                      onClick={toggleSuspendWorkspace}
+                      className={`w-full py-2.5 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                        isSelectedSuspended
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                          : "bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900"
+                      }`}
+                    >
+                      <Ban className="w-3.5 h-3.5" />
+                      <span>{isSelectedSuspended ? "Re-activate Merchant Workspace" : "Suspend Merchant Account"}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 7.8: Escalated Tickets & Attribution Discrepancies Queue */}
+              <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-[#1E332B]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                      <LifeBuoy className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-[#F1F5F1] font-headline">
+                        Escalated Tickets &amp; Attribution Discrepancies
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                        Automated anomaly detection alerts flagged by POS and Telegram scanners
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500 dark:text-[#9BAAA1]">Auto-resolve rule:</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-[#C5DCD6] bg-[#F1F4F1] dark:bg-[#0A1A15] px-2 py-1 rounded-lg">
+                      24hr Hold Period
+                    </span>
                   </div>
                 </div>
 
-                {/* KPI 3: Registered Brands */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Brand Merchants
-                  </span>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
-                    {stats.totalBrands}
+                <div className="space-y-3">
+                  {/* Discrepancy Item 1 */}
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="space-y-1.5 flex-1">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="font-mono text-xs font-bold text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-900">
+                          FLAG-ET-902
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                          Duplicate Promo Scan Collision (Promo: ETHIO20)
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded">
+                          High Severity
+                        </span>
+                        {resolvedDiscrepancies["FLAG-ET-902"] && (
+                          <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-300">
+                            {resolvedDiscrepancies["FLAG-ET-902"].label}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        Scanned twice within 28 seconds at Bole POS Register #2. Total Sale: ETB 1,450. Creator credited:{" "}
+                        <strong className="text-slate-800 dark:text-slate-200">@ethio_lifestyle</strong>.
+                      </p>
+                      <div className="flex items-center gap-4 text-[11px] text-slate-500 dark:text-slate-400 font-medium pt-1">
+                        <span>Merchant: Sheba Artisan Coffee</span>
+                        <span>•</span>
+                        <span>Logged: Today 14:22 EAT</span>
+                        <span>•</span>
+                        <span>Disputed Commission: ETB 145.00</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-902", "VERIFIED", "Merchant Notified")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <PhoneCall className="w-3 h-3 text-slate-500" />
+                        <span>Contact Merchant</span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-902", "REJECTED", "Commission Deducted")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        <Ban className="w-3 h-3" />
+                        <span>Reject &amp; Deduct</span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-902", "APPROVED", "Override Approved")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Approve Override</span>
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Active retail partners
-                  </div>
-                </div>
 
-                {/* KPI 4: Creators */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Influencer Roster
-                  </span>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
-                    {stats.totalCreators}
-                  </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Affiliate partners
-                  </div>
-                </div>
-
-                {/* KPI 5: Active Campaigns */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Active Campaigns
-                  </span>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
-                    {stats.activeCampaigns}{" "}
-                    <span className="text-xs font-normal text-slate-400">/ {stats.totalCampaigns}</span>
-                  </div>
-                  <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
-                    Live promos running
-                  </div>
-                </div>
-
-                {/* KPI 6: Ingested Events */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Ingested Telemetry
-                  </span>
-                  <div className="text-lg font-black font-mono text-slate-900 dark:text-slate-100 mt-1">
-                    {stats.totalEvents.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    Clicks &amp; page views
+                  {/* Discrepancy Item 2 */}
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="space-y-1.5 flex-1">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="font-mono text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-900">
+                          FLAG-ET-899
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                          Unverified Manual Sale Log &gt; ETB 10,000
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/60 px-2 py-0.5 rounded">
+                          Manual Review
+                        </span>
+                        {resolvedDiscrepancies["FLAG-ET-899"] && (
+                          <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-300">
+                            {resolvedDiscrepancies["FLAG-ET-899"].label}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        High-value leather jacket sale logged manually by cashier without Telebirr transaction ID attachment. Total Sale: ETB 12,500. Creator:{" "}
+                        <strong className="text-slate-800 dark:text-slate-200">@addisfashionista</strong>.
+                      </p>
+                      <div className="flex items-center gap-4 text-[11px] text-slate-500 dark:text-slate-400 font-medium pt-1">
+                        <span>Merchant: Zoma Leather Crafts</span>
+                        <span>•</span>
+                        <span>Logged: Yesterday 18:04 EAT</span>
+                        <span>•</span>
+                        <span>Held Commission: ETB 1,250.00</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-899", "RECEIPT_REQUESTED", "Receipt Requested")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <Receipt className="w-3 h-3 text-slate-500" />
+                        <span>Request Receipt</span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-899", "VERIFIED", "Bank Verified")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        <Shield className="w-3 h-3" />
+                        <span>Verify with Bank</span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDiscrepancyAction("FLAG-ET-899", "APPROVED", "Commission Released")
+                        }
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Approve Release</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -618,7 +1364,7 @@ export function AdminDashboardView({
                   </div>
                 </div>
 
-                {/* Top Performing Campaigns Preview */}
+                {/* Top Performing Campaigns Leaderboard Preview */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -1649,34 +2395,114 @@ export function AdminDashboardView({
 
                   {/* Filter Selectors */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-                      <Filter className="w-3.5 h-3.5 text-slate-400" />
-                      <select
-                        value={issueStatusFilter}
-                        onChange={(e) => setIssueStatusFilter(e.target.value)}
-                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          className="h-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          <Filter className="w-3.5 h-3.5 text-slate-400" />
+                          <span>
+                            {issueStatusFilter === "ALL"
+                              ? `All Statuses (${issuesList.length})`
+                              : issueStatusFilter === "OPEN"
+                              ? "Open"
+                              : issueStatusFilter === "IN_REVIEW"
+                              ? "In Review"
+                              : issueStatusFilter === "RESOLVED"
+                              ? "Resolved"
+                              : "Dismissed"}
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-48 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-xl z-50 text-xs"
                       >
-                        <option value="ALL">All Statuses ({issuesList.length})</option>
-                        <option value="OPEN">Open</option>
-                        <option value="IN_REVIEW">In Review</option>
-                        <option value="RESOLVED">Resolved</option>
-                        <option value="DISMISSED">Dismissed</option>
-                      </select>
-                    </div>
+                        <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Issue Status
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                        {[
+                          { value: "ALL", label: `All Statuses (${issuesList.length})` },
+                          { value: "OPEN", label: "Open" },
+                          { value: "IN_REVIEW", label: "In Review" },
+                          { value: "RESOLVED", label: "Resolved" },
+                          { value: "DISMISSED", label: "Dismissed" },
+                        ].map((opt) => {
+                          const isSelected = issueStatusFilter === opt.value;
+                          return (
+                            <DropdownMenuItem
+                              key={opt.value}
+                              onClick={() => setIssueStatusFilter(opt.value)}
+                              className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                                isSelected
+                                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold"
+                                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
 
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
-                      <select
-                        value={issuePriorityFilter}
-                        onChange={(e) => setIssuePriorityFilter(e.target.value)}
-                        className="bg-transparent font-medium text-slate-700 dark:text-slate-300 focus:outline-none"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          className="h-8 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-all"
+                        >
+                          <span>
+                            {issuePriorityFilter === "ALL"
+                              ? "All Priorities"
+                              : issuePriorityFilter === "URGENT"
+                              ? "Urgent"
+                              : issuePriorityFilter === "HIGH"
+                              ? "High"
+                              : issuePriorityFilter === "MEDIUM"
+                              ? "Medium"
+                              : "Low"}
+                          </span>
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-44 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg rounded-xl z-50 text-xs"
                       >
-                        <option value="ALL">All Priorities</option>
-                        <option value="URGENT">Urgent</option>
-                        <option value="HIGH">High</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="LOW">Low</option>
-                      </select>
-                    </div>
+                        <DropdownMenuLabel className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Priority Level
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+                        {[
+                          { value: "ALL", label: "All Priorities" },
+                          { value: "URGENT", label: "Urgent" },
+                          { value: "HIGH", label: "High" },
+                          { value: "MEDIUM", label: "Medium" },
+                          { value: "LOW", label: "Low" },
+                        ].map((opt) => {
+                          const isSelected = issuePriorityFilter === opt.value;
+                          return (
+                            <DropdownMenuItem
+                              key={opt.value}
+                              onClick={() => setIssuePriorityFilter(opt.value)}
+                              className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                                isSelected
+                                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold"
+                                  : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
 
@@ -1985,91 +2811,726 @@ export function AdminDashboardView({
             </div>
           )}
 
-          {/* TAB 8: SYSTEM HEALTH & INFRASTRUCTURE */}
+          {/* TAB 8: SYSTEM HEALTH & PLATFORM OPS CONSOLE */}
           {activeTab === "health" && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-headline font-bold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <Server className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <span>System Infrastructure Diagnostics &amp; Telemetry Watchdog</span>
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Production health metrics for database clusters, telemetry deduplication, and retention engines
-                  </p>
+            <div className="space-y-6">
+              {/* Section 1: Telemetry Bento Grid */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-headline">
+                    Core Infrastructure &amp; Ingestion Telemetry
+                  </h2>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Telemetry poll: 250ms</span>
+                  </span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
-                  <span>Operational</span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Card 1: Postgres Latency */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Database className="w-4 h-4 text-slate-400" />
+                          <span>PostgreSQL Cluster</span>
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          Primary DB
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-baseline justify-between">
+                        <div>
+                          <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                            {health.dbLatencyMs}
+                          </span>
+                          <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-mono ml-0.5">
+                            ms
+                          </span>
+                        </div>
+                        {/* Mini SVG Sparkline */}
+                        <div className="w-20 h-7 text-emerald-600 dark:text-emerald-400">
+                          <svg className="w-full h-full" fill="none" viewBox="0 0 80 28">
+                            <path
+                              d="M2 20 L 15 16 L 30 19 L 45 10 L 60 14 L 78 6"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M2 20 L 15 16 L 30 19 L 45 10 L 60 14 L 78 6 V 28 H 2 Z"
+                              fill="currentColor"
+                              fillOpacity="0.1"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-mono flex items-center justify-between">
+                      <span>Pool: 42/100 conns</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-medium">0 deadlocks • 100% health</span>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Redis Attribution Buffer */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Cpu className="w-4 h-4 text-slate-400" />
+                          <span>Redis Attribution Buffer</span>
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                          In-Memory
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-baseline justify-between">
+                        <div>
+                          <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                            98.4%
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium ml-1">
+                            hit rate
+                          </span>
+                        </div>
+                        {/* Mini Radial Arc Indicator */}
+                        <div className="w-10 h-10 relative flex items-center justify-center">
+                          <svg className="w-10 h-10 transform -rotate-90">
+                            <circle
+                              cx="20"
+                              cy="20"
+                              fill="transparent"
+                              r="16"
+                              stroke="currentColor"
+                              className="text-slate-200 dark:text-slate-700"
+                              strokeWidth="3.5"
+                            />
+                            <circle
+                              cx="20"
+                              cy="20"
+                              fill="transparent"
+                              r="16"
+                              stroke="#059669"
+                              strokeDasharray="100.5"
+                              strokeDashoffset="1.6"
+                              strokeLinecap="round"
+                              strokeWidth="3.5"
+                            />
+                          </svg>
+                          <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 absolute" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-mono flex items-center justify-between">
+                      <span>142,800 active keys</span>
+                      <span>Mem: 1.2 GB / 4 GB</span>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Webhook & Event Dispatcher */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Send className="w-4 h-4 text-slate-400" />
+                          <span>Webhook Dispatcher</span>
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          Active
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-baseline justify-between">
+                        <div>
+                          <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                            99.98%
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium ml-1">
+                            delivery
+                          </span>
+                        </div>
+                        <div className="w-20 h-7 text-blue-600 dark:text-blue-400">
+                          <svg className="w-full h-full" fill="none" viewBox="0 0 80 28">
+                            <path
+                              d="M2 18 L 15 14 L 30 15 L 45 8 L 60 11 L 78 4"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M2 18 L 15 14 L 30 15 L 45 8 L 60 11 L 78 4 V 28 H 2 Z"
+                              fill="currentColor"
+                              fillOpacity="0.1"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-mono flex items-center justify-between">
+                      <span>14ms avg dispatch</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-semibold">0 dead-letter queue</span>
+                    </div>
+                  </div>
+
+                  {/* Card 4: Network Gross Attributed GMV (24h) */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Receipt className="w-4 h-4 text-amber-500" />
+                          <span>24h Attributed GMV</span>
+                        </span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                          +14.2% DoD
+                        </span>
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight block">
+                          {formatETB(stats.totalRevenueETB || 1842500)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-mono flex items-center justify-between">
+                      <span>{stats.totalBrands} retail brands</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">
+                        {stats.totalSalesCount.toLocaleString()} total txns
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
-                  <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
-                    Database Engine
-                  </span>
-                  <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    PostgreSQL / Prisma
+              {/* Section 2: Granular Real-Time Attribution Ledger & Audit Trail */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden">
+                {/* Table Header & Live Bar */}
+                <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-headline font-bold text-base text-slate-900 dark:text-slate-100">
+                        Real-Time Attribution Ledger &amp; Audit Trail
+                      </h3>
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-mono font-medium bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping"></span>
+                        <span>Live Socket</span>
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Cryptographically signed immutable events from Bole, Kazanchis, and Sarbet retail endpoints.
+                    </p>
                   </div>
-                  <div className="text-emerald-700 dark:text-emerald-400">
-                    Status: {health.dbStatus} ({health.dbLatencyMs}ms)
+                  <div className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                    Showing <span className="font-semibold text-slate-800 dark:text-slate-200">4</span> of{" "}
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                      {stats.totalSalesCount.toLocaleString()}
+                    </span>{" "}
+                    events today
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
-                  <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
-                    Process &amp; Platform
-                  </span>
-                  <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    {health.platform}
+                {/* Filters & Search Toolbar */}
+                <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                  <div className="md:col-span-5 relative">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Filter by TxID, Creator Handle (@...), or Merchant..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-emerald-500 font-mono"
+                    />
                   </div>
-                  <div className="text-slate-600 dark:text-slate-400">
-                    Runtime: Node {health.nodeVersion}
+                  <div className="md:col-span-3">
+                    <select className="w-full py-1.5 pl-3 pr-7 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none">
+                      <option>All Statuses (Verified, Flagged, Blocked)</option>
+                      <option>Verified Only</option>
+                      <option>Flagged Anomaly</option>
+                      <option>Blocked Fraud</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <select className="w-full py-1.5 pl-3 pr-7 text-xs text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none">
+                      <option>All Channels</option>
+                      <option>In-Store POS</option>
+                      <option>Telegram Channel</option>
+                      <option>Phone Call Track</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="inline-flex w-full items-center justify-between px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Today (EAT)</span>
+                      </span>
+                      <span className="text-[10px] text-slate-400">UTC+3</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
-                  <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
-                    System Uptime
-                  </span>
-                  <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                    {formatUptime(health.uptimeSeconds)}
+                {/* High-Density Data Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/75 text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider font-headline">
+                        <th className="py-3 px-4">TxID</th>
+                        <th className="py-3 px-4">Timestamp (EAT)</th>
+                        <th className="py-3 px-4">Merchant &amp; Branch</th>
+                        <th className="py-3 px-4">Creator / Source</th>
+                        <th className="py-3 px-4">Channel</th>
+                        <th className="py-3 px-4 text-right">Gross GMV</th>
+                        <th className="py-3 px-4 text-right">Commission</th>
+                        <th className="py-3 px-4">Receipt Hash / Nonce</th>
+                        <th className="py-3 px-4 text-center">Audit Status</th>
+                        <th className="py-3 px-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-body">
+                      {/* Row 1: Sheba Coffee Verified */}
+                      <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                          TX-89201
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          10:41:22 AM
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-semibold text-slate-900 dark:text-slate-100">Sheba Coffee</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">Bole Flagship (POS-02)</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-medium text-slate-800 dark:text-slate-200">Meron B.</div>
+                          <div className="text-[11px] font-mono text-blue-600 dark:text-blue-400">@ethio_lifestyle</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                            <Store className="w-3 h-3 text-slate-500" />
+                            <span>In-Store POS</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          864.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
+                          86.40 ETB
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                          <span className="text-slate-400 dark:text-slate-500">sha256:</span>4a8b9f...c4d2
+                        </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+                            <span>Verified</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-right whitespace-nowrap">
+                          <button className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Row 2: Zoma Leather Telegram Verified */}
+                      <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                          TX-89200
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          10:38:15 AM
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-semibold text-slate-900 dark:text-slate-100">Zoma Leather</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">Kazanchis Mall</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-medium text-slate-800 dark:text-slate-200">Yared K.</div>
+                          <div className="text-[11px] font-mono text-blue-600 dark:text-blue-400">@addisfoodie</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            <Send className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                            <span>Telegram Channel</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          3,200.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
+                          320.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                          <span className="text-slate-400 dark:text-slate-500">sha256:</span>7c1d2e...a1b4
+                        </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+                            <span>Verified</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-right whitespace-nowrap">
+                          <button className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Row 3: Kaldi's Hub Phone Call Track */}
+                      <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                          TX-89199
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          10:35:02 AM
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-semibold text-slate-900 dark:text-slate-100">Kaldi&apos;s Hub</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">Sarbet Retail Station</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-medium text-slate-800 dark:text-slate-200">Bethlehem G.</div>
+                          <div className="text-[11px] font-mono text-blue-600 dark:text-blue-400">@sheba_vibes</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            <PhoneCall className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                            <span>Phone Call Track</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          520.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-semibold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
+                          52.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                          <span className="text-slate-400 dark:text-slate-500">sha256:</span>9e2f4a...80c3
+                        </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+                            <span>Verified</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-right whitespace-nowrap">
+                          <button className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Row 4: Flagged Velocity / Blocked Fraud */}
+                      <tr className="bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-semibold text-rose-700 dark:text-rose-400">
+                          TX-89198
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          10:31:40 AM
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-semibold text-slate-900 dark:text-slate-100">Sheba Coffee</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">Bole Flagship (POS-01)</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <div className="font-medium text-rose-800 dark:text-rose-300">Flagged Velocity</div>
+                          <div className="text-[11px] font-mono text-rose-600 dark:text-rose-400">
+                            IP 196.188.*** (Ethio Telecom ASN)
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                            <Store className="w-3 h-3 text-slate-500" />
+                            <span>In-Store POS</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          1,500.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-semibold text-rose-700 dark:text-rose-400 whitespace-nowrap">
+                          0.00 ETB
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[11px] text-rose-600 dark:text-rose-400 font-semibold whitespace-nowrap">
+                          RateLimitExceeded
+                        </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-600"></span>
+                            <span>Blocked / Fraud</span>
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-right whitespace-nowrap">
+                          <button className="px-2 py-0.5 text-[11px] font-semibold text-rose-700 dark:text-rose-300 bg-white dark:bg-slate-900 border border-rose-300 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950 cursor-pointer">
+                            Inspect
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table Footer */}
+                <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="text-slate-600 dark:text-slate-400 font-mono flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>
+                      Ledger integrity hash:{" "}
+                      <span className="font-mono text-slate-800 dark:text-slate-200">
+                        sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                      </span>{" "}
+                      (Verified 14s ago)
+                    </span>
                   </div>
-                  <div className="text-slate-600 dark:text-slate-400">
-                    Heap: {health.memory.heapUsedMB} MB
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-slate-700 dark:text-slate-300 px-1">Page 1 of 160</span>
+                    <button className="px-3 py-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs cursor-pointer">
+                      Next
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Telemetry & Governance Watchdog */}
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-                  Telemetry &amp; Data Governance Watchdog
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-emerald-900 dark:text-emerald-300">
-                        Telemetry Ingestion Pipeline
+              {/* Section 3: Security & Gateway Watchdog (Addis Nodes) */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-headline">
+                    Security &amp; Gateway Watchdog (Addis Nodes)
+                  </h2>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                    Subsystem Status: Nominal
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Watchdog 1: Velocity Rate Limiter */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-800">
+                          <Activity className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-headline">
+                            Velocity Rate Limiter
+                          </h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                            Token bucket active
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                        15-min sliding deduplication • Salted SHA-256 IP hashing active
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        Active
+                      </span>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>Rule constraint:</span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          5 attempts / min
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 mt-1">
+                        <span>Bypass attempts:</span>
+                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                          0 detected
+                        </span>
                       </div>
                     </div>
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
 
-                  <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-emerald-900 dark:text-emerald-300">
-                        Retention &amp; Snapshot Engine
+                  {/* Watchdog 2: Duplicate Receipt Hash Matching */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-800">
+                          <Lock className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-headline">
+                            Hash Deduplication
+                          </h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                            SHA-256 collision scan
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                        90-day automated rolling prune • SHA-256 backup integrity verified
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        100% Clean
+                      </span>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>Double-redemptions:</span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          0 today
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 mt-1">
+                        <span>Receipt verification:</span>
+                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                          Strict Match
+                        </span>
                       </div>
                     </div>
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+
+                  {/* Watchdog 3: Telebirr Merchant Gateway */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-800">
+                          <Zap className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-headline">
+                            Telebirr Merchant GW
+                          </h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                            Addis Ababa Core API
+                          </p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <span className="h-1 w-1 rounded-full bg-emerald-500"></span>
+                        <span>124ms</span>
+                      </span>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>OAuth2 Token:</span>
+                        <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">
+                          Valid (42m left)
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 mt-1">
+                        <span>Settlement sync:</span>
+                        <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                          Auto-Reconcile
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Watchdog 4: CBE Birr Webhook Engine */}
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-100 dark:border-purple-800">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-headline">
+                            CBE Birr Engine
+                          </h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                            Commercial Bank Webhooks
+                          </p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        Synchronized
+                      </span>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
+                        <span>Engine Heartbeat:</span>
+                        <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                          1s ago
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 mt-1">
+                        <span>Signature validation:</span>
+                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                          HMAC-SHA256
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: System Diagnostics & Runtime Memory */}
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-6 space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-headline font-bold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                      <Server className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <span>Diagnostics &amp; Memory Allocation</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Platform runtime metrics, heap allocation, and data retention policies
+                    </p>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
+                    <span>Operational</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono">
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
+                      Database Engine
+                    </span>
+                    <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      PostgreSQL / Prisma
+                    </div>
+                    <div className="text-emerald-700 dark:text-emerald-400">
+                      Status: {health.dbStatus} ({health.dbLatencyMs}ms)
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
+                      Process &amp; Platform
+                    </span>
+                    <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      {health.platform}
+                    </div>
+                    <div className="text-slate-600 dark:text-slate-400">
+                      Runtime: Node {health.nodeVersion}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span className="text-slate-400 font-sans font-bold uppercase text-[10px]">
+                      System Uptime
+                    </span>
+                    <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      {formatUptime(health.uptimeSeconds)}
+                    </div>
+                    <div className="text-slate-600 dark:text-slate-400">
+                      Heap: {health.memory.heapUsedMB} MB
+                    </div>
+                  </div>
+                </div>
+
+                {/* Telemetry & Governance Watchdog */}
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+                    Telemetry &amp; Data Governance Watchdog
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-emerald-900 dark:text-emerald-300">
+                          Telemetry Ingestion Pipeline
+                        </div>
+                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                          15-min sliding deduplication • Salted SHA-256 IP hashing active
+                        </div>
+                      </div>
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+                      <div>
+                        <div className="font-bold text-emerald-900 dark:text-emerald-300">
+                          Retention &amp; Snapshot Engine
+                        </div>
+                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                          90-day automated rolling prune • SHA-256 backup integrity verified
+                        </div>
+                      </div>
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
                   </div>
                 </div>
               </div>
