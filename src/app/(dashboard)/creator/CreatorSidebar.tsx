@@ -54,35 +54,30 @@ export function CreatorSidebar({
       id: "overview" as const,
       label: "Overview & Earnings",
       icon: LayoutGrid,
-      href: "#overview",
     },
     {
       id: "campaigns" as const,
       label: "My Campaigns",
       icon: Receipt,
-      href: "#campaigns",
       badge: campaignCount > 0 ? `${campaignCount} Active` : undefined,
     },
     {
       id: "links" as const,
       label: "Tracking Deep Links & QR",
       icon: QrCode,
-      href: "#links",
     },
     {
       id: "payouts" as const,
       label: "Telebirr & CBE Payouts",
       icon: Wallet,
-      href: "#payouts",
     },
   ];
 
-  const handleNavClick = (id: "overview" | "campaigns" | "links" | "payouts", href: string) => {
+  const handleNavClick = (id: "overview" | "campaigns" | "links" | "payouts") => {
     onSelectTab(id);
     onCloseMobile();
-    const el = document.querySelector(href);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -226,7 +221,7 @@ export function CreatorSidebar({
                   <div key={item.id} className={isCollapsed ? "relative group/nav flex items-center justify-center w-full" : "w-full"}>
                     <button
                       type="button"
-                      onClick={() => handleNavClick(item.id, item.href)}
+                      onClick={() => handleNavClick(item.id)}
                       aria-label={item.label}
                       className={`flex items-center transition-all cursor-pointer ${
                         isCollapsed
@@ -283,7 +278,7 @@ export function CreatorSidebar({
               <div className="relative group/chan flex items-center justify-center">
                 <button
                   type="button"
-                  onClick={() => handleNavClick("overview", "#overview")}
+                  onClick={() => handleNavClick("overview")}
                   aria-label="Attribution Channels breakdown"
                   className="w-10 h-10 rounded-xl bg-[#0C2722]/80 dark:bg-[#060D0B]/80 hover:bg-[#16443D] dark:hover:bg-[#11211C] border border-[#16443D] dark:border-[#1E332B] flex flex-col items-center justify-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-2xs"
                 >
@@ -469,7 +464,7 @@ export function CreatorSidebar({
               <div className="relative group/bot flex items-center justify-center">
                 <button
                   type="button"
-                  onClick={() => handleNavClick("payouts", "#payouts")}
+                  onClick={() => handleNavClick("payouts")}
                   aria-label={`${creator.name} (Creator Profile & Wallet)`}
                   className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1C554C] to-[#0D2B26] dark:from-[#18332A] dark:to-[#0D1714] border border-[#2B7366] dark:border-[#28493D] text-white flex items-center justify-center font-bold text-sm shadow-xs hover:border-emerald-400 hover:scale-105 transition-all cursor-pointer relative"
                 >
@@ -529,7 +524,7 @@ export function CreatorSidebar({
               {/* Interactive Telebirr Payout Status Card: Matching BrandSidebar Payment Gateway */}
               <button
                 type="button"
-                onClick={() => handleNavClick("payouts", "#payouts")}
+                onClick={() => handleNavClick("payouts")}
                 className="w-full bg-[#163E3A]/80 dark:bg-[#101F1C]/80 rounded-xl p-2.5 flex items-center justify-between border border-[#225C52]/60 dark:border-[#20362E] transition-all hover:bg-[#1C4E49] cursor-pointer shadow-2xs h-11 text-left group/gateway"
               >
                 <div className="flex items-center gap-2 min-w-0">
