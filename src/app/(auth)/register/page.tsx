@@ -96,7 +96,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden flex flex-col lg:flex-row w-full bg-[#F7F8F5] dark:bg-[#07120F] text-slate-900 dark:text-[#F1F5F1] transition-colors duration-200">
       {/* LEFT PANEL: Merchant Growth & Addis Ababa Commerce Showcase */}
-      <div className="lg:w-[50%] xl:w-[52%] bg-[#102F2B] dark:bg-[#071714] text-slate-100 flex flex-col justify-between p-6 sm:p-8 lg:p-8 xl:p-10 lg:py-6 relative overflow-hidden border-b lg:border-b-0 lg:border-r border-[#1B4B42] dark:border-[#1E332B] lg:overflow-y-auto">
+      <div className="lg:w-[50%] xl:w-[52%] bg-[#102F2B] dark:bg-[#071714] text-slate-100 flex flex-col justify-between p-6 sm:p-8 lg:p-8 xl:p-10 lg:py-6 relative overflow-hidden border-b lg:border-b-0 lg:border-r border-[#1B4B42] dark:border-[#1E332B]">
         {/* Ambient Decorative Gradients */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#287362] opacity-25 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-600 opacity-20 rounded-full blur-3xl pointer-events-none" />
@@ -147,10 +147,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Feature Highlights Grid */}
-        <div className="relative z-10 my-3 lg:my-auto space-y-2.5">
-          <div className="grid grid-cols-1 gap-2.5">
+        <div className="relative z-10 my-2 lg:my-auto space-y-2 sm:space-y-2.5">
+          <div className="grid grid-cols-1 gap-2 sm:gap-2.5">
             {/* Feature 1 */}
-            <div className="p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
               <div className="w-8 h-8 rounded-xl bg-emerald-600/30 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
                 <Smartphone className="w-4 h-4" />
               </div>
@@ -158,7 +158,7 @@ export default function RegisterPage() {
                 <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   Zero-Hardware Deployment
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Store cashiers log and verify promo codes on any smartphone or tablet without
                   expensive proprietary POS equipment.
                 </p>
@@ -166,7 +166,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
               <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-[#D4AF37] flex items-center justify-center shrink-0 mt-0.5">
                 <Zap className="w-4 h-4" />
               </div>
@@ -174,7 +174,7 @@ export default function RegisterPage() {
                 <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   Telebirr &amp; CBE Birr Integrated
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Automated receipt pairing, instant payment reconciliation, and 4ms sync latency
                   for all transactions.
                 </p>
@@ -182,7 +182,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-3">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#17443D]/70 border border-emerald-400/20 backdrop-blur-md flex items-start gap-2.5 sm:gap-3">
               <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
                 <BarChart3 className="w-4 h-4" />
               </div>
@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 <h4 className="text-xs sm:text-sm font-headline font-bold text-white">
                   2-Tier Merchant Governance
                 </h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Full analytics cockpit for Brand Owners, plus isolated fast cashier mode for
                   storefront sales staff.
                 </p>
@@ -199,12 +199,12 @@ export default function RegisterPage() {
           </div>
 
           {/* Social Proof Quote Card */}
-          <div className="p-3 rounded-2xl bg-[#10352F]/90 border border-emerald-500/20 shadow-md">
-            <p className="text-xs text-emerald-200/90 italic font-body leading-relaxed">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-[#10352F]/90 border border-emerald-500/20 shadow-md">
+            <p className="text-[11px] sm:text-xs text-emerald-200/90 italic font-body leading-relaxed">
               &ldquo;EthioLink eliminated coupon chaos across our Bole &amp; Kazanchis branches. We
               tracked 1,200+ attributed sales in our first month alone.&rdquo;
             </p>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+            <div className="mt-1.5 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-300">
               <span className="font-semibold text-white">Sheba Artisan Coffee</span>
               <span className="font-mono text-emerald-400">Addis Ababa Retail Flagship</span>
             </div>
