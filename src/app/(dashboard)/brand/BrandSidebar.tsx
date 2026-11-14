@@ -137,14 +137,14 @@ export const BrandSidebar = React.memo(function BrandSidebar({
         />
       )}
 
-      {/* Sidebar Container: The Dark Anchor — Deep Evergreen (#10352F) in Light / Midnight Pine (#08120F) in Dark */}
+      {/* Sidebar Container: The Dark Anchor — Deep Evergreen (#102F2B / Stitch brand-950) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-[#10352F] dark:bg-[#08120F] text-white border-r border-[#1B4B42] dark:border-[#1E332B] flex flex-col justify-between transition-all duration-300 ease-in-out lg:translate-x-0 ${
-          isCollapsed ? "w-20" : "w-64"
-        } ${isMobileOpen ? "translate-x-0 shadow-2xl w-64" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-50 bg-[#102F2B] dark:bg-[#08120F] text-white border-r border-[#163E3A] dark:border-[#1A2E28] flex flex-col justify-between transition-all duration-300 ease-in-out lg:translate-x-0 ${
+          isCollapsed ? "w-20" : "w-72"
+        } ${isMobileOpen ? "translate-x-0 shadow-2xl w-72" : "-translate-x-full"}`}
       >
-        {/* Top: Brand Header */}
-        <div className={isCollapsed ? "p-3 pb-2 flex flex-col items-center" : "p-3.5 pb-2"}>
+        {/* Top: Brand Header & Store Switcher */}
+        <div className={isCollapsed ? "p-3 pb-2 flex flex-col items-center gap-2" : "p-4 pb-2 space-y-3"}>
           <div className={`flex items-center justify-between px-1 pt-0.5 ${isCollapsed ? "flex-col gap-2.5 items-center w-full" : "w-full"}`}>
             {onTabChange ? (
               <button
@@ -155,7 +155,7 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                   isCollapsed ? "justify-center relative" : ""
                 }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#102F2B] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
                 {!isCollapsed && (
@@ -181,7 +181,7 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                 title={isCollapsed ? "EthioLink Attribution Engine" : undefined}
                 className={`flex items-center gap-2.5 group/brand ${isCollapsed ? "justify-center relative" : ""}`}
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#10352F] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-[#102F2B] dark:from-[#78B99D] dark:to-[#0D2119] text-white dark:text-[#0D2119] flex items-center justify-center font-black text-base shadow-xs group-hover/brand:scale-105 transition-transform shrink-0 border border-emerald-400/20 dark:border-transparent">
                   <Layers className="w-5 h-5 text-white dark:text-[#0D2119]" />
                 </div>
                 {!isCollapsed && (
@@ -211,7 +211,7 @@ export const BrandSidebar = React.memo(function BrandSidebar({
                   onClick={onToggleCollapse}
                   title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                   aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                  className={`hidden lg:flex items-center justify-center rounded-xl text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-all cursor-pointer ${
+                  className={`hidden lg:flex items-center justify-center rounded-xl text-emerald-200/70 hover:text-white hover:bg-[#163E3A] dark:text-[#9BAAA1] dark:hover:text-white dark:hover:bg-[#142621] transition-all cursor-pointer ${
                     isCollapsed ? "w-9 h-9" : "p-1.5"
                   }`}
                 >
@@ -228,15 +228,50 @@ export const BrandSidebar = React.memo(function BrandSidebar({
             {/* Mobile Close Button */}
             <button
               onClick={onCloseMobile}
-              className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#16443D] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg text-emerald-200/70 hover:text-white hover:bg-[#163E3A] dark:text-slate-300 dark:hover:text-white dark:hover:bg-[#142621] transition-colors cursor-pointer"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
+          {/* Store Switcher Card: Positioned right under Header matching Stitch Screen 71260bb1 */}
+          {!isCollapsed ? (
+            <button
+              type="button"
+              onClick={() => setIsMerchantModalOpen(true)}
+              className="w-full bg-[#163E3A] hover:bg-[#1C4E49] dark:bg-[#11211C] dark:hover:bg-[#18332A] rounded-xl p-3 flex items-center justify-between transition-colors cursor-pointer border border-[#225C52]/60 dark:border-[#20362E] text-left shadow-2xs group/store"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-[#D4AF37] dark:text-[#F0B85C] flex items-center justify-center shrink-0">
+                  <Store className="w-4 h-4" />
+                </div>
+                <div className="truncate">
+                  <p className="text-xs font-semibold text-white truncate leading-tight group-hover/store:text-emerald-200 transition-colors">
+                    {brandName}
+                  </p>
+                  <p className="text-[10px] text-slate-300 dark:text-[#9BAAA1] truncate mt-0.5">
+                    Bole Flagship • Addis Ababa
+                  </p>
+                </div>
+              </div>
+              <ChevronsUpDown className="w-4 h-4 text-slate-300 dark:text-[#9BAAA1] shrink-0" />
+            </button>
+          ) : (
+            <div className="pt-1 flex justify-center w-full">
+              <button
+                type="button"
+                onClick={() => setIsMerchantModalOpen(true)}
+                title={`${brandName} (Bole Flagship • Addis Ababa)`}
+                className="w-10 h-10 rounded-xl bg-[#163E3A] hover:bg-[#1C4E49] dark:bg-[#11211C] text-amber-300 dark:text-[#F0B85C] flex items-center justify-center transition-colors cursor-pointer border border-[#225C52]/60 dark:border-[#20362E] shadow-2xs"
+              >
+                <Store className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {isCollapsed && (
-            <div className="w-8 h-px bg-[#1B4B42]/60 dark:bg-[#1E332B]/60 mx-auto mt-2" />
+            <div className="w-8 h-px bg-[#163E3A] dark:bg-[#1E332B] mx-auto mt-1" />
           )}
         </div>
 
@@ -905,84 +940,56 @@ export const BrandSidebar = React.memo(function BrandSidebar({
             </div>
           ) : (
             <>
-              {/* Interactive Merchant Account Switcher Card */}
-              <button
-                type="button"
-                onClick={() => setIsMerchantModalOpen(true)}
-                className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 dark:text-[#F0B85C] flex items-center justify-center shrink-0">
-                    <Store className="w-4 h-4" />
-                  </div>
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-white truncate leading-tight">
-                      {brandName}
-                    </p>
-                    <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
-                      {staffCount > 0 ? `${staffCount} Staff` : "Merchant"} • Bole Flagship
-                    </p>
-                  </div>
-                </div>
-                <ChevronsUpDown className="w-4 h-4 text-emerald-200/60 dark:text-[#9BAAA1] shrink-0" />
-              </button>
-
-              {/* Interactive Telebirr & CBE Birr Live Integration Card */}
+              {/* Interactive Telebirr & CBE Birr Live Integration Card (Stitch: bg-brand-900/80) */}
               <button
                 type="button"
                 onClick={() => setIsGatewayModalOpen(true)}
-                className="w-full bg-[#16443D] dark:bg-[#11211C] rounded-xl p-2.5 flex items-center justify-between border border-[#225C52] dark:border-[#20362E] transition-all hover:bg-[#1C554C] dark:hover:bg-[#18332A] cursor-pointer shadow-2xs h-12 text-left"
+                className="w-full bg-[#163E3A]/80 dark:bg-[#101F1C]/80 rounded-xl p-2.5 flex items-center justify-between border border-[#225C52]/60 dark:border-[#20362E] transition-all hover:bg-[#1C4E49] cursor-pointer shadow-2xs h-11 text-left group/gateway"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 dark:text-[#83D1A5] flex items-center justify-center shrink-0">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse" />
-                  </div>
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-white truncate leading-tight">
-                      Telebirr &amp; CBE Birr
-                    </p>
-                    <p className="text-[11px] text-emerald-200/70 dark:text-[#9BAAA1] truncate mt-0.5">
-                      Gateway Sync v2.4
-                    </p>
-                  </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 dark:bg-[#83D1A5] animate-pulse shrink-0" />
+                  <span className="text-[11px] font-medium text-slate-200 group-hover/gateway:text-white truncate">
+                    Telebirr &amp; CBE Birr
+                  </span>
                 </div>
-                <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-900/80 dark:bg-[#193629] px-2 py-0.5 rounded-md border border-emerald-500/40 dark:border-[#28493D] shrink-0">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-300 dark:text-[#83D1A5] bg-emerald-950/80 dark:bg-[#193629] px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
                   Active
                 </span>
               </button>
 
-              {/* User Profile & Theme Toggle Row */}
-              <div className="flex items-center justify-between px-1 h-10">
+              {/* User Profile, Theme Toggle & Sign Out (Stitch Spec) */}
+              <div className="flex items-center justify-between px-1.5 pt-1">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    {brandName.charAt(0)}
+                  <div className="w-8 h-8 rounded-full bg-emerald-600 dark:bg-[#78B99D] text-white dark:text-[#0D2119] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                    {ownerName ? ownerName.charAt(0).toUpperCase() : brandName.charAt(0)}
                   </div>
                   <div className="min-w-0">
                     <span className="font-semibold text-xs text-white block truncate leading-tight">
                       {ownerName}
                     </span>
-                    <span className="text-[11px] text-emerald-200/60 dark:text-[#9BAAA1] block truncate mt-0.5">
+                    <span className="text-[10px] text-slate-400 dark:text-[#9BAAA1] block truncate mt-0.5">
                       {role === "OWNER" ? "Brand Merchant" : role}
                     </span>
                   </div>
                 </div>
 
-                <ThemeToggle
-                  size="sm"
-                  className="!bg-[#16443D] dark:!bg-[#11211C] !border-[#225C52] dark:!border-[#20362E] !text-emerald-100 dark:!text-[#9BAAA1] hover:!bg-[#1C554C] dark:hover:!bg-[#18332A] rounded-lg"
-                />
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <ThemeToggle
+                    size="sm"
+                    className="!bg-[#163E3A] hover:!bg-[#1C4E49] !border-[#225C52] !text-emerald-100 rounded-lg"
+                  />
+                  <form action="/api/auth/logout" method="POST" className="inline-flex">
+                    <button
+                      type="submit"
+                      aria-label="Sign Out"
+                      title="Sign Out"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#163E3A] transition-colors cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </form>
+                </div>
               </div>
-
-              {/* Sign Out Action Button */}
-              <form action="/api/auth/logout" method="POST">
-                <button
-                  type="submit"
-                  className="w-full h-9 flex items-center justify-center gap-2 px-3 rounded-xl text-xs font-semibold text-[#C5DCD6] dark:text-[#9BAAA1] bg-[#16443D]/70 dark:bg-transparent hover:text-rose-300 hover:bg-rose-950/40 border border-[#225C52] dark:border-[#20362E] shadow-2xs transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Sign Out</span>
-                </button>
-              </form>
             </>
           )}
         </div>
