@@ -842,8 +842,10 @@ export function AdminDashboardView({
 
               {/* Main Workspace Split: Brands Table + Live Tenant Inspector */}
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-                {/* Left 8 Cols: Brand Workspaces Data Table Card */}
-                <div className="xl:col-span-8 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
+                {/* Left 8 Cols: Brand Workspaces Data Table + Live Activity Feeds */}
+                <div className="xl:col-span-8 space-y-6">
+                  {/* Brand Workspaces Data Table Card */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs overflow-hidden flex flex-col">
                   {/* Filter Toolbar */}
                   <div className="p-4 bg-slate-50 dark:bg-[#0A1A15] border-b border-slate-200/80 dark:border-[#1E332B] flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div className="relative flex-1">
@@ -1020,6 +1022,120 @@ export function AdminDashboardView({
                     </div>
                   </div>
                 </div>
+
+                {/* Two Column Sub-Grid: Recent Sales & Top Campaigns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Recent Sales Preview */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1] flex items-center gap-2">
+                          <Receipt className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                          <span>Recent POS Transactions</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                          Latest sales logged by in-store cashiers
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab("sales")}
+                        className="text-xs font-bold text-emerald-600 dark:text-[#78B99D] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>View All</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="divide-y divide-slate-100 dark:divide-[#1E332B]">
+                      {audit.sales.slice(0, 4).map((sale) => (
+                        <div key={sale.id} className="py-2.5 flex items-center justify-between text-xs">
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-[#F1F5F1]">
+                              {sale.brandName}
+                            </div>
+                            <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">
+                              Campaign: {sale.campaignName} • Promo:{" "}
+                              <span className="font-mono font-bold text-emerald-700 dark:text-[#78B99D]">
+                                {sale.promoCode}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-black font-mono text-emerald-700 dark:text-[#78B99D]">
+                              {formatETB(sale.amountETB)}
+                            </div>
+                            <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
+                              {new Date(sale.recordedAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Top Performing Campaigns Leaderboard Preview */}
+                  <div className="bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl p-5 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-[#F1F5F1] flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-emerald-600 dark:text-[#78B99D]" />
+                          <span>Top Campaigns</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-[#9BAAA1]">
+                          Ranked by verified revenue
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab("analytics")}
+                        className="text-xs font-bold text-emerald-600 dark:text-[#78B99D] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Analytics</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="divide-y divide-slate-100 dark:divide-[#1E332B]">
+                      {analytics.topCampaigns.length === 0 ? (
+                        <div className="py-6 text-center text-xs text-slate-400 dark:text-[#9BAAA1]">
+                          No sales recorded yet for active campaigns.
+                        </div>
+                      ) : (
+                        analytics.topCampaigns.slice(0, 4).map((camp, idx) => (
+                          <div key={camp.id} className="py-2.5 flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-[#0A1A15] text-slate-700 dark:text-[#C5DCD6] font-mono font-bold text-[10px] flex items-center justify-center border border-slate-200/60 dark:border-[#1E332B]">
+                                #{idx + 1}
+                              </span>
+                              <div>
+                                <div className="font-bold text-slate-900 dark:text-[#F1F5F1]">
+                                  {camp.name}
+                                </div>
+                                <div className="text-[11px] text-slate-500 dark:text-[#9BAAA1]">
+                                  {camp.brandName} • Code:{" "}
+                                  <span className="font-mono font-bold text-slate-700 dark:text-[#C5DCD6]">
+                                    {camp.promoCode}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-black font-mono text-emerald-700 dark:text-[#78B99D]">
+                                {formatETB(camp.revenueETB)}
+                              </div>
+                              <div className="text-[10px] text-slate-400 dark:text-[#9BAAA1] font-mono">
+                                {camp.salesCount} orders
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
                 {/* Right 4 Cols: Live Tenant Inspector Drawer */}
                 <div className="xl:col-span-4 bg-white dark:bg-[#14211D] border border-slate-200/80 dark:border-[#1E332B] rounded-2xl shadow-xs p-6 space-y-6">
@@ -1307,119 +1423,6 @@ export function AdminDashboardView({
                         <span>Approve Release</span>
                       </button>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Two Column Grid: Recent Sales & Top Campaigns */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Sales Preview */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Recent POS Transactions</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Latest sales logged by in-store cashiers
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setActiveTab("sales")}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>View All</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {audit.sales.slice(0, 5).map((sale) => (
-                      <div key={sale.id} className="py-3 flex items-center justify-between text-xs">
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-slate-100">
-                            {sale.brandName}
-                          </div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Campaign: {sale.campaignName} • Promo:{" "}
-                            <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                              {sale.promoCode}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-black font-mono text-emerald-700 dark:text-emerald-400">
-                            {formatETB(sale.amountETB)}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {new Date(sale.recordedAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Performing Campaigns Leaderboard Preview */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-bold font-headline text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Top Campaigns Leaderboard</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Ranked by verified revenue generated
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setActiveTab("analytics")}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Deep Analytics</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {analytics.topCampaigns.length === 0 ? (
-                      <div className="py-6 text-center text-xs text-slate-400">
-                        No sales recorded yet for active campaigns.
-                      </div>
-                    ) : (
-                      analytics.topCampaigns.slice(0, 5).map((camp, idx) => (
-                        <div key={camp.id} className="py-3 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-3">
-                            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono font-bold text-[10px] flex items-center justify-center">
-                              #{idx + 1}
-                            </span>
-                            <div>
-                              <div className="font-bold text-slate-900 dark:text-slate-100">
-                                {camp.name}
-                              </div>
-                              <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                                {camp.brandName} • Code:{" "}
-                                <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
-                                  {camp.promoCode}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-black font-mono text-emerald-700 dark:text-emerald-400">
-                              {formatETB(camp.revenueETB)}
-                            </div>
-                            <div className="text-[10px] text-slate-400 font-mono">
-                              {camp.salesCount} orders
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
               </div>
