@@ -1672,14 +1672,15 @@ export function CreatorView({ initialData, origin }: CreatorViewProps) {
                     Direct mobile wallet disbursements, automated batch schedules, and TIN-compliant tax statements.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsPayoutModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-[#059669] hover:bg-[#047857] text-white rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
-                >
-                  <Bolt className="w-4 h-4" />
-                  <span>Request Instant Telebirr Transfer</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>EthSwitch Rails Live</span>
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-100 dark:bg-[#10231D] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-[#1A332C]">
+                    0% Platform Fee
+                  </span>
+                </div>
               </div>
 
               {/* Financial KPI Metric Row (4 cards) */}
